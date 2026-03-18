@@ -6,27 +6,23 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
 import TextInput from "@/components/ui/text-input";
-import { cn } from "@/lib/utils";
+import { authStyles } from "@/features/auth/styles/authStyles";
 
 const LoginForm = () => {
   const [email, setEmail] = React.useState("john.doe@email.com");
   const [password, setPassword] = React.useState("*********");
 
   return (
-    <div className={cn("w-full", "max-w-114", "space-y-10")}>
-      <div className={cn("space-y-8")}>
-        <div className={cn("space-y-1.5")}>
-          <h1
-            className={cn("text-[28px]", "font-semibold", "text-text-primary")}
-          >
-            Welcome Back!
-          </h1>
-          <p className={cn("text-base", "text-text-secondary")}>
+    <div className={authStyles.formRoot}>
+      <div className={authStyles.formSection}>
+        <div className={authStyles.titleBlock}>
+          <h1 className={authStyles.title}>Welcome Back!</h1>
+          <p className={authStyles.subtitle}>
             Login to your account and manage your leads
           </p>
         </div>
 
-        <div className={cn("space-y-4.5")}>
+        <div className={authStyles.loginFields}>
           <TextInput
             id="email"
             label="Email address"
@@ -35,7 +31,7 @@ const LoginForm = () => {
             placeholder="john.doe@email.com"
             startIcon={
               <svg
-                className={cn("size-5", "text-primary")}
+                className={authStyles.inputIcon}
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
@@ -56,7 +52,7 @@ const LoginForm = () => {
             }
           />
 
-          <div className={cn("space-y-2")}>
+          <div className={authStyles.passwordBlock}>
             <PasswordInput
               id="password"
               label="Password"
@@ -64,7 +60,7 @@ const LoginForm = () => {
               setValue={setPassword}
               startIcon={
                 <svg
-                  className={cn("size-5", "text-primary")}
+                  className={authStyles.inputIcon}
                   viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
@@ -87,8 +83,11 @@ const LoginForm = () => {
                 </svg>
               }
             />
-            <div className={cn("flex", "justify-end")}>
-              <Link href="/auth/forgot-password" className={cn("text-sm", "font-medium", "text-secondary")}>
+            <div className={authStyles.forgotLinkWrap}>
+              <Link
+                href="/auth/forgot-password"
+                className={authStyles.forgotLink}
+              >
                 Forgot password?
               </Link>
             </div>
@@ -96,7 +95,7 @@ const LoginForm = () => {
         </div>
       </div>
 
-      <Button type="submit" size="xl" className={cn("w-full")}>
+      <Button type="submit" size="xl" className={authStyles.ctaButton}>
         Log in
       </Button>
     </div>

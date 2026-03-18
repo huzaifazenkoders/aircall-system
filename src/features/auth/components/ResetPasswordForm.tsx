@@ -5,7 +5,7 @@ import { LockKeyhole } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
-import { cn } from "@/lib/utils";
+import { authStyles } from "@/features/auth/styles/authStyles";
 
 const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
   const [password, setPassword] = React.useState("*********");
@@ -13,30 +13,31 @@ const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
 
   return (
     <form
-      className={cn("w-full", "max-w-114", "space-y-10")}
+      className={authStyles.formRoot}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit?.();
       }}
     >
-      <div className={cn("space-y-8")}>
-        <div className={cn("space-y-1.5")}>
-          <h1 className={cn("text-[28px]", "font-semibold", "text-text-primary")}>
-            Reset password
-          </h1>
-          <p className={cn("text-base", "text-text-secondary")}>
+      <div className={authStyles.formSection}>
+        <div className={authStyles.titleBlock}>
+          <h1 className={authStyles.title}>Reset password</h1>
+          <p className={authStyles.subtitle}>
             Create a new password for your account
           </p>
         </div>
 
-        <div className={cn("space-y-5")}>
+        <div className={authStyles.resetFields}>
           <PasswordInput
             id="password"
             label="Password"
             value={password}
             setValue={setPassword}
             startIcon={
-              <LockKeyhole className={cn("size-5", "text-primary")} aria-hidden="true" />
+              <LockKeyhole
+                className={authStyles.inputIcon}
+                aria-hidden="true"
+              />
             }
           />
 
@@ -46,13 +47,16 @@ const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
             value={confirmPassword}
             setValue={setConfirmPassword}
             startIcon={
-              <LockKeyhole className={cn("size-5", "text-primary")} aria-hidden="true" />
+              <LockKeyhole
+                className={authStyles.inputIcon}
+                aria-hidden="true"
+              />
             }
           />
         </div>
       </div>
 
-      <Button type="submit" size="xl" className={cn("w-full")}>
+      <Button type="submit" size="xl" className={authStyles.ctaButton}>
         Save
       </Button>
     </form>

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { authStyles } from "@/features/auth/styles/authStyles";
 
 const AuthBackLink = ({
   href = "/auth/sign-in",
@@ -14,24 +14,11 @@ const AuthBackLink = ({
   label?: string;
 }) => {
   return (
-    <Link
-      href={href}
-      className={cn(
-        "inline-flex",
-        "items-center",
-        "gap-2",
-        "text-sm",
-        "font-medium",
-        "text-text-primary",
-        "transition-colors",
-        "hover:text-secondary"
-      )}
-    >
-      <ArrowLeft className={cn("size-4")} aria-hidden="true" />
+    <Link href={href} className={authStyles.backButton}>
+      <ArrowLeft className={authStyles.backIcon} aria-hidden="true" />
       <span>{label}</span>
     </Link>
   );
 };
 
 export default AuthBackLink;
-
