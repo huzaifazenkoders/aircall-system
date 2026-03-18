@@ -70,6 +70,7 @@
   --color-status-invalid-fg: var(--status-invalid-fg);
   --color-status-ban-bg: var(--status-ban-bg);
   --color-status-ban-fg: var(--status-ban-fg);
+  --color-aircall-callbar: var(--aircall-callbar);
 }
 
 :root {
@@ -130,6 +131,7 @@
   --status-invalid-fg: #6B7280;
   --status-ban-bg: #E5E7EB;
   --status-ban-fg: #374151;
+  --aircall-callbar: #212636;
 }
 
 /* ========================|| Util Classes ||======================== */
