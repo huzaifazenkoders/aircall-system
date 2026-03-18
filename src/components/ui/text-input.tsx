@@ -36,6 +36,7 @@ const TextInput = ({
           </span>
         )}
         <input
+          {...rest}
           type="text"
           className={cn(
             "h-11",
@@ -53,7 +54,6 @@ const TextInput = ({
             hasEndIcon && "pr-10",
             rest.className
           )}
-          {...rest}
           value={value}
           onChange={(e) => {
             setValue(e.target.value);
