@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
@@ -87,12 +88,9 @@ const LoginForm = () => {
               }
             />
             <div className={cn("flex", "justify-end")}>
-              <button
-                type="button"
-                className={cn("text-sm", "font-medium", "text-secondary")}
-              >
+              <Link href="/auth/forgot-password" className={cn("text-sm", "font-medium", "text-secondary")}>
                 Forgot password?
-              </button>
+              </Link>
             </div>
           </div>
         </div>

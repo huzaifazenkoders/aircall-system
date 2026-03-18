@@ -48,9 +48,12 @@
 
   --color-text-primary:var(--text-primary);
   --color-text-secondary:var(--text-secondary);
+  --color-text-inverse:var(--text-inverse);
+  --color-text-inverse-muted:var(--text-inverse-muted);
   --color-border-primary:var(--border-primary);
   --color-input:var(--input);
   --gradient:var(--gradient);
+  --color-brand-accent:var(--brand-accent);
 }
 
 :root {
@@ -89,10 +92,15 @@
 
   --text-primary:#212636;
   --text-secondary:#667085;
+  --text-inverse:#FFFFFF;
+  --text-inverse-muted:#DCDFE4;
   --border-primary:#DCDFE4;
   --input:#FFFFFF;
   --gradient:linear-gradient(180deg, #073031 0%, #183D3E 100%);
+  --brand-accent:#2FBF9B;
 }
+
+/* ========================|| Util Classes ||======================== */
 
 @layer base {
   * {
@@ -115,5 +123,21 @@
 @layer utilities {
   .dropdown-content-width-full {
     width: var(--radix-dropdown-menu-trigger-width);
+  }
+}
+
+/* ========================|| Button Ripple Animation ||======================== */
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
   }
 }
