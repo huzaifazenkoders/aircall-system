@@ -36,7 +36,7 @@ const AssignedLeadActiveState = () => {
       </div>
 
       <button onClick={() => dial("+923302546626")} disabled={!isReady}>
-        {isReady ? "Open" : "Loading Aircall..."}
+        {isReady ? "Dial number" : "Loading Aircall..."}
       </button>
       <AssignedLeadCallBar />
 
