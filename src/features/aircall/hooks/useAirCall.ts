@@ -16,11 +16,10 @@ export function useAircall({ containerId, onCallEnded }: Props) {
     if (phoneRef.current) return;
 
     const phone = new AircallPhone({
-      domToLoadWorkspace: containerId,
-      size: "auto",
-      onLogin: (settings) => {
+      domToLoadPhone: containerId,
+      onLogin: () => {
         setIsReady(true);
-        console.log("Aircall agent logged in", settings);
+        console.log("Aircall agent logged in");
       },
       onLogout: () => {
         setIsReady(false);
@@ -28,12 +27,12 @@ export function useAircall({ containerId, onCallEnded }: Props) {
       }
     });
 
-    phone.on("outgoing_call", (data) => {
-      console.log("Call started", data);
+    phone.on("outgoing_call", () => {
+      console.log("Call started");
     });
 
     phone.on("call_ended", (data) => {
-      console.log("Call ended", data);
+      console.log("Call ended");
 
       if (onCallEnded) {
         onCallEnded(data);
@@ -41,7 +40,7 @@ export function useAircall({ containerId, onCallEnded }: Props) {
     });
 
     phoneRef.current = phone;
-    console.log("phone", phone);
+    console.log("Aircall workspace initialized");
 
     return () => {
       phoneRef.current = null;
@@ -53,9 +52,9 @@ export function useAircall({ containerId, onCallEnded }: Props) {
     phoneRef.current?.send(
       "dial_number",
       { phone_number: number },
-      (success, response) => {
+      (success) => {
         if (!success) {
-          console.error("Aircall dial failed", response);
+          console.error("Aircall dial failed");
         }
       }
     );

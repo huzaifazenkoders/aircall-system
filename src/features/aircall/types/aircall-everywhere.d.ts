@@ -1,9 +1,7 @@
 declare module "aircall-everywhere" {
   interface AircallOptions {
-    domToLoadWorkspace?: string;
+    domToLoadPhone?: string;
     integrationToLoad?: string;
-    size?: "big" | "small" | "auto";
-    debug?: boolean;
     onLogin?: (settings: any) => void;
     onLogout?: () => void;
   }
