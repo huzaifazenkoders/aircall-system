@@ -8,7 +8,7 @@ import AppTopbar from "@/components/custom/app-shell/AppTopbar";
 
 const AppShell = ({
   children,
-  activeKey = "list",
+  activeKey,
   className
 }: {
   children: React.ReactNode;
@@ -24,7 +24,7 @@ const AppShell = ({
 }) => {
   return (
     <div className={cn("min-h-screen bg-background", className)}>
-      <div className="mx-auto grid w-full grid-cols-[300px_1fr] gap-6 p-3">
+      <div className="mx-auto grid min-h-screen w-full grid-cols-1 gap-6 p-3 lg:grid-cols-[300px_1fr]">
         <AppSidebar activeKey={activeKey} />
         <div className="flex min-w-0 flex-col">
           <AppTopbar />

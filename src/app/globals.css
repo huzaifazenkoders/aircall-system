@@ -71,6 +71,13 @@
   --color-status-ban-bg: var(--status-ban-bg);
   --color-status-ban-fg: var(--status-ban-fg);
   --color-aircall-callbar: var(--aircall-callbar);
+  --color-overlay-strong: var(--overlay-strong);
+  --color-success-soft: var(--success-soft);
+  --color-success-fg: var(--success-fg);
+  --color-stat-card-bg: var(--stat-card-bg);
+  --color-panel-muted: var(--panel-muted);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
 }
 
 :root {
@@ -132,6 +139,13 @@
   --status-ban-bg: #E5E7EB;
   --status-ban-fg: #374151;
   --aircall-callbar: #212636;
+  --overlay-strong: rgba(17, 24, 39, 0.34);
+  --success-soft: #CFF8EE;
+  --success-fg: #14806A;
+  --stat-card-bg: #DDF8FA;
+  --panel-muted: #667085;
+  --danger: #EE3124;
+  --danger-foreground: #FFFFFF;
 }
 
 /* ========================|| Util Classes ||======================== */

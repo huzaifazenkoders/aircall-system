@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboardIcon,
   ListIcon,
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { key: "dashboard", label: "Dashboard", href: "#", icon: LayoutDashboardIcon },
   { key: "list", label: "List Management", href: "/list", icon: ListIcon },
-  { key: "users", label: "Users", href: "#", icon: UsersIcon },
+  { key: "users", label: "Users", href: "/users", icon: UsersIcon },
   { key: "groups", label: "Groups", href: "#", icon: UsersRoundIcon },
   { key: "workflows", label: "Workflows", href: "#", icon: WorkflowIcon },
   { key: "logs", label: "Call Logs", href: "#", icon: PhoneCallIcon },
@@ -28,7 +29,7 @@ const navItems = [
 const AppSidebar = ({
   activeKey,
 }: {
-  activeKey:
+  activeKey?:
     | "dashboard"
     | "list"
     | "users"
@@ -37,8 +38,17 @@ const AppSidebar = ({
     | "logs"
     | "settings";
 }) => {
+  const pathname = usePathname();
+  const resolvedActiveKey =
+    activeKey ??
+    (pathname.startsWith("/users")
+      ? "users"
+      : pathname.startsWith("/list")
+        ? "list"
+        : "dashboard");
+
   return (
-    <aside className="sticky top-6 flex h-[calc(100vh-48px)] flex-col rounded-3xl bg-[image:var(--gradient)] px-7 py-8 text-white">
+    <aside className="sticky top-3 hidden h-[calc(100vh-24px)] flex-col rounded-4xl bg-[image:var(--gradient)] px-7 py-8 text-white lg:flex">
       <div className="flex items-center gap-3">
         <div className="grid size-10 place-items-center rounded-xl bg-brand-accent/20">
           <HexagonIcon className="size-6 text-brand-accent" aria-hidden="true" />
@@ -51,7 +61,7 @@ const AppSidebar = ({
       <nav className="mt-12 flex flex-1 flex-col gap-3">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = item.key === activeKey;
+          const isActive = item.key === resolvedActiveKey;
 
           return (
             <Link
@@ -79,4 +89,3 @@ const AppSidebar = ({
 };
 
 export default AppSidebar;
-
