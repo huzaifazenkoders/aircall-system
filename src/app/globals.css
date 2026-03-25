@@ -146,6 +146,17 @@
   --panel-muted: #667085;
   --danger: #EE3124;
   --danger-foreground: #FFFFFF;
+  --workflow-card-mint: #ECFAFA;
+  --workflow-card-lilac: #ECEFFE;
+  --workflow-card-cream: #FFF8E3;
+  --workflow-card-sky: #E9FBFF;
+  --workflow-card-lime: #F2FFE3;
+  --workflow-badge-default: #94F1E1;
+  --workflow-badge-default-fg: #0E5D59;
+  --workflow-tag: #A7EFE6;
+  --workflow-tag-fg: #0E7C77;
+  --workflow-button-muted: #D7DCE5;
+  --workflow-button-muted-fg: #62708A;
 }
 
 /* ========================|| Util Classes ||======================== */
