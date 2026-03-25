@@ -78,6 +78,14 @@
   --color-panel-muted: var(--panel-muted);
   --color-danger: var(--danger);
   --color-danger-foreground: var(--danger-foreground);
+  --color-status-no-answer-bg: var(--status-no-answer-bg);
+  --color-status-no-answer-fg: var(--status-no-answer-fg);
+  --color-status-callback-bg: var(--status-callback-bg);
+  --color-status-callback-fg: var(--status-callback-fg);
+  --color-status-not-interested-bg: var(--status-not-interested-bg);
+  --color-status-not-interested-fg: var(--status-not-interested-fg);
+  --color-status-wrong-number-bg: var(--status-wrong-number-bg);
+  --color-status-wrong-number-fg: var(--status-wrong-number-fg);
 }
 
 :root {
@@ -146,6 +154,14 @@
   --panel-muted: #667085;
   --danger: #EE3124;
   --danger-foreground: #FFFFFF;
+  --status-no-answer-bg: #F3F4F6;
+  --status-no-answer-fg: #5F6368;
+  --status-callback-bg: #E7EBFF;
+  --status-callback-fg: #5D63FF;
+  --status-not-interested-bg: #FFF7E8;
+  --status-not-interested-fg: #D36A08;
+  --status-wrong-number-bg: #FFE0DC;
+  --status-wrong-number-fg: #F04438;
   --workflow-card-mint: #ECFAFA;
   --workflow-card-lilac: #ECEFFE;
   --workflow-card-cream: #FFF8E3;

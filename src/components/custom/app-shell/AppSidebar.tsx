@@ -22,7 +22,7 @@ const navItems = [
   { key: "users", label: "Users", href: "/users", icon: UsersIcon },
   { key: "groups", label: "Groups", href: "/groups", icon: UsersRoundIcon },
   { key: "workflows", label: "Workflows", href: "/workflows", icon: WorkflowIcon },
-  { key: "logs", label: "Call Logs", href: "#", icon: PhoneCallIcon },
+  { key: "logs", label: "Call Logs", href: "/call-logs", icon: PhoneCallIcon },
   { key: "settings", label: "Settings", href: "#", icon: SettingsIcon },
 ] as const;
 
@@ -47,6 +47,8 @@ const AppSidebar = ({
         ? "groups"
       : pathname.startsWith("/workflows")
         ? "workflows"
+      : pathname.startsWith("/call-logs")
+        ? "logs"
       : pathname.startsWith("/list")
         ? "list"
         : "dashboard");

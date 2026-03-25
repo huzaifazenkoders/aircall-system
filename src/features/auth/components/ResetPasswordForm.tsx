@@ -7,7 +7,21 @@ import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
 import { authStyles } from "@/features/auth/styles/authStyles";
 
-const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
+const ResetPasswordForm = ({
+  onSubmit,
+  title = "Reset password",
+  subtitle = "Create a new password for your account",
+  passwordLabel = "Password",
+  confirmPasswordLabel = "Re-type Password",
+  submitLabel = "Save"
+}: {
+  onSubmit?: () => void;
+  title?: string;
+  subtitle?: string;
+  passwordLabel?: string;
+  confirmPasswordLabel?: string;
+  submitLabel?: string;
+}) => {
   const [password, setPassword] = React.useState("*********");
   const [confirmPassword, setConfirmPassword] = React.useState("*********");
 
@@ -21,18 +35,17 @@ const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
     >
       <div className={authStyles.formSection}>
         <div className={authStyles.titleBlock}>
-          <h1 className={authStyles.title}>Reset password</h1>
-          <p className={authStyles.subtitle}>
-            Create a new password for your account
-          </p>
+          <h1 className={authStyles.title}>{title}</h1>
+          {subtitle ? <p className={authStyles.subtitle}>{subtitle}</p> : null}
         </div>
 
         <div className={authStyles.resetFields}>
           <PasswordInput
             id="password"
-            label="Password"
+            label={passwordLabel}
             value={password}
             setValue={setPassword}
+            showToggle={false}
             startIcon={
               <LockKeyhole
                 className={authStyles.inputIcon}
@@ -43,9 +56,10 @@ const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
 
           <PasswordInput
             id="confirmPassword"
-            label="Re-type Password"
+            label={confirmPasswordLabel}
             value={confirmPassword}
             setValue={setConfirmPassword}
+            showToggle={false}
             startIcon={
               <LockKeyhole
                 className={authStyles.inputIcon}
@@ -57,7 +71,7 @@ const ResetPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
       </div>
 
       <Button type="submit" size="xl" className={authStyles.ctaButton}>
-        Save
+        {submitLabel}
       </Button>
     </form>
   );

@@ -7,6 +7,8 @@ interface Props {
   error?: string;
   htmlFor?: string;
   required?: boolean;
+  className?: string;
+  labelClassName?: string;
 }
 
 const LabelContainer = ({
@@ -14,12 +16,23 @@ const LabelContainer = ({
   error,
   label,
   htmlFor,
-  required
+  required,
+  className,
+  labelClassName
 }: Props) => {
   return (
-    <div className={cn("flex flex-col gap-2")}>
+    <div className={cn("flex", "flex-col", "gap-2", className)}>
       {label && (
-        <label htmlFor={htmlFor}>
+        <label
+          htmlFor={htmlFor}
+          className={cn(
+            "text-[0.95rem]",
+            "font-medium",
+            "leading-6",
+            "text-text-primary",
+            labelClassName
+          )}
+        >
           {label}
           {required && <span className="text-xl text-red-600 ms-1">*</span>}
         </label>

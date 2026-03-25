@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { authStyles } from "@/features/auth/styles/authStyles";
 
 const AuthBackLink = ({
-  href = "/auth/sign-in",
+  href = "/dialer/auth/sign-in",
   label = "Back"
 }: {
   href?: string;

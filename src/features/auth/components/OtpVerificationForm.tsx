@@ -1,20 +1,20 @@
 "use client";
 
 import React from "react";
-import { KeyRound } from "lucide-react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import TextInput from "@/components/ui/text-input";
 import { authStyles } from "@/features/auth/styles/authStyles";
+import { cn } from "@/lib/utils";
 
 const OtpVerificationForm = ({
   onSubmit,
-  hint = "Enter the 6-digit code we sent to your email"
+  email = "alex@example.com"
 }: {
   onSubmit?: () => void;
-  hint?: string;
+  email?: string;
 }) => {
-  const [otp, setOtp] = React.useState("");
+  const [otp, setOtp] = React.useState(["1", "", "", "", "", ""]);
 
   return (
     <form
@@ -26,26 +26,49 @@ const OtpVerificationForm = ({
     >
       <div className={authStyles.formSection}>
         <div className={authStyles.titleBlock}>
-          <h1 className={authStyles.title}>OTP Verification</h1>
-          <p className={authStyles.subtitle}>{hint}</p>
+          <h1 className={authStyles.title}>Verify code</h1>
+          <p className={authStyles.otpIntro}>
+            We&apos;ve sent a 6-digit code to{" "}
+            <span className={authStyles.otpStrong}>{email}</span>. Enter it
+            below to verify your email and continue.
+          </p>
         </div>
 
-        <TextInput
-          id="otp"
-          label="OTP Code"
-          value={otp}
-          setValue={setOtp}
-          placeholder="Enter OTP"
-          inputMode="numeric"
-          startIcon={
-            <KeyRound className={authStyles.inputIcon} aria-hidden="true" />
-          }
-        />
-      </div>
+        <div className={authStyles.otpActions}>
+          <div className={authStyles.otpGrid}>
+            {otp.map((digit, index) => (
+              <input
+                key={`otp-${index}`}
+                value={digit}
+                placeholder="-"
+                onChange={(e) => {
+                  const next = [...otp];
+                  next[index] = e.target.value.slice(-1);
+                  setOtp(next);
+                }}
+                inputMode="numeric"
+                maxLength={1}
+                aria-label={`Verification digit ${index + 1}`}
+                className={cn(
+                  authStyles.otpCell,
+                  index === 0 && authStyles.otpCellActive
+                )}
+              />
+            ))}
+          </div>
 
-      <Button type="submit" size="xl" className={authStyles.ctaButton}>
-        Verify Code
-      </Button>
+          <Button type="submit" size="xl" className={authStyles.ctaButton}>
+            Verify
+          </Button>
+
+          <p className={authStyles.otpFooter}>
+            Didn&apos;t receive a code?{" "}
+            <Link href="/dialer/auth/forgot-password" className={authStyles.otpResend}>
+              Resend
+            </Link>
+          </p>
+        </div>
+      </div>
     </form>
   );
 };

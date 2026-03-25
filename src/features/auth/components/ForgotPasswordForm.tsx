@@ -27,16 +27,18 @@ const ForgotPasswordForm = ({ onSubmit }: { onSubmit?: () => void }) => {
           </p>
         </div>
 
-        <TextInput
-          id="email"
-          label="Email address"
-          value={email}
-          setValue={setEmail}
-          placeholder="john.doe@email.com"
-          startIcon={
-            <Mail className={authStyles.inputIcon} aria-hidden="true" />
-          }
-        />
+        <div className={authStyles.fieldStack}>
+          <TextInput
+            id="email"
+            label="Email address"
+            value={email}
+            setValue={setEmail}
+            placeholder="john.doe@email.com"
+            startIcon={
+              <Mail className={authStyles.inputIcon} aria-hidden="true" />
+            }
+          />
+        </div>
       </div>
 
       <Button type="submit" size="xl" className={authStyles.ctaButton}>

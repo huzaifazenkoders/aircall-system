@@ -30,16 +30,32 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
+  overlayClassName,
+  position = "center",
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Popup>) {
+}: React.ComponentProps<typeof DialogPrimitive.Popup> &
+  {
+    position?: "center" | "right";
+    overlayClassName?: string;
+  }) {
   return (
     <DialogPortal>
-      <DialogOverlay />
-      <DialogPrimitive.Viewport className="fixed inset-0 z-50 grid place-items-center p-4">
+      <DialogOverlay className={overlayClassName} />
+      <DialogPrimitive.Viewport
+        className={cn(
+          "fixed inset-0 z-50 grid",
+          position === "center" && "place-items-center p-4",
+          position === "right" && "place-items-stretch justify-items-end p-5"
+        )}
+      >
         <DialogPrimitive.Popup
           data-slot="dialog-content"
           className={cn(
-            "relative w-full max-w-2xl overflow-hidden rounded-2xl bg-card text-card-foreground shadow-lg ring-1 ring-foreground/10 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            "relative w-full overflow-hidden bg-card text-card-foreground shadow-lg ring-1 ring-foreground/10 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+            position === "center" &&
+              "max-w-2xl rounded-2xl data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+            position === "right" &&
+              "h-full max-w-[698px] rounded-[30px] data-[state=closed]:slide-out-to-right-4 data-[state=open]:slide-in-from-right-4",
             className
           )}
           {...props}

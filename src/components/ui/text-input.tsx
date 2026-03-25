@@ -10,6 +10,8 @@ const TextInput = ({
   setValue,
   startIcon,
   endIcon,
+  containerClassName,
+  labelClassName,
   ...rest
 }: React.ComponentProps<"input"> & {
   label?: string;
@@ -18,6 +20,8 @@ const TextInput = ({
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
   setValue: ReactDispatch<string>;
+  containerClassName?: string;
+  labelClassName?: string;
 }) => {
   const hasStartIcon = Boolean(startIcon);
   const hasEndIcon = Boolean(endIcon);
@@ -27,11 +31,21 @@ const TextInput = ({
       error={error}
       htmlFor={rest.id}
       label={label}
+      className={containerClassName}
+      labelClassName={labelClassName}
       required={rest.required}
     >
-      <div className="relative flex items-center">
+      <div className={cn("relative", "flex", "items-center")}>
         {hasStartIcon && (
-          <span className="pointer-events-auto absolute left-3 inline-flex items-center">
+          <span
+            className={cn(
+              "pointer-events-auto",
+              "absolute",
+              "left-4",
+              "inline-flex",
+              "items-center"
+            )}
+          >
             {startIcon}
           </span>
         )}
@@ -39,19 +53,26 @@ const TextInput = ({
           {...rest}
           type="text"
           className={cn(
-            "h-11",
+            "h-12",
             "w-full",
-            "rounded-lg",
+            "rounded-xl",
             "border",
             "border-border-primary",
             "bg-input",
-            "px-3",
-            "py-2",
+            "px-4",
+            "py-3",
             "text-base",
+            "leading-6",
             "text-text-primary",
             "placeholder:text-text-secondary",
-            hasStartIcon && "pl-10",
-            hasEndIcon && "pr-10",
+            "shadow-[0_1px_2px_rgba(16,24,40,0.05)]",
+            "transition-colors",
+            "outline-none",
+            "focus:border-primary/40",
+            "focus:ring-2",
+            "focus:ring-primary/10",
+            hasStartIcon && "pl-11",
+            hasEndIcon && "pr-11",
             rest.className
           )}
           value={value}
@@ -61,7 +82,15 @@ const TextInput = ({
           }}
         />
         {hasEndIcon && (
-          <span className="pointer-events-auto absolute right-3 inline-flex items-center">
+          <span
+            className={cn(
+              "pointer-events-auto",
+              "absolute",
+              "right-4",
+              "inline-flex",
+              "items-center"
+            )}
+          >
             {endIcon}
           </span>
         )}
