@@ -63,7 +63,10 @@ const OtpVerificationForm = ({
 
           <p className={authStyles.otpFooter}>
             Didn&apos;t receive a code?{" "}
-            <Link href="/dialer/auth/forgot-password" className={authStyles.otpResend}>
+            <Link
+              href="/dialer/auth/forgot-password"
+              className={authStyles.otpResend}
+            >
               Resend
             </Link>
           </p>

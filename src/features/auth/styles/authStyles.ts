@@ -6,19 +6,18 @@ export const authStyles = {
     "w-full",
     "grid",
     "grid-cols-1",
-    "xl:grid-cols-[minmax(0,1.28fr)_minmax(0,1fr)]"
+    "md:grid-cols-2"
   ),
   heroPanel: cn(
     "hidden",
-    "xl:flex",
+    "md:flex",
     "bg-[url('/assets/auth/auth-bg.png')]",
     "bg-cover",
     "bg-center",
     "flex-col",
-    "justify-between",
-    "px-14",
-    "pt-10",
-    "pb-0"
+    "gap-5",
+    "px-12",
+    "pt-24"
   ),
   heroTop: cn("flex", "flex-col", "gap-20"),
   brandRow: cn("flex", "items-center", "gap-3"),
@@ -35,18 +34,24 @@ export const authStyles = {
   heroCopy: cn("flex", "max-w-2xl", "flex-col", "gap-6"),
   heroTitle: cn(
     "max-w-xl",
-    "text-[3.5rem]",
+    "text-5xl",
     "font-semibold",
-    "leading-[1.08]",
+    "leading-[1.1]",
     "text-brand-accent"
   ),
   heroSubtitle: cn(
-    "max-w-2xl",
-    "text-[1.05rem]",
-    "leading-9",
+    "max-w-xl",
+    "text-base",
+    "leading-6",
     "text-text-inverse-muted"
   ),
-  heroPreviewWrap: cn("flex", "min-h-0", "items-end", "justify-center", "overflow-hidden"),
+  heroPreviewWrap: cn(
+    "flex",
+    "min-h-0",
+    "items-end",
+    "justify-center",
+    "overflow-hidden"
+  ),
   heroPreviewFrame: cn(
     "flex",
     "h-[36rem]",
@@ -91,7 +96,13 @@ export const authStyles = {
     "text-primary"
   ),
   heroPreviewNav: cn("flex", "flex-col", "items-center", "gap-7"),
-  heroPreviewNavItem: cn("flex", "flex-col", "items-center", "gap-1.5", "text-[0.68rem]"),
+  heroPreviewNavItem: cn(
+    "flex",
+    "flex-col",
+    "items-center",
+    "gap-1.5",
+    "text-[0.68rem]"
+  ),
   heroPreviewMain: cn("grid", "min-h-0", "grid-rows-[auto_1fr]", "bg-white"),
   heroPreviewToolbar: cn(
     "flex",
@@ -143,13 +154,24 @@ export const authStyles = {
     "bg-white",
     "p-4"
   ),
-  heroPreviewSectionTitle: cn("text-xs", "font-semibold", "tracking-[0.12em]", "text-text-primary"),
+  heroPreviewSectionTitle: cn(
+    "text-xs",
+    "font-semibold",
+    "tracking-[0.12em]",
+    "text-text-primary"
+  ),
   heroPreviewInfoGrid: cn("mt-4", "grid", "grid-cols-3", "gap-x-6", "gap-y-4"),
   heroPreviewInfoBlock: cn("flex", "flex-col", "gap-1"),
   heroPreviewLabel: cn("text-[0.72rem]", "text-text-secondary"),
   heroPreviewValue: cn("text-sm", "font-medium", "text-text-primary"),
   heroPreviewBottomGrid: cn("grid", "gap-4"),
-  heroPreviewTable: cn("mt-4", "overflow-hidden", "rounded-xl", "border", "border-border/60"),
+  heroPreviewTable: cn(
+    "mt-4",
+    "overflow-hidden",
+    "rounded-xl",
+    "border",
+    "border-border/60"
+  ),
   heroPreviewTableHead: cn(
     "grid",
     "grid-cols-3",
@@ -195,17 +217,14 @@ export const authStyles = {
   ),
 
   pageRoot: cn("flex", "min-h-screen", "w-full", "flex-col"),
-  pageTopBar: cn("px-8", "pt-8", "md:px-14", "md:pt-12"),
+  pageTopBar: cn("px-8", "pt-8"),
   pageContent: cn(
     "flex",
     "flex-1",
-    "items-start",
+    "items-center",
     "justify-center",
     "px-8",
-    "pb-10",
-    "pt-24",
-    "md:px-14",
-    "md:pt-36"
+    "pb-10"
   ),
   pageContentNoTopBar: cn(
     "flex",
@@ -222,34 +241,28 @@ export const authStyles = {
   backButton: cn(
     "inline-flex",
     "items-center",
-    "gap-3",
-    "text-[1.05rem]",
+    "gap-2",
+    "text-sm",
     "font-medium",
     "text-text-primary",
     "transition-colors",
     "hover:text-secondary"
   ),
-  backIcon: cn("size-5"),
+  backIcon: cn("size-4"),
 
-  formRoot: cn("flex", "w-full", "max-w-md", "flex-col", "gap-12"),
-  formSection: cn("flex", "flex-col", "gap-8"),
-  titleBlock: cn("flex", "flex-col", "gap-1"),
-  title: cn("text-[3rem]", "font-semibold", "leading-[1.08]", "text-text-primary"),
-  subtitle: cn("text-[1.05rem]", "leading-8", "text-text-secondary"),
-  fieldStack: cn("flex", "flex-col", "gap-5"),
-  ctaButton: cn("h-12", "w-full", "rounded-xl", "bg-none", "bg-primary", "text-lg", "font-medium"),
-  inputIcon: cn("size-5", "text-secondary"),
-  resetFields: cn("flex", "flex-col", "gap-6"),
-  loginFields: cn("flex", "flex-col", "gap-5"),
-  passwordBlock: cn("flex", "flex-col", "gap-2"),
+  formRoot: cn("w-full", "max-w-114", "space-y-10"),
+  formSection: cn("space-y-8"),
+  titleBlock: cn("space-y-1.5"),
+  title: cn("text-[28px]", "font-semibold", "text-text-primary"),
+  subtitle: cn("text-base", "text-text-secondary"),
+  ctaButton: cn("w-full"),
+  inputIcon: cn("size-5", "text-primary"),
+
+  resetFields: cn("space-y-5"),
+  loginFields: cn("space-y-4.5"),
+  passwordBlock: cn("space-y-2"),
   forgotLinkWrap: cn("flex", "justify-end"),
-  forgotLink: cn(
-    "text-[0.95rem]",
-    "font-medium",
-    "text-secondary",
-    "underline",
-    "underline-offset-2"
-  ),
+  forgotLink: cn("text-sm", "font-medium", "text-secondary"),
   otpIntro: cn("text-[1.05rem]", "leading-8", "text-text-secondary"),
   otpStrong: cn("font-semibold", "text-primary"),
   otpGrid: cn("grid", "grid-cols-6", "gap-3"),
@@ -276,5 +289,10 @@ export const authStyles = {
   otpCellActive: cn("border-primary", "bg-success-soft", "text-primary"),
   otpActions: cn("flex", "flex-col", "gap-4"),
   otpFooter: cn("text-center", "text-[1.05rem]", "text-text-secondary"),
-  otpResend: cn("font-medium", "text-secondary", "underline", "underline-offset-2")
+  otpResend: cn(
+    "font-medium",
+    "text-secondary",
+    "underline",
+    "underline-offset-2"
+  )
 };

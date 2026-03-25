@@ -13,7 +13,7 @@ const LoginForm = () => {
   const [password, setPassword] = React.useState("*********");
 
   return (
-    <form className={authStyles.formRoot}>
+    <div className={authStyles.formRoot}>
       <div className={authStyles.formSection}>
         <div className={authStyles.titleBlock}>
           <h1 className={authStyles.title}>Welcome Back!</h1>
@@ -22,7 +22,7 @@ const LoginForm = () => {
           </p>
         </div>
 
-        <div className={authStyles.fieldStack}>
+        <div className={authStyles.loginFields}>
           <TextInput
             id="email"
             label="Email address"
@@ -58,7 +58,6 @@ const LoginForm = () => {
               label="Password"
               value={password}
               setValue={setPassword}
-              showToggle={false}
               startIcon={
                 <svg
                   className={authStyles.inputIcon}
@@ -86,7 +85,7 @@ const LoginForm = () => {
             />
             <div className={authStyles.forgotLinkWrap}>
               <Link
-                href="/dialer/auth/forgot-password"
+                href="/auth/forgot-password"
                 className={authStyles.forgotLink}
               >
                 Forgot password?
@@ -95,11 +94,10 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
-
       <Button type="submit" size="xl" className={authStyles.ctaButton}>
         Log in
       </Button>
-    </form>
+    </div>
   );
 };
 
