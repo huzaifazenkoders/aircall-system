@@ -173,6 +173,16 @@
   --workflow-tag-fg: #0E7C77;
   --workflow-button-muted: #D7DCE5;
   --workflow-button-muted-fg: #62708A;
+  --dialer-auth-page: #FBFBFC;
+  --dialer-auth-surface: #FFFFFF;
+  --dialer-auth-hero: #073031;
+  --dialer-auth-hero-alt: #0B3A3A;
+  --dialer-auth-hero-border: rgba(255, 255, 255, 0.18);
+  --dialer-auth-hero-shell: rgba(255, 255, 255, 0.12);
+  --dialer-auth-hero-shadow: rgba(7, 48, 49, 0.32);
+  --dialer-auth-input-shadow: rgba(16, 24, 40, 0.06);
+  --dialer-auth-otp-active: #DDF8FA;
+  --dialer-auth-otp-border: #8BCBCF;
 }
 
 /* ========================|| Util Classes ||======================== */
