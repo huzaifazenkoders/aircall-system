@@ -255,7 +255,7 @@ export const authStyles = {
   titleBlock: cn("space-y-1.5"),
   title: cn("text-[28px]", "font-semibold", "text-text-primary"),
   subtitle: cn("text-base", "text-text-secondary"),
-  ctaButton: cn("w-full"),
+  ctaButton: cn("w-full mt-5"),
   inputIcon: cn("size-5", "text-primary"),
 
   resetFields: cn("space-y-5"),

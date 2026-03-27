@@ -24,20 +24,15 @@ const ListManagementView = () => {
         </Button>
       </div>
 
-      {hasLists ? <ListTable /> : <ListEmptyState onCreate={() => setCreateOpen(true)} />}
+      {hasLists ? (
+        <ListTable />
+      ) : (
+        <ListEmptyState onCreate={() => setCreateOpen(true)} />
+      )}
 
       <CreateListDialog open={createOpen} onOpenChange={setCreateOpen} />
-
-      <button
-        type="button"
-        className="mt-8 self-start text-xs text-muted-foreground underline"
-        onClick={() => setHasLists((v) => !v)}
-      >
-        Toggle empty state (dev)
-      </button>
     </div>
   );
 };
 
 export default ListManagementView;
-

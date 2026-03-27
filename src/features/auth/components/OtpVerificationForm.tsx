@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { authStyles } from "@/features/auth/styles/authStyles";
 import { cn } from "@/lib/utils";
+import OtpInput from "@/components/ui/otp-input.component";
 
 const OtpVerificationForm = ({
   onSubmit,
@@ -35,27 +36,7 @@ const OtpVerificationForm = ({
         </div>
 
         <div className={authStyles.otpActions}>
-          <div className={authStyles.otpGrid}>
-            {otp.map((digit, index) => (
-              <input
-                key={`otp-${index}`}
-                value={digit}
-                placeholder="-"
-                onChange={(e) => {
-                  const next = [...otp];
-                  next[index] = e.target.value.slice(-1);
-                  setOtp(next);
-                }}
-                inputMode="numeric"
-                maxLength={1}
-                aria-label={`Verification digit ${index + 1}`}
-                className={cn(
-                  authStyles.otpCell,
-                  index === 0 && authStyles.otpCellActive
-                )}
-              />
-            ))}
-          </div>
+          <OtpInput />
 
           <Button type="submit" size="xl" className={authStyles.ctaButton}>
             Verify

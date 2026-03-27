@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   SearchIcon,
   MoreVerticalIcon,
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { listStyles } from "@/features/list/styles/listStyles";
+import DateSelector from "@/components/custom/date-selector.component";
 
 type ListRow = {
   id: string;
@@ -104,6 +105,7 @@ const rows: ListRow[] = [
 
 const ListTable = () => {
   const [query, setQuery] = React.useState("");
+  const [tabs, setTabs] = useState("shared");
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,12 +117,15 @@ const ListTable = () => {
 
   return (
     <div className={listStyles.card}>
-      <Tabs defaultValue="shared" className="w-full">
+      <Tabs className="w-full gap-0" value={tabs} onValueChange={setTabs}>
         <div className={listStyles.cardHeader}>
           <TabsList className={cn("bg-transparent p-0", listStyles.tabsWrap)}>
             <TabsTrigger
               value="shared"
-              className={cn(listStyles.tabTrigger, listStyles.tabUnderline)}
+              className={cn(
+                listStyles.tabTrigger,
+                tabs === "shared" ? "border-b-primary" : "border-b-transparent"
+              )}
             >
               Shared List{" "}
               <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-foreground">
@@ -129,7 +134,10 @@ const ListTable = () => {
             </TabsTrigger>
             <TabsTrigger
               value="idv"
-              className={cn(listStyles.tabTrigger, listStyles.tabUnderline)}
+              className={cn(
+                listStyles.tabTrigger,
+                tabs === "idv" ? "border-b-primary" : "border-b-transparent"
+              )}
             >
               IDV List{" "}
               <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-foreground">
@@ -151,16 +159,23 @@ const ListTable = () => {
                 aria-hidden="true"
               />
             }
-            className="bg-background"
+            className="bg-transparent"
           />
 
-          <Button variant="outline" className={listStyles.dateBtn}>
-            <span>Date</span>
-            <CalendarIcon
-              className="ml-2 size-4 text-muted-foreground"
-              aria-hidden="true"
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className={listStyles.dateBtn}>
+                  <span>Date</span>
+                  <CalendarIcon
+                    className="ml-2 size-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </Button>
+              }
             />
-          </Button>
+            <DateSelector />
+          </DropdownMenu>
         </div>
 
         <TabsContent value="shared" className="m-0">
@@ -168,7 +183,7 @@ const ListTable = () => {
             <Table>
               <TableHeader>
                 <TableRow className="bg-background">
-                  <TableHead className="w-20">ID</TableHead>
+                  <TableHead className="w-28">ID</TableHead>
                   <TableHead className="min-w-60">Name</TableHead>
                   <TableHead className="w-24">Priority</TableHead>
                   <TableHead className="w-36">Cooldown (hrs)</TableHead>
@@ -182,7 +197,7 @@ const ListTable = () => {
               </TableHeader>
               <TableBody>
                 {filtered.map((r) => (
-                  <TableRow key={r.id} className="h-14">
+                  <TableRow key={r.id} className="h-15.5">
                     <TableCell className="font-medium text-foreground">
                       {r.id}
                     </TableCell>
@@ -275,7 +290,9 @@ const StatusBadge = ({ status }: { status: ListRow["status"] }) => {
         : "bg-muted text-muted-foreground";
 
   return (
-    <Badge className={cn("rounded-lg px-3 py-1 text-xs font-medium", classes)}>
+    <Badge
+      className={cn("rounded-md px-4 py-1 h-auto text-sm font-medium", classes)}
+    >
       {status}
     </Badge>
   );

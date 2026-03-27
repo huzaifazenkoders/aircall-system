@@ -1,6 +1,15 @@
 "use client";
 
 import React from "react";
+import { LogOutIcon } from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const UserAvatar = () => {
   return (
@@ -34,15 +43,36 @@ const UserAvatar = () => {
 const AppTopbar = () => {
   return (
     <header className="flex items-center justify-end border-b border-border px-1 pb-5">
-      <div className="flex items-center gap-3">
-        <UserAvatar />
-        <div className="leading-tight">
-          <div className="text-[14px] text-[#94A3B8]">Hello</div>
-          <div className="text-[14px] font-semibold text-text-primary">
-            James Smith
-          </div>
-        </div>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <button
+              type="button"
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-colors hover:bg-muted"
+              )}
+            >
+              <UserAvatar />
+              <div className="leading-tight">
+                <div className="text-[14px] text-[#94A3B8]">Hello</div>
+                <div className="text-[14px] font-semibold text-text-primary">
+                  James Smith
+                </div>
+              </div>
+            </button>
+          }
+        />
+
+        <DropdownMenuContent align="end" className="w-44">
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => console.log("Logout clicked")}
+          >
+            <LogOutIcon className="size-4" aria-hidden="true" />
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 };
