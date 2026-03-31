@@ -10,7 +10,7 @@ const VerifyCodeView = () => {
   return (
     <div className={authStyles.pageRoot}>
       <div className={authStyles.pageTopBar}>
-        <AuthBackLink href="/dialer/auth/forgot-password" />
+        <AuthBackLink href="/auth/forgot-password" />
       </div>
 
       <div className={authStyles.pageContent}>

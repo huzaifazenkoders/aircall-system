@@ -2,18 +2,48 @@
 
 import React from "react";
 import Link from "next/link";
+import * as Yup from "yup";
+import { useFormik } from "formik";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
 import TextInput from "@/components/ui/text-input";
 import { authStyles } from "@/features/auth/styles/authStyles";
+import { useLogin } from "../services/authService";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { useRouter } from "next/navigation";
+import { setCookie } from "cookies-next/client";
+
+const validationSchema = Yup.object({
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string().required("Password is required")
+});
 
 const LoginForm = () => {
-  const [email, setEmail] = React.useState("john.doe@email.com");
-  const [password, setPassword] = React.useState("*********");
+  const router = useRouter();
+  const { mutate: login, isPending } = useLogin();
+
+  const formik = useFormik({
+    initialValues: { email: "", password: "" },
+    validationSchema,
+    onSubmit: (values) => {
+      login(
+        { payload: values },
+        {
+          onSuccess: (res) => {
+            toast.success("Logged in successfully");
+            setCookie("token", res.data.token);
+            router.replace("/list");
+          },
+          onError: handleMutationError
+        }
+      );
+    }
+  });
 
   return (
-    <div className={authStyles.formRoot}>
+    <form className={authStyles.formRoot} onSubmit={formik.handleSubmit}>
       <div className={authStyles.formSection}>
         <div className={authStyles.titleBlock}>
           <h1 className={authStyles.title}>Welcome Back!</h1>
@@ -26,9 +56,10 @@ const LoginForm = () => {
           <TextInput
             id="email"
             label="Email address"
-            value={email}
-            setValue={setEmail}
-            placeholder="john.doe@email.com"
+            value={formik.values.email}
+            setValue={(val) => formik.setFieldValue("email", val)}
+            placeholder="Enter email"
+            error={formik.touched.email ? formik.errors.email : undefined}
             startIcon={
               <svg
                 className={authStyles.inputIcon}
@@ -56,8 +87,12 @@ const LoginForm = () => {
             <PasswordInput
               id="password"
               label="Password"
-              value={password}
-              setValue={setPassword}
+              value={formik.values.password}
+              setValue={(val) => formik.setFieldValue("password", val)}
+              error={
+                formik.touched.password ? formik.errors.password : undefined
+              }
+              placeholder="Enter password"
               startIcon={
                 <svg
                   className={authStyles.inputIcon}
@@ -94,10 +129,16 @@ const LoginForm = () => {
           </div>
         </div>
       </div>
-      <Button type="submit" size="xl" className={authStyles.ctaButton}>
-        Log in
+
+      <Button
+        type="submit"
+        size="xl"
+        className={authStyles.ctaButton}
+        disabled={isPending}
+      >
+        {isPending ? "Logging in..." : "Log in"}
       </Button>
-    </div>
+    </form>
   );
 };
 

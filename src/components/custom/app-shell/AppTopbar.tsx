@@ -10,6 +10,9 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useMe } from "@/features/users/services/userService";
+import { deleteCookie } from "cookies-next/client";
+import { useRouter } from "next/navigation";
 
 const UserAvatar = () => {
   return (
@@ -34,13 +37,25 @@ const UserAvatar = () => {
           d="M15 40c1-5.8 4.8-9.5 8.8-9.5S31.5 34.2 32.5 40H15Z"
           fill="#111827"
         />
-        <path d="M31.4 40H34c0-3.9-1.2-7-3.4-9.2l-2 1.7c1.7 1.7 2.7 4.2 2.8 7.5Z" fill="#0F172A" opacity=".75" />
+        <path
+          d="M31.4 40H34c0-3.9-1.2-7-3.4-9.2l-2 1.7c1.7 1.7 2.7 4.2 2.8 7.5Z"
+          fill="#0F172A"
+          opacity=".75"
+        />
       </svg>
     </div>
   );
 };
 
 const AppTopbar = () => {
+  const { data, isPending, isError } = useMe();
+  const router = useRouter();
+
+  if (isPending || isError) {
+    return null;
+  }
+
+  const name = data?.data?.first_name + " " + data?.data?.last_name;
   return (
     <header className="flex items-center justify-end border-b border-border px-1 pb-5">
       <DropdownMenu>
@@ -56,7 +71,7 @@ const AppTopbar = () => {
               <div className="leading-tight">
                 <div className="text-[14px] text-[#94A3B8]">Hello</div>
                 <div className="text-[14px] font-semibold text-text-primary">
-                  James Smith
+                  {name}
                 </div>
               </div>
             </button>
@@ -66,7 +81,11 @@ const AppTopbar = () => {
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem
             variant="destructive"
-            onClick={() => console.log("Logout clicked")}
+            onClick={() => {
+              deleteCookie("token");
+              router.push("/auth/sign-in");
+              router.refresh();
+            }}
           >
             <LogOutIcon className="size-4" aria-hidden="true" />
             Logout

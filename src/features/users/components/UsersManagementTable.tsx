@@ -9,17 +9,18 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "@/components/ui/table";
 import { UserRecord } from "@/features/users/data/usersData";
 import { usersStyles } from "@/features/users/styles/usersStyles";
+import TextInput from "@/components/ui/text-input";
 
 const UsersManagementTable = ({
   users,
   selectedUserId,
   searchValue,
   onSearchChange,
-  onSelectUser,
+  onSelectUser
 }: {
   users: UserRecord[];
   selectedUserId: string;
@@ -29,16 +30,16 @@ const UsersManagementTable = ({
 }) => {
   return (
     <section className={usersStyles.card}>
-      <div className={usersStyles.toolbar}>
-        <label className={usersStyles.searchField}>
-          <SearchIcon className="size-7 shrink-0 text-panel-muted" />
-          <input
-            value={searchValue}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className={usersStyles.searchInput}
-            placeholder="Search by name, email, or phone"
+      <div className="p-3 border-b">
+        <div className="">
+          <TextInput
+            setValue={() => {}}
+            className="bg-transparent"
+            startIcon={
+              <SearchIcon className="size-5 shrink-0 text-panel-muted" />
+            }
           />
-        </label>
+        </div>
       </div>
 
       <Table>
@@ -46,7 +47,9 @@ const UsersManagementTable = ({
           <TableRow className="border-border hover:bg-transparent">
             <TableHead className={usersStyles.tableHead}>Name</TableHead>
             <TableHead className={usersStyles.tableHead}>Email</TableHead>
-            <TableHead className={usersStyles.tableHead}>Phone Number</TableHead>
+            <TableHead className={usersStyles.tableHead}>
+              Phone Number
+            </TableHead>
             <TableHead className={usersStyles.tableHead}>Role</TableHead>
           </TableRow>
         </TableHeader>
@@ -58,10 +61,18 @@ const UsersManagementTable = ({
               data-state={user.id === selectedUserId ? "selected" : undefined}
               onClick={() => onSelectUser(user.id)}
             >
-              <TableCell className={usersStyles.tableCell}>{user.name}</TableCell>
-              <TableCell className={usersStyles.tableCell}>{user.email}</TableCell>
-              <TableCell className={usersStyles.tableCell}>{user.phone}</TableCell>
-              <TableCell className={usersStyles.tableCell}>{user.role}</TableCell>
+              <TableCell className={usersStyles.tableCell}>
+                {user.name}
+              </TableCell>
+              <TableCell className={usersStyles.tableCell}>
+                {user.email}
+              </TableCell>
+              <TableCell className={usersStyles.tableCell}>
+                {user.phone}
+              </TableCell>
+              <TableCell className={usersStyles.tableCell}>
+                {user.role}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
