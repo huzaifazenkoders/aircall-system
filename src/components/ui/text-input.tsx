@@ -50,7 +50,7 @@ const TextInput = ({
             "rounded-lg",
             "border",
             "border-border-primary",
-            "bg-input",
+            "bg-white",
             "px-3",
             "py-2",
             "text-base",

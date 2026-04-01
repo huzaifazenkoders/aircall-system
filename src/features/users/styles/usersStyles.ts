@@ -70,13 +70,13 @@ export const usersStyles = {
   ),
   menuItem: cn("gap-3 rounded-[14px] px-4 py-3 text-[18px] text-text-primary"),
   modalContent: cn("max-w-[790px] rounded-[30px] p-0"),
-  modalHeader: cn("items-start px-8 pt-9 pb-5"),
-  modalTitle: cn("text-[32px] font-semibold tracking-tight text-text-primary"),
-  modalSubtitle: cn("mt-2 text-[18px] leading-7 text-panel-muted"),
-  modalBody: cn("px-8 pt-7 pb-0"),
-  sectionLabel: cn("mb-3 text-[18px] font-medium text-[#475467]"),
+  modalHeader: cn("items-start p-6"),
+  modalTitle: cn("text-[24px] font-semibold tracking-tight text-text-primary"),
+  modalSubtitle: cn("text-[14px] leading-2 text-panel-muted"),
+  modalBody: cn("px-6 pt-6 pb-0"),
+  sectionLabel: cn("text-sm font-medium text-[#475467]"),
   triggerField: cn(
-    "flex h-14 w-full items-center justify-between rounded-2xl border border-secondary bg-white px-4 text-[16px] text-panel-muted shadow-xs"
+    "mt-3 flex h-11 w-full items-center justify-between rounded-lg border border-border-primary bg-white px-4 text-[16px] text-panel-muted shadow-xs"
   ),
   menuPanel: cn(
     "mt-3 overflow-hidden rounded-3xl border border-border bg-white shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
@@ -87,19 +87,12 @@ export const usersStyles = {
   ),
   optionMuted: cn("text-panel-muted"),
   menuItemMuted: cn("text-panel-muted"),
-  cooldownGrid: cn("mt-8 grid grid-cols-1 gap-4 md:grid-cols-2"),
+  cooldownGrid: cn("mt-3 grid grid-cols-1 gap-4 md:grid-cols-2"),
   timeField: cn(
-    "flex h-14 items-center justify-between rounded-2xl border border-border bg-white px-4 shadow-xs"
+    "flex h-11 items-center justify-between rounded-lg border border-border bg-white px-4 shadow-xs"
   ),
   timeValue: cn("text-[18px] text-text-primary"),
   timeUnit: cn("text-[18px] text-panel-muted"),
-  helperText: cn("mt-3 text-[16px] text-panel-muted"),
-  modalFooter: cn("justify-end gap-4 px-8 pt-10 pb-8"),
-  cancelButton: cn(
-    "h-14 rounded-2xl border-secondary px-8 text-[18px] font-medium text-secondary"
-  ),
-  submitButton: cn("h-14 rounded-2xl px-8 text-[18px] font-medium"),
-  dangerButton: cn(
-    "h-14 rounded-2xl border-danger bg-danger px-8 text-[18px] font-medium text-danger-foreground hover:bg-danger/90"
-  )
+  helperText: cn("mt-3 text-sm text-panel-muted"),
+  modalFooter: cn("justify-end gap-4 px-8 pt-10 pb-8")
 };
