@@ -1,6 +1,10 @@
 "use client";
 
 import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -11,30 +15,57 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
+import TextInput from "@/components/ui/text-input";
+import TextArea from "@/components/ui/text-area";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
+import { useCreateWorkflow } from "@/features/workflows/services/workflowService";
+import { workflowKeys } from "@/features/workflows/query-keys";
+import { handleMutationError } from "@/utils/handleMutationError";
+
+const validationSchema = Yup.object({
+  name: Yup.string()
+    .trim()
+    .required("Workflow name is required")
+    .max(50, "Workflow name cannot exceed 50 characters"),
+  description: Yup.string()
+    .trim()
+    .required("Description is required")
+    .max(250, "Workflow description cannot exceed 250 characters")
+});
 
 const CreateWorkflowDialog = ({
   open,
-  onOpenChange,
-  onContinue,
+  onOpenChange
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onContinue: () => void;
 }) => {
-  const [name, setName] = React.useState("VIP Event Workflow");
-  const [description, setDescription] = React.useState(
-    "Special automation rules for VIP campaign leads."
-  );
+  const queryClient = useQueryClient();
+  const { mutate: createWorkflow, isPending } = useCreateWorkflow();
+
+  const formik = useFormik({
+    initialValues: { name: "", description: "" },
+    validationSchema,
+    onSubmit: (values) => {
+      createWorkflow(
+        { payload: { ...values, status: "draft" } },
+        {
+          onSuccess: () => {
+            toast.success("Workflow created successfully");
+            queryClient.invalidateQueries({ queryKey: workflowKeys.all });
+            onOpenChange(false);
+          },
+          onError: handleMutationError
+        }
+      );
+    }
+  });
 
   React.useEffect(() => {
-    if (!open) {
-      setName("VIP Event Workflow");
-      setDescription("Special automation rules for VIP campaign leads.");
-    }
-  }, [open]);
+    if (!open) formik.resetForm();
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,52 +76,48 @@ const CreateWorkflowDialog = ({
               Create Workflow Template
             </DialogTitle>
             <DialogDescription className={workflowsStyles.dialogDescription}>
-              Define how call outcomes trigger automation and update lead status.
+              Define how call outcomes trigger automation and update lead
+              status.
             </DialogDescription>
           </div>
           <DialogIconClose />
         </DialogHeader>
 
-        <DialogBody className={workflowsStyles.dialogBody}>
-          <div className={workflowsStyles.fieldStack}>
-            <label className={workflowsStyles.field}>
-              <span className={workflowsStyles.fieldLabel}>Workflow Name</span>
-              <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                className={workflowsStyles.textInput}
-              />
-            </label>
+        <form onSubmit={formik.handleSubmit}>
+          <DialogBody className={workflowsStyles.dialogBody}>
+            <TextInput
+              label="Workflow Name"
+              placeholder="eg, VIP Event Workflow"
+              value={formik.values.name}
+              setValue={(val) => formik.setFieldValue("name", val)}
+              error={formik.touched.name ? formik.errors.name : undefined}
+            />
+            <TextArea
+              label="Description"
+              placeholder="eg, Special automation rules for VIP campaign leads."
+              value={formik.values.description}
+              setValue={(val) => formik.setFieldValue("description", val)}
+              error={
+                formik.touched.description
+                  ? formik.errors.description
+                  : undefined
+              }
+            />
+          </DialogBody>
 
-            <label className={workflowsStyles.field}>
-              <span className={workflowsStyles.fieldLabel}>Description</span>
-              <textarea
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                className={workflowsStyles.textarea}
-              />
-            </label>
-          </div>
-        </DialogBody>
-
-        <DialogFooter className={workflowsStyles.dialogFooter}>
-          <Button
-            variant="outline"
-            className={workflowsStyles.cancelButton}
-            onClick={() => onOpenChange(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            className={workflowsStyles.saveButton}
-            onClick={() => {
-              onContinue();
-              onOpenChange(false);
-            }}
-          >
-            Continue
-          </Button>
-        </DialogFooter>
+          <DialogFooter className={workflowsStyles.dialogFooter}>
+            <Button
+              type="button"
+              variant="outline-transparent"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Creating..." : "Continue"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -4,12 +4,14 @@ import { InfiniteData } from "@tanstack/react-query";
 // -------------------[ Get next page utility utility function ]-------------------
 
 type GetNextPageParamArgs = {
-  pagination: IPagination;
+  data: {
+    meta: IPagination;
+  };
 };
 
 export function getNextPageParam(lastPage: GetNextPageParamArgs) {
-  if (lastPage.pagination?.nextPage) {
-    return lastPage.pagination?.nextPage;
+  if (lastPage.data.meta?.hasNextPage) {
+    return Number(lastPage.data.meta?.page) + 1;
   }
   return undefined;
 }
@@ -17,14 +19,18 @@ export function getNextPageParam(lastPage: GetNextPageParamArgs) {
 // -------------------[ Transform infinite data utility function ]-------------------
 
 type TransformInfiniteDataArgs<T, TKey extends string> = {
-  pagination: IPagination;
+  data: {
+    meta: IPagination;
+  };
 } & {
-  [K in TKey]: T[];
+  data: {
+    [K in TKey]: T[];
+  };
 };
 
 export function transformInfiniteData<TData, TKey extends string>(
   data: InfiniteData<TransformInfiniteDataArgs<TData, TKey>> | undefined,
   key: TKey
 ) {
-  return data?.pages.flatMap((each) => each[key]) ?? [];
+  return data?.pages.flatMap((each) => each.data?.[key]) ?? [];
 }

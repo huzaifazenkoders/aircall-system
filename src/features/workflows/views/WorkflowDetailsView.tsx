@@ -2,125 +2,158 @@
 
 import Link from "next/link";
 import React from "react";
-import { ArrowLeftIcon, BookOpenIcon, PencilLineIcon, PlusCircleIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  BookOpenIcon,
+  Loader2Icon,
+  PencilLineIcon,
+  PlusCircleIcon
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import DispositionRuleDialog from "@/features/workflows/components/DispositionRuleDialog";
 import WorkflowConfirmDialog from "@/features/workflows/components/WorkflowConfirmDialog";
 import WorkflowRuleCard from "@/features/workflows/components/WorkflowRuleCard";
-import {
-  buildWorkflowRuleFromForm,
-  getWorkflowById,
-  vipDraftPreset,
-  WorkflowRule,
-  WorkflowRuleFormValues,
-} from "@/features/workflows/data/workflowsData";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
+import { useGetDispositions } from "@/features/workflows/services/dispositionService";
+import { useUpdateWorkflowStatus } from "@/features/workflows/services/workflowService";
+import { workflowKeys } from "@/features/workflows/query-keys";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import {
+  Disposition,
+  WorkflowStatus
+} from "@/features/workflows/types/workflowTypes";
 
-const WorkflowDetailsView = ({
-  workflowId,
-}: {
-  workflowId: string;
-}) => {
-  const workflow = getWorkflowById(workflowId) ?? getWorkflowById("vip-event-workflow");
+const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
+  const queryClient = useQueryClient();
 
-  const [status, setStatus] = React.useState(workflow?.status ?? "Draft");
-  const [draftRules, setDraftRules] = React.useState<WorkflowRule[]>([]);
-  const [activeRules, setActiveRules] = React.useState<WorkflowRule[]>(
-    workflow?.status === "Active" ? workflow.publishedRules ?? [] : []
-  );
+  const [status, setStatus] = React.useState<WorkflowStatus | null>(null);
+
   const [isRuleDialogOpen, setIsRuleDialogOpen] = React.useState(false);
-  const [editingRuleId, setEditingRuleId] = React.useState<string | null>(null);
-  const [ruleToDelete, setRuleToDelete] = React.useState<WorkflowRule | null>(null);
+  const [editingDisposition, setEditingDisposition] =
+    React.useState<Disposition | null>(null);
+  const [dispositionToDelete, setDispositionToDelete] =
+    React.useState<Disposition | null>(null);
   const [moveToDraftOpen, setMoveToDraftOpen] = React.useState(false);
 
-  if (!workflow) {
-    return null;
+  const {
+    data: dispositionsData,
+    isPending: isLoadingDispositions,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useGetDispositions({ workflow_id: workflowId, limit: 20 });
+
+  const dispositions = transformInfiniteData(dispositionsData, "dispositions");
+
+  const workflow = dispositionsData?.pages?.[0]?.data;
+
+  React.useEffect(() => {
+    if (workflow && status === null)
+      setStatus(workflow.status as WorkflowStatus);
+  }, [workflow]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const currentStatus = status ?? workflow?.status ?? "draft";
+
+  const { mutate: updateStatus, isPending: isUpdatingStatus } =
+    useUpdateWorkflowStatus();
+
+  const invalidateDispositions = () => {
+    queryClient.invalidateQueries({
+      queryKey: workflowKeys.dispositions({ workflow_id: workflowId })
+    });
+    queryClient.invalidateQueries({
+      queryKey: workflowKeys.remainingDispositionTypes(workflowId)
+    });
+    queryClient.invalidateQueries({
+      queryKey: workflowKeys.existingDispositionTypes(workflowId)
+    });
+  };
+
+  const handleStatusChange = (nextStatus: WorkflowStatus) => {
+    updateStatus(
+      { payload: { id: workflowId, status: nextStatus } },
+      {
+        onSuccess: () => {
+          toast.success(
+            nextStatus === "publish"
+              ? "Workflow published"
+              : "Workflow moved to draft"
+          );
+          setStatus(nextStatus);
+          queryClient.invalidateQueries({ queryKey: workflowKeys.all });
+          setMoveToDraftOpen(false);
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
+  if (isLoadingDispositions) {
+    return (
+      <div className="mt-12 flex justify-center">
+        <Loader2Icon className="size-8 animate-spin text-secondary" />
+      </div>
+    );
   }
 
-  const editableRuleSet = status === "Active" ? activeRules : draftRules;
-  const editingRule =
-    editingRuleId !== null
-      ? editableRuleSet.find((rule) => rule.id === editingRuleId) ?? null
-      : null;
-
-  const canPublish = draftRules.length > 0 || workflow.id === "vip-event-workflow";
-
-  const handleSaveRule = (values: WorkflowRuleFormValues) => {
-    const nextRule = buildWorkflowRuleFromForm(values);
-
-    if (status === "Active") {
-      setActiveRules((current) => {
-        if (!editingRuleId) {
-          return [...current, nextRule];
-        }
-
-        return current.map((rule) => (rule.id === editingRuleId ? nextRule : rule));
-      });
-    } else {
-      setDraftRules((current) => {
-        if (!editingRuleId) {
-          return [...current, nextRule];
-        }
-
-        return current.map((rule) => (rule.id === editingRuleId ? nextRule : rule));
-      });
-    }
-
-    setEditingRuleId(null);
-  };
-
-  const openNewRule = () => {
-    setEditingRuleId(null);
-    setIsRuleDialogOpen(true);
-  };
-
-  const visibleRules = status === "Active" ? activeRules : [];
+  if (!workflow) {
+    return (
+      <div className="mt-12 text-center text-sm text-red-500">
+        Workflow not found.
+      </div>
+    );
+  }
 
   return (
     <div className={workflowsStyles.detailsPage}>
-      <Link href="/workflows" className={workflowsStyles.backLink}>
-        <ArrowLeftIcon className="size-5" />
-        Back
-      </Link>
-
       <div className={workflowsStyles.detailHeader}>
-        <div className={workflowsStyles.detailHeading}>
-          <div className={workflowsStyles.detailTitleRow}>
-            <h1 className={workflowsStyles.detailTitle}>{workflow.name}</h1>
-            {status === "Active" ? (
-              <span className={workflowsStyles.activeBadge}>Active</span>
-            ) : null}
+        <div>
+          <Link href="/workflows" className={workflowsStyles.backLink}>
+            <ArrowLeftIcon className="size-5" />
+            Back
+          </Link>
+
+          <div className={workflowsStyles.detailHeading}>
+            <div className={workflowsStyles.detailTitleRow}>
+              <h1 className={workflowsStyles.detailTitle}>{workflow.name}</h1>
+              {currentStatus === "publish" && (
+                <span className={workflowsStyles.activeBadge}>Active</span>
+              )}
+            </div>
+            <p className={workflowsStyles.detailDescription}>
+              {workflow.description}
+            </p>
           </div>
-          <p className={workflowsStyles.detailDescription}>{workflow.description}</p>
         </div>
 
         <div className={workflowsStyles.detailActions}>
-          {status === "Active" ? (
+          {currentStatus === "publish" ? (
             <Button
               variant="outline"
-              className={workflowsStyles.outlineAction}
               onClick={() => setMoveToDraftOpen(true)}
+              disabled={isUpdatingStatus}
             >
               Move to Draft
             </Button>
           ) : (
             <>
-              <Button variant="outline" className={workflowsStyles.outlineAction}>
+              <Button variant="outline" disabled>
                 <BookOpenIcon className="size-5" />
                 Draft
               </Button>
               <Button
-                className={draftRules.length > 0 ? workflowsStyles.primaryAction : workflowsStyles.mutedAction}
-                disabled={!canPublish}
-                onClick={() => {
-                  setActiveRules(
-                    draftRules.length > 0 ? draftRules : workflow.publishedRules ?? []
-                  );
-                  setStatus("Active");
-                }}
+                onClick={() => handleStatusChange("publish")}
+                disabled={isUpdatingStatus}
               >
-                <PencilLineIcon className="size-5" />
+                {isUpdatingStatus ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  <PencilLineIcon className="size-5" />
+                )}
                 Publish
               </Button>
             </>
@@ -128,37 +161,29 @@ const WorkflowDetailsView = ({
         </div>
       </div>
 
-      {status === "Active" ? (
+      {isLoadingDispositions ? (
+        <div className="mt-12 flex justify-center">
+          <Loader2Icon className="size-8 animate-spin text-secondary" />
+        </div>
+      ) : (
         <div className={workflowsStyles.rulesGrid}>
-          {visibleRules.map((rule) => (
+          {dispositions.map((disposition) => (
             <WorkflowRuleCard
-              key={rule.id}
-              rule={rule}
+              key={disposition.id}
+              disposition={disposition}
               onEdit={() => {
-                setEditingRuleId(rule.id);
+                setEditingDisposition(disposition);
                 setIsRuleDialogOpen(true);
               }}
-              onDelete={() => setRuleToDelete(rule)}
+              onDelete={() => setDispositionToDelete(disposition)}
             />
           ))}
 
           <button
             type="button"
             className={workflowsStyles.addRuleCard}
-            onClick={openNewRule}
-          >
-            <PlusCircleIcon className={workflowsStyles.addRuleIcon} />
-            <span className={workflowsStyles.addRuleText}>Add Disposition</span>
-          </button>
-        </div>
-      ) : (
-        <div className={workflowsStyles.addCardWrap}>
-          <button
-            type="button"
-            className={workflowsStyles.addRuleCard}
             onClick={() => {
-              setEditingRuleId(null);
-              setDraftRules((current) => (current.length === 0 ? [buildWorkflowRuleFromForm(vipDraftPreset)] : current));
+              setEditingDisposition(null);
               setIsRuleDialogOpen(true);
             }}
           >
@@ -168,45 +193,51 @@ const WorkflowDetailsView = ({
         </div>
       )}
 
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <Button
+            variant="outline"
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? (
+              <Loader2Icon className="size-4 animate-spin" />
+            ) : (
+              "Load More"
+            )}
+          </Button>
+        </div>
+      )}
+
       <DispositionRuleDialog
         open={isRuleDialogOpen}
         onOpenChange={(open) => {
           setIsRuleDialogOpen(open);
-          if (!open) {
-            setEditingRuleId(null);
-          }
+          if (!open) setEditingDisposition(null);
         }}
-        initialValues={editingRule?.formValues ?? vipDraftPreset}
-        onSave={handleSaveRule}
+        workflowId={workflowId}
+        editingDisposition={editingDisposition}
       />
 
       <WorkflowConfirmDialog
-        open={Boolean(ruleToDelete)}
+        open={Boolean(dispositionToDelete)}
         onOpenChange={(open) => {
-          if (!open) {
-            setRuleToDelete(null);
-          }
+          if (!open) setDispositionToDelete(null);
         }}
         title="Delete Disposition"
         actionLabel="Delete Disposition"
         destructive
         onConfirm={() => {
-          if (!ruleToDelete) {
-            return;
-          }
-
-          setActiveRules((current) =>
-            current.filter((rule) => rule.id !== ruleToDelete.id)
-          );
-          setRuleToDelete(null);
+          invalidateDispositions();
+          setDispositionToDelete(null);
         }}
         content={
           <>
             <p>
-              This disposition will be removed from the workflow and will no longer
-              be available for dialers to select during calls.
+              This disposition will be removed from the workflow and will no
+              longer be available for dialers to select during calls.
             </p>
-            <p>Past call records and reports will remain unchanged</p>
+            <p>Past call records and reports will remain unchanged.</p>
           </>
         }
       />
@@ -216,15 +247,10 @@ const WorkflowDetailsView = ({
         onOpenChange={setMoveToDraftOpen}
         title={`Move ${workflow.name} to Draft?`}
         actionLabel="Move to Draft"
-        onConfirm={() => {
-          setDraftRules(activeRules);
-          setActiveRules([]);
-          setStatus("Draft");
-          setMoveToDraftOpen(false);
-        }}
+        onConfirm={() => handleStatusChange("draft")}
         content={
           <>
-            <p>This workflow is currently assigned to 5 active lists.</p>
+            <p>This workflow is currently assigned to active lists.</p>
             <div>
               <p>Moving it to draft will:</p>
               <ul className={workflowsStyles.bulletList}>

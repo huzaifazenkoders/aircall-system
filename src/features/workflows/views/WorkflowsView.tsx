@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -10,36 +10,41 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import CreateWorkflowDialog from "@/features/workflows/components/CreateWorkflowDialog";
 import WorkflowTemplateCard from "@/features/workflows/components/WorkflowTemplateCard";
-import {
-  workflowsSummary,
-  WorkflowStatus,
-} from "@/features/workflows/data/workflowsData";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
+import { useGetWorkflows } from "@/features/workflows/services/workflowService";
+import { WorkflowStatus } from "@/features/workflows/types/workflowTypes";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
-const statusOptions: Array<"All Status" | WorkflowStatus> = [
-  "All Status",
-  "Active",
-  "Draft",
+type StatusFilter = "all" | WorkflowStatus;
+
+const statusOptions: Array<{ label: string; value: StatusFilter }> = [
+  { label: "All Status", value: "all" },
+  { label: "Active", value: "publish" },
+  { label: "Draft", value: "draft" }
 ];
 
 const WorkflowsView = () => {
   const router = useRouter();
   const [createOpen, setCreateOpen] = React.useState(false);
-  const [statusFilter, setStatusFilter] = React.useState<"All Status" | WorkflowStatus>(
-    "All Status"
-  );
+  const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
 
-  const filteredWorkflows = React.useMemo(() => {
-    if (statusFilter === "All Status") {
-      return workflowsSummary;
-    }
+  const {
+    data,
+    isPending,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useGetWorkflows({
+    limit: 10,
+    status: statusFilter === "all" ? undefined : statusFilter
+  });
 
-    return workflowsSummary.filter((workflow) => workflow.status === statusFilter);
-  }, [statusFilter]);
+  const workflows = transformInfiniteData(data, "data");
 
   return (
     <div className={workflowsStyles.page}>
@@ -49,47 +54,77 @@ const WorkflowsView = () => {
         <div className={workflowsStyles.pageActions}>
           <Select
             value={statusFilter}
-            onValueChange={(value) =>
-              setStatusFilter(value as "All Status" | WorkflowStatus)
-            }
+            onValueChange={(value) => setStatusFilter(value as StatusFilter)}
           >
             <SelectTrigger className={workflowsStyles.filterTrigger}>
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
-            <SelectContent className={workflowsStyles.selectContent} align="end">
+            <SelectContent
+              className={workflowsStyles.selectContent}
+              align="end"
+            >
               {statusOptions.map((option) => (
                 <SelectItem
-                  key={option}
-                  value={option}
+                  key={option.value}
+                  value={option.value}
                   className={workflowsStyles.selectItem}
                 >
-                  {option}
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
           <Button
+            size="xl"
             className={workflowsStyles.createButton}
             onClick={() => setCreateOpen(true)}
           >
-            <PlusIcon className="size-5" />
+            <PlusIcon className="size-4" />
             Create New Template
           </Button>
         </div>
       </div>
 
-      <div className={workflowsStyles.cardGrid}>
-        {filteredWorkflows.map((workflow) => (
-          <WorkflowTemplateCard key={workflow.id} workflow={workflow} />
-        ))}
-      </div>
+      {isPending ? (
+        <div className="mt-12 flex justify-center">
+          <Loader2Icon className="size-8 animate-spin text-secondary" />
+        </div>
+      ) : error ? (
+        <div className="mt-12 text-center text-sm text-red-500">
+          Failed to load workflows. Please try again.
+        </div>
+      ) : !workflows.length ? (
+        <div className="mt-12 text-center font-semibold text-secondary">
+          No workflows found.
+        </div>
+      ) : (
+        <>
+          <div className={workflowsStyles.cardGrid}>
+            {workflows.map((workflow) => (
+              <WorkflowTemplateCard key={workflow.id} workflow={workflow} />
+            ))}
+          </div>
 
-      <CreateWorkflowDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onContinue={() => router.push("/workflows/vip-event-workflow")}
-      />
+          {hasNextPage && (
+            <div className="mt-6 flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => fetchNextPage()}
+                disabled={isFetchingNextPage}
+              >
+                {isFetchingNextPage ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  "Load More"
+                )}
+              </Button>
+            </div>
+          )}
+        </>
+      )}
+
+      <CreateWorkflowDialog open={createOpen} onOpenChange={setCreateOpen} />
     </div>
   );
 };

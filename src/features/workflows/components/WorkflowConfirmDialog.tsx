@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
 
@@ -21,7 +21,7 @@ const WorkflowConfirmDialog = ({
   content,
   actionLabel,
   onConfirm,
-  destructive = false,
+  destructive = false
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,7 +36,9 @@ const WorkflowConfirmDialog = ({
       <DialogContent className={workflowsStyles.wideDialogContent}>
         <DialogHeader className={workflowsStyles.dialogHeader}>
           <div>
-            <DialogTitle className={workflowsStyles.dialogTitle}>{title}</DialogTitle>
+            <DialogTitle className={workflowsStyles.dialogTitle}>
+              {title}
+            </DialogTitle>
           </div>
           <DialogIconClose />
         </DialogHeader>
@@ -46,19 +48,10 @@ const WorkflowConfirmDialog = ({
         </DialogBody>
 
         <DialogFooter className={workflowsStyles.dialogFooter}>
-          <Button
-            variant="outline"
-            className={workflowsStyles.cancelButton}
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            className={
-              destructive
-                ? workflowsStyles.dangerButton
-                : workflowsStyles.saveButton
-            }
             onClick={() => {
               onConfirm();
               onOpenChange(false);

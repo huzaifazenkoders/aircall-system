@@ -9,17 +9,16 @@ export type DynamicObject = {
 };
 
 export interface PaginationRes {
-  pagination: IPagination;
+  meta: IPagination;
 }
 
 export interface IPagination {
-  lastPage: number;
-  limit: number;
-  nextPage: number | null;
-  page: number;
-  prevPage: number | null;
   total: number;
+  page: string;
+  limit: string;
   totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 }
 
 export interface PaginationReq {
