@@ -13,12 +13,12 @@ export const groupsStyles = {
     "max-w-[460px] text-[16px] leading-8 text-text-secondary"
   ),
   successBanner: cn(
-    "mx-auto flex w-full max-w-[640px] items-start gap-4 rounded-[18px] bg-success-soft px-6 py-5 text-success-fg shadow-xs"
+    "mx-auto flex w-full max-w-[640px] items-start gap-4 rounded-lg bg-success-soft px-6 py-5 text-success-fg shadow-xs"
   ),
   successTitle: cn("text-[18px] font-semibold"),
   successText: cn("mt-1 text-[16px]"),
   tableCard: cn(
-    "overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
+    "overflow-hidden rounded-lg bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn("flex items-center border-b border-zinc-200 px-6 py-4"),
   filterRow: cn("flex flex-1 items-center justify-end gap-4"),
@@ -89,8 +89,8 @@ export const groupsStyles = {
   assignmentMeta: cn("mt-0 text-sm text-panel-muted"),
   memberMetaRow: cn("flex items-center gap-4"),
   footerActions: cn("mt-auto grid grid-cols-2 gap-5 py-6 px-6"),
-  dialogContent: cn("max-w-[790px] rounded-[30px] p-0"),
-  selectionDialogContent: cn("max-w-[790px] rounded-[30px] p-0"),
+  dialogContent: cn("max-w-[790px] rounded-lg p-0"),
+  selectionDialogContent: cn("max-w-[790px] rounded-lg p-0"),
   dialogHeader: cn("items-start p-4 px-6"),
   dialogTitle: cn("mt-0 text-[18px] font-medium text-text-primary"),
   dialogSubtitle: cn("mt-0 text-[14px] leading-7 text-panel-muted"),
@@ -102,27 +102,27 @@ export const groupsStyles = {
     "flex h-11 items-center justify-between rounded-lg border border-border-primary bg-white px-4 text-[16px] text-panel-muted shadow-xs"
   ),
   memberPanel: cn(
-    "overflow-hidden rounded-[20px] border border-border bg-white shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
+    "overflow-hidden rounded-lg border border-border bg-white shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
   ),
   memberList: cn("max-h-[260px] overflow-y-auto custom-scrollbar px-4 pb-4"),
   memberRow: cn("grid grid-cols-[auto_auto_1fr] items-center gap-4 pt-4"),
-  selectionRow: cn("grid grid-cols-[auto_auto_1fr] items-center gap-4 py-4"),
+  selectionRow: cn("grid grid-cols-[auto_auto_1fr] items-center gap-4 py-2"),
   listCheckboxSpacer: cn("size-11"),
   selectionEmptyState: cn(
-    "flex min-h-[430px] flex-col items-center justify-center px-8 py-12 text-center"
+    "flex min-h-[260px] flex-col items-center justify-center px-8 py-12 text-center"
   ),
   selectionEmptyIconWrap: cn(
     "grid size-20 place-items-center rounded-full bg-[#EEFBFB]"
   ),
-  selectionEmptyTitle: cn("mt-6 text-[28px] font-semibold text-text-primary"),
+  selectionEmptyTitle: cn("mt-6 text-[24px] font-medium text-text-primary"),
   selectionEmptyDescription: cn(
-    "mt-4 max-w-[360px] text-[18px] leading-8 text-text-secondary"
+    "mt-0 max-w-[360px] text-sm leading-8 text-text-secondary"
   ),
   avatar: cn(
     "grid size-11 place-items-center overflow-hidden rounded-full text-[16px] font-semibold"
   ),
   dialogFooter: cn("justify-end gap-4 px-6 pt-0 pb-6"),
-  confirmDialogContent: cn("max-w-[780px] rounded-[30px] p-0"),
+  confirmDialogContent: cn("max-w-[780px] rounded-lg p-0"),
   confirmDialogHeader: cn("items-start border-none px-6 pt-6 pb-0"),
   confirmDialogTitle: cn("text-[24px] font-medium text-text-primary"),
   confirmDialogSubtitle: cn("mt-2 text-text-secondary"),

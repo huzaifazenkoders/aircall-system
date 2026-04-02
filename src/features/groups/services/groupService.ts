@@ -165,6 +165,18 @@ export const useAddUsersToGroup = () =>
     }
   });
 
+// ─── Activate Group ──────────────────────────────────────────────────────────
+
+export const useActivateGroup = () =>
+  useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const res = await axiosInstance.patch("/groups/activate-group", null, {
+        params: { id }
+      });
+      return res.data as UpdateGroupStatusRes;
+    }
+  });
+
 // ─── Update Group ─────────────────────────────────────────────────────────────
 
 interface UpdateGroupReq {

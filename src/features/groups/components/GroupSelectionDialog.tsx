@@ -6,7 +6,7 @@ import {
   ChevronUpIcon,
   ListChecksIcon,
   SearchIcon,
-  UsersRoundIcon,
+  UsersRoundIcon
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import GroupAvatar from "@/features/groups/components/GroupAvatar";
 import { GroupMember } from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import TextInput from "@/components/ui/text-input";
 
 type SelectionItem = {
   id: string;
@@ -46,7 +52,7 @@ const GroupSelectionDialog = ({
   emptyKind,
   items,
   initialSelectedIds,
-  onSubmit,
+  onSubmit
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -64,13 +70,18 @@ const GroupSelectionDialog = ({
   onSubmit: (selectedIds: string[]) => void;
 }) => {
   const [query, setQuery] = React.useState("");
-  const [pickerOpen, setPickerOpen] = React.useState(true);
-  const [selectedIds, setSelectedIds] = React.useState<string[]>(initialSelectedIds ?? []);
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [selectedIds, setSelectedIds] = React.useState<string[]>(
+    initialSelectedIds ?? []
+  );
+  const lockedIds = React.useMemo(
+    () => new Set(initialSelectedIds ?? []),
+    [initialSelectedIds]
+  );
 
   React.useEffect(() => {
     if (open) {
       setQuery("");
-      setPickerOpen(true);
       setSelectedIds(initialSelectedIds ?? []);
     }
   }, [initialSelectedIds, open]);
@@ -82,14 +93,29 @@ const GroupSelectionDialog = ({
       return items;
     }
 
-    return items.filter((item) => item.title.toLowerCase().includes(search));
+    return items.filter((item) => {
+      const titleMatch = item.title.toLowerCase().includes(search);
+      const subtitleMatch = item.subtitle?.toLowerCase().includes(search);
+      return titleMatch || subtitleMatch;
+    });
   }, [items, query]);
 
   const toggleItem = (itemId: string, checked: boolean) => {
-    setSelectedIds((current) =>
-      checked ? [...current, itemId] : current.filter((value) => value !== itemId)
-    );
+    if (lockedIds.has(itemId)) {
+      return;
+    }
+
+    setSelectedIds((current) => {
+      if (checked) {
+        return current.includes(itemId) ? current : [...current, itemId];
+      }
+
+      return current.filter((value) => value !== itemId);
+    });
   };
+
+  const resolvedTriggerLabel =
+    selectedIds.length > 0 ? `${selectedIds.length} selected` : triggerLabel;
 
   const EmptyIcon = emptyKind === "members" ? UsersRoundIcon : ListChecksIcon;
 
@@ -98,7 +124,9 @@ const GroupSelectionDialog = ({
       <DialogContent className={groupsStyles.selectionDialogContent}>
         <DialogHeader className={groupsStyles.dialogHeader}>
           <div>
-            <DialogTitle className={groupsStyles.dialogTitle}>{title}</DialogTitle>
+            <DialogTitle className={groupsStyles.dialogTitle}>
+              {title}
+            </DialogTitle>
             <DialogDescription className={groupsStyles.dialogSubtitle}>
               {description}
             </DialogDescription>
@@ -107,85 +135,106 @@ const GroupSelectionDialog = ({
         </DialogHeader>
 
         <DialogBody className={groupsStyles.dialogBody}>
-          <div className={groupsStyles.fieldGroup}>
-            <span className={groupsStyles.fieldLabel}>{fieldLabel}</span>
+          <div className={groupsStyles.formGrid}>
+            <div className={groupsStyles.fieldGroup}>
+              <span className={groupsStyles.fieldLabel}>{fieldLabel}</span>
 
-            <button
-              type="button"
-              className={groupsStyles.memberTrigger}
-              onClick={() => setPickerOpen((current) => !current)}
-            >
-              <span>{triggerLabel}</span>
-              {pickerOpen ? (
-                <ChevronUpIcon className="size-6 text-panel-muted" />
-              ) : (
-                <ChevronDownIcon className="size-6 text-panel-muted" />
-              )}
-            </button>
+              <DropdownMenu open={pickerOpen} onOpenChange={setPickerOpen}>
+                <DropdownMenuTrigger
+                  render={
+                    <button
+                      type="button"
+                      className={groupsStyles.memberTrigger}
+                    >
+                      <span>{resolvedTriggerLabel}</span>
+                      {pickerOpen ? (
+                        <ChevronUpIcon className="size-6 text-panel-muted" />
+                      ) : (
+                        <ChevronDownIcon className="size-6 text-panel-muted" />
+                      )}
+                    </button>
+                  }
+                />
 
-            {pickerOpen ? (
-              <div className={groupsStyles.memberPanel}>
-                <div className={groupsStyles.memberSearchField}>
-                  <SearchIcon className="size-6 text-panel-muted" />
-                  <input
-                    className={groupsStyles.memberSearchInput}
-                    placeholder={searchPlaceholder}
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                  />
-                </div>
-
-                {filteredItems.length ? (
-                  <div className={groupsStyles.memberList}>
-                    {filteredItems.map((item) => {
-                      const checked = selectedIds.includes(item.id);
-
-                      return (
-                        <label key={item.id} className={groupsStyles.selectionRow}>
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={(value) => toggleItem(item.id, Boolean(value))}
-                            className="size-7 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary"
-                          />
-                          {item.member ? (
-                            <GroupAvatar member={item.member} />
-                          ) : (
-                            <div className={groupsStyles.listCheckboxSpacer} />
-                          )}
-                          <div>
-                            <div className={groupsStyles.assignmentTitle}>{item.title}</div>
-                            {item.subtitle ? (
-                              <div className={groupsStyles.assignmentMeta}>{item.subtitle}</div>
-                            ) : null}
-                          </div>
-                        </label>
-                      );
-                    })}
+                <DropdownMenuContent
+                  className={`${groupsStyles.memberPanel} w-(--anchor-width) p-0`}
+                  sideOffset={8}
+                >
+                  <div className="px-3 pt-3">
+                    <TextInput
+                      startIcon={
+                        <SearchIcon className="size-6 text-panel-muted" />
+                      }
+                      placeholder={searchPlaceholder}
+                      value={query}
+                      setValue={setQuery}
+                    />
                   </div>
-                ) : (
-                  <div className={groupsStyles.selectionEmptyState}>
-                    <div className={groupsStyles.selectionEmptyIconWrap}>
-                      <EmptyIcon className="size-10 text-[#1795A1]" />
+
+                  {filteredItems.length ? (
+                    <div className={groupsStyles.memberList}>
+                      {filteredItems.map((item) => {
+                        const checked = selectedIds.includes(item.id);
+                        const isLocked = lockedIds.has(item.id);
+
+                        return (
+                          <label
+                            key={item.id}
+                            className={groupsStyles.selectionRow}
+                          >
+                            <Checkbox
+                              checked={checked}
+                              disabled={isLocked}
+                              onCheckedChange={(value) =>
+                                toggleItem(item.id, Boolean(value))
+                              }
+                              className="size-7 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary disabled:opacity-100"
+                            />
+                            {item.member ? (
+                              <GroupAvatar member={item.member} />
+                            ) : (
+                              <div
+                                className={groupsStyles.listCheckboxSpacer}
+                              />
+                            )}
+                            <div>
+                              <div className={groupsStyles.assignmentTitle}>
+                                {item.title}
+                              </div>
+                              {item.subtitle ? (
+                                <div className={groupsStyles.assignmentMeta}>
+                                  {item.subtitle}
+                                </div>
+                              ) : null}
+                            </div>
+                          </label>
+                        );
+                      })}
                     </div>
-                    <div className={groupsStyles.selectionEmptyTitle}>{emptyTitle}</div>
-                    <div className={groupsStyles.selectionEmptyDescription}>{emptyDescription}</div>
-                  </div>
-                )}
-              </div>
-            ) : null}
+                  ) : (
+                    <div className={groupsStyles.selectionEmptyState}>
+                      <div className={groupsStyles.selectionEmptyIconWrap}>
+                        <EmptyIcon className="size-10 text-[#1795A1]" />
+                      </div>
+                      <div className={groupsStyles.selectionEmptyTitle}>
+                        {emptyTitle}
+                      </div>
+                      <div className={groupsStyles.selectionEmptyDescription}>
+                        {emptyDescription}
+                      </div>
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </DialogBody>
 
         <DialogFooter className={groupsStyles.dialogFooter}>
-          <Button
-            variant="outline"
-            className={groupsStyles.cancelButton}
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            className={groupsStyles.submitButton}
             disabled={!selectedIds.length}
             onClick={() => {
               onSubmit(selectedIds);

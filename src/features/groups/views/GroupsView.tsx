@@ -8,8 +8,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import GroupConfirmDialog from "@/features/groups/components/GroupConfirmDialog";
 import CreateGroupDialog from "@/features/groups/components/CreateGroupDialog";
-import DeactivateGroupDialog from "@/features/groups/components/DeactivateGroupDialog";
-import DeleteGroupDialog from "@/features/groups/components/DeleteGroupDialog";
 import EditGroupDialog from "@/features/groups/components/EditGroupDialog";
 import GroupDetailsSheet from "@/features/groups/components/GroupDetailsSheet";
 import GroupSelectionDialog from "@/features/groups/components/GroupSelectionDialog";
@@ -24,12 +22,18 @@ import {
   useAddUsersToGroup,
   useRemoveUserFromGroup,
   useUpdateGroupStatus,
+  useActivateGroup,
   useDeleteGroup
 } from "@/features/groups/services/groupService";
 import { groupKeys } from "@/features/groups/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
-import { Group, GroupInfo, GroupUser } from "@/features/groups/types/groupTypes";
+import {
+  Group,
+  GroupInfo,
+  GroupUser
+} from "@/features/groups/types/groupTypes";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { useUnassignList } from "@/features/list/services/listService";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
 
@@ -76,6 +80,8 @@ const GroupsView = () => {
     useRemoveUserFromGroup();
   const { mutate: updateStatus, isPending: isDeactivating } =
     useUpdateGroupStatus();
+  const { mutate: activateGroup, isPending: isActivating } = useActivateGroup();
+  const { mutate: unassignList, isPending: isUnassigning } = useUnassignList();
   const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
 
   const handleAddMembers = (memberIds: string[]) => {
@@ -101,9 +107,7 @@ const GroupsView = () => {
       { group_id: selectedGroupId, user_id: memberToRemove.id },
       {
         onSuccess: () => {
-          toast.success(
-            `${memberToRemove.first_name} removed from group`
-          );
+          toast.success(`${memberToRemove.first_name} removed from group`);
           queryClient.invalidateQueries({
             queryKey: groupKeys.info(selectedGroupId)
           });
@@ -115,22 +119,31 @@ const GroupsView = () => {
     );
   };
 
-  const handleDeactivate = () => {
+  const handleDeactivateOrActivate = () => {
     if (!selectedGroupId) return;
-    updateStatus(
-      { payload: { id: selectedGroupId } },
-      {
-        onSuccess: () => {
-          toast.success("Group status updated");
-          queryClient.invalidateQueries({
-            queryKey: groupKeys.info(selectedGroupId)
-          });
-          queryClient.invalidateQueries({ queryKey: groupKeys.all });
-          setDeactivateOpen(false);
-        },
-        onError: handleMutationError
-      }
+    const cached = queryClient.getQueryData<{ data: { is_active: boolean } }>(
+      groupKeys.info(selectedGroupId)
     );
+    const isActive = cached?.data?.is_active ?? true;
+    const onSuccess = () => {
+      toast.success(isActive ? "Group deactivated" : "Group activated");
+      queryClient.invalidateQueries({
+        queryKey: groupKeys.info(selectedGroupId)
+      });
+      queryClient.invalidateQueries({ queryKey: groupKeys.all });
+      setDeactivateOpen(false);
+    };
+    if (isActive) {
+      updateStatus(
+        { payload: { id: selectedGroupId } },
+        { onSuccess, onError: handleMutationError }
+      );
+    } else {
+      activateGroup(
+        { id: selectedGroupId },
+        { onSuccess, onError: handleMutationError }
+      );
+    }
   };
 
   const handleDelete = () => {
@@ -144,6 +157,26 @@ const GroupsView = () => {
           setDeleteOpen(false);
           setSheetOpen(false);
           setSelectedGroupId(null);
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
+  const handleUnassignList = () => {
+    if (!selectedGroupId || !listToUnassign) return;
+    unassignList(
+      {
+        payload: { list_id: listToUnassign.list.id, group_id: selectedGroupId }
+      },
+      {
+        onSuccess: () => {
+          toast.success("List unassigned from group");
+          queryClient.invalidateQueries({
+            queryKey: groupKeys.info(selectedGroupId)
+          });
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setListToUnassign(null);
         },
         onError: handleMutationError
       }
@@ -193,8 +226,8 @@ const GroupsView = () => {
               onSearchChange={setSearchValue}
               onStatusChange={setStatusFilter}
               onViewDetails={(groupId) => openDetails(groupId, "members")}
-              onAssignList={(groupId) => openDetails(groupId, "lists")}
-              onAddMember={(groupId) => openDetails(groupId, "members")}
+              onAssignList={() => setAssignListsOpen(true)}
+              onAddMember={() => setAddMembersOpen(true)}
             />
           </>
         )}
@@ -301,21 +334,25 @@ const GroupsView = () => {
         }
         prompt="Do you want to continue?"
         actionLabel="Unassign List"
-        onConfirm={() => {
-          // unassign list API to be wired when endpoint is available
-          setListToUnassign(null);
-        }}
+        onConfirm={handleUnassignList}
       />
 
-      <DeactivateGroupDialog
+      <GroupConfirmDialog
         open={deactivateOpen}
         onOpenChange={setDeactivateOpen}
-        onConfirm={handleDeactivate}
+        title="Update Group Status"
+        description="This will change the active status of the group."
+        prompt="Do you want to continue?"
+        actionLabel={isDeactivating || isActivating ? "Updating..." : "Confirm"}
+        onConfirm={handleDeactivateOrActivate}
       />
 
-      <DeleteGroupDialog
+      <GroupConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
+        title="Delete Group"
+        description="Deleting this group will remove all members and stop lead distribution to this group."
+        actionLabel={isDeleting ? "Deleting..." : "Delete Group"}
         onConfirm={handleDelete}
       />
 
@@ -323,7 +360,6 @@ const GroupsView = () => {
         open={editOpen}
         onOpenChange={setEditOpen}
         groupId={selectedGroupId}
-        members={groupMembers}
       />
     </div>
   );

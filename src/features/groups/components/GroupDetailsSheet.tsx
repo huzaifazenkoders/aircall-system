@@ -93,7 +93,7 @@ const GroupDetailsSheet = ({
                     onClick={onDeactivate}
                   >
                     <RotateCcwIcon className="size-5 text-panel-muted" />
-                    Deactivate
+                    {group?.is_active ? "Deactivate" : "Activate"}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={groupsStyles.menuItem}
