@@ -28,7 +28,7 @@ const AppShell = ({
         <AppSidebar activeKey={activeKey} />
         <div className="flex min-w-0 flex-col">
           <AppTopbar />
-          <main className="flex min-h-0 flex-1 flex-col px-1 pt-8 container mx-auto">
+          <main className="flex min-h-0 flex-1 flex-col px-1 pt-2 container mx-auto">
             {children}
           </main>
         </div>

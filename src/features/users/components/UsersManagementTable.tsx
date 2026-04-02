@@ -36,27 +36,27 @@ import {
   SelectItem
 } from "@/components/ui/select";
 import TextInput from "@/components/ui/text-input";
-import { UserRecord } from "@/features/users/data/usersData";
+import { User } from "@/features/users/types/userTypes";
 import { ReactDispatch } from "@/types/common";
 
 const PAGE_SIZE = 10;
 
-const statusBadge = (status: UserRecord["status"] | "Invite Send") => {
-  if (status === "Active")
+const statusBadge = (status: User["status"]) => {
+  if (status === "active")
     return (
       <span className="inline-flex items-center rounded-lg bg-teal-100 px-2.5 py-1 text-xs font-medium text-teal-600">
         Active
       </span>
     );
-  if (status === "Inactive")
+  if (status === "suspend")
     return (
       <span className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
-        Inactive
+        Suspended
       </span>
     );
   return (
     <span className="inline-flex items-center rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-500">
-      Invite Send
+      Invited
     </span>
   );
 };
@@ -72,7 +72,7 @@ const UsersManagementTable = ({
   onAssignList,
   onAddToGroup
 }: {
-  users: UserRecord[];
+  users: User[];
   selectedUserId: string;
   searchValue: string;
   onSearchChange: ReactDispatch<string>;
@@ -82,7 +82,7 @@ const UsersManagementTable = ({
   onAssignList?: ReactDispatch<string>;
   onAddToGroup?: ReactDispatch<string>;
 }) => {
-  type StatusFilter = "All Status" | "Active" | "Inactive";
+  type StatusFilter = "All Status" | "active" | "suspend" | "invited";
 
   const [statusFilter, setStatusFilter] =
     React.useState<StatusFilter>("All Status");
@@ -90,9 +90,7 @@ const UsersManagementTable = ({
 
   const filtered = React.useMemo(() => {
     if (statusFilter === "All Status") return users;
-    return users.filter(
-      (u) => u.status.toLowerCase() === statusFilter.toLowerCase()
-    );
+    return users.filter((u) => u.status === statusFilter);
   }, [users, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -118,14 +116,14 @@ const UsersManagementTable = ({
       </div>
 
       {/* Card */}
-      <div className="w-full overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]">
+      <div className="w-full overflow-hidden rounded-lg bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]">
         {/* Toolbar */}
-        <div className="flex items-center gap-4 border-b border-zinc-200 px-6 py-4">
+        <div className="flex items-center gap-4 border-b border-zinc-200 px-6 py-6">
           <TextInput
             setValue={onSearchChange}
             value={searchValue}
             placeholder="Search by name, email, or phone"
-            className="h-9 w-96 text-sm"
+            className="w-96 text-sm"
             startIcon={<SearchIcon className="size-4 text-gray-500" />}
           />
           <div className="flex flex-1 justify-end">
@@ -138,8 +136,9 @@ const UsersManagementTable = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All Status">All Status</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Inactive">Inactive</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="invited">Invited</SelectItem>
+                <SelectItem value="suspend">Suspended</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -181,19 +180,19 @@ const UsersManagementTable = ({
                 onClick={() => onSelectUser(user.id)}
               >
                 <TableCell className="w-44 px-4 text-sm text-gray-800">
-                  {user.name}
+                  {user.first_name} {user.last_name}
                 </TableCell>
                 <TableCell className="w-48 px-4 text-sm text-gray-800">
                   {user.email}
                 </TableCell>
                 <TableCell className="w-48 px-4 text-sm text-gray-800">
-                  {user.phone}
+                  {user.phone_number ?? "—"}
                 </TableCell>
                 <TableCell className="w-40 px-4 text-sm text-gray-800">
-                  {user.groups.length}
+                  {user.total_groups ?? 0}
                 </TableCell>
                 <TableCell className="w-40 px-4 text-sm text-gray-800">
-                  {user.assignedLists.length}
+                  {user.total_lists ?? 0}
                 </TableCell>
                 <TableCell className="w-32 px-4">
                   {statusBadge(user.status)}
@@ -214,24 +213,24 @@ const UsersManagementTable = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="w-40 rounded-xl p-1"
+                      className="w-40 rounded-xl py-2 px-0"
                     >
                       <DropdownMenuItem
-                        className="gap-3 rounded-lg px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
                         onClick={() => onViewDetails?.(user.id)}
                       >
                         <EyeIcon className="size-4 text-gray-500" />
                         View Details
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="gap-3 rounded-lg px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
                         onClick={() => onAssignList?.(user.id)}
                       >
                         <ListIcon className="size-4 text-gray-500" />
                         Assign List
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="gap-3 rounded-lg px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
                         onClick={() => onAddToGroup?.(user.id)}
                       >
                         <UsersIcon className="size-4 text-gray-500" />
