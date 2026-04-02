@@ -4,6 +4,7 @@ import React from "react";
 import {
   ArrowLeftIcon,
   EllipsisVerticalIcon,
+  Loader2Icon,
   PencilIcon,
   RotateCcwIcon,
   Trash2Icon
@@ -18,15 +19,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GroupAvatar from "@/features/groups/components/GroupAvatar";
-import {
-  GroupAssignedList,
-  GroupMember,
-  GroupRecord
-} from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import { useGetGroupInfo } from "@/features/groups/services/groupService";
+import { GroupInfo, GroupUser } from "@/features/groups/types/groupTypes";
+
+type ListAssignment = GroupInfo["list_assignments"][number];
 
 const GroupDetailsSheet = ({
-  group,
+  groupId,
   open,
   activeTab,
   onTabChange,
@@ -36,23 +36,26 @@ const GroupDetailsSheet = ({
   onRemoveMember,
   onUnassignList,
   onDeactivate,
-  onDelete
+  onDelete,
+  onEdit,
 }: {
-  group: GroupRecord | null;
+  groupId: string | null;
   open: boolean;
   activeTab: "members" | "lists";
   onTabChange: (tab: "members" | "lists") => void;
   onClose: () => void;
   onAddMembers: () => void;
   onAssignLists: () => void;
-  onRemoveMember: (member: GroupMember) => void;
-  onUnassignList: (list: GroupAssignedList) => void;
+  onRemoveMember: (user: GroupUser) => void;
+  onUnassignList: (assignment: ListAssignment) => void;
   onDeactivate: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 }) => {
-  if (!open || !group) {
-    return null;
-  }
+  const { data, isPending } = useGetGroupInfo(groupId ?? "");
+  const group = data?.data;
+
+  if (!open || !groupId) return null;
 
   return (
     <>
@@ -81,7 +84,7 @@ const GroupDetailsSheet = ({
                   align="end"
                   sideOffset={12}
                 >
-                  <DropdownMenuItem className={groupsStyles.menuItem}>
+                  <DropdownMenuItem className={groupsStyles.menuItem} onClick={onEdit}>
                     <PencilIcon className="size-5 text-panel-muted" />
                     Edit
                   </DropdownMenuItem>
@@ -104,109 +107,149 @@ const GroupDetailsSheet = ({
             </div>
           </header>
 
-          <div className={groupsStyles.sheetLeadRow}>
-            <div>
-              <div className={groupsStyles.sheetGroupName}>{group.name}</div>
-              <p className={groupsStyles.sheetDescription}>
-                {group.description}
-              </p>
+          {isPending ? (
+            <div className="flex flex-1 items-center justify-center py-12">
+              <Loader2Icon className="size-8 animate-spin text-secondary" />
             </div>
-            <span className={groupsStyles.sheetStatus}>{group.status}</span>
-          </div>
-
-          <div className={groupsStyles.tabsWrap}>
-            <Tabs
-              value={activeTab}
-              onValueChange={(value) =>
-                onTabChange(value as "members" | "lists")
-              }
-            >
-              <TabsList variant="line" className={groupsStyles.tabsList}>
-                <TabsTrigger
-                  value="members"
-                  className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
-                >
-                  Members
-                  <span className={groupsStyles.countBadge}>
-                    {group.members.length}
-                  </span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="lists"
-                  className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
-                >
-                  Assigned Lists
-                  <span className={groupsStyles.countBadge}>
-                    {group.assignedLists.length}
-                  </span>
-                </TabsTrigger>
-              </TabsList>
-
-              <div className={groupsStyles.sheetBody}>
-                <TabsContent
-                  value="members"
-                  className={groupsStyles.assignmentList}
-                >
-                  {group.members.map((member) => (
-                    <div key={member.id} className={groupsStyles.assignmentRow}>
-                      <div className={groupsStyles.memberMetaRow}>
-                        <GroupAvatar member={member} />
-                        <div>
-                          <div className={groupsStyles.assignmentTitle}>
-                            {member.name}
-                          </div>
-                          <div className={groupsStyles.assignmentMeta}>
-                            {member.role ?? "Representative"}
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline-transparent"
-                        size={"sm"}
-                        onClick={() => onRemoveMember(member)}
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ))}
-                </TabsContent>
-
-                <TabsContent
-                  value="lists"
-                  className={groupsStyles.assignmentList}
-                >
-                  {group.assignedLists.map((assignedList) => (
-                    <div
-                      key={assignedList.id}
-                      className={groupsStyles.assignmentRow}
-                    >
-                      <div>
-                        <div className={groupsStyles.assignmentTitle}>
-                          {assignedList.name}
-                        </div>
-                        <div className={groupsStyles.assignmentMeta}>
-                          {assignedList.leads} Leads
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size={"sm"}
-                        onClick={() => onUnassignList(assignedList)}
-                      >
-                        Unassign
-                      </Button>
-                    </div>
-                  ))}
-                </TabsContent>
+          ) : !group ? (
+            <div className="flex flex-1 items-center justify-center py-12 text-sm text-red-500">
+              Failed to load group details.
+            </div>
+          ) : (
+            <>
+              <div className={groupsStyles.sheetLeadRow}>
+                <div>
+                  <div className={groupsStyles.sheetGroupName}>
+                    {group.name}
+                  </div>
+                  <p className={groupsStyles.sheetDescription}>
+                    {group.description}
+                  </p>
+                </div>
+                <span className={groupsStyles.sheetStatus}>
+                  {group.is_active ? "Active" : "Inactive"}
+                </span>
               </div>
-            </Tabs>
-          </div>
-          <div className={groupsStyles.footerActions}>
-            <Button variant="outline" onClick={onAddMembers}>
-              Add Member
-            </Button>
-            <Button onClick={onAssignLists}>Assign List</Button>
-          </div>
+
+              <div className={groupsStyles.tabsWrap}>
+                <Tabs
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    onTabChange(value as "members" | "lists")
+                  }
+                >
+                  <TabsList variant="line" className={groupsStyles.tabsList}>
+                    <TabsTrigger
+                      value="members"
+                      className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
+                    >
+                      Members
+                      <span className={groupsStyles.countBadge}>
+                        {group.user_groups.length}
+                      </span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="lists"
+                      className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
+                    >
+                      Assigned Lists
+                      <span className={groupsStyles.countBadge}>
+                        {group.list_assignments.length}
+                      </span>
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <div className={groupsStyles.sheetBody}>
+                    <TabsContent
+                      value="members"
+                      className={groupsStyles.assignmentList}
+                    >
+                      {group.user_groups.length ? (
+                        group.user_groups.map((user) => (
+                          <div
+                            key={user.id}
+                            className={groupsStyles.assignmentRow}
+                          >
+                            <div className={groupsStyles.memberMetaRow}>
+                              <GroupAvatar
+                                member={{
+                                  id: user.id,
+                                  name: `${user.user.first_name} ${user.user.last_name}`,
+                                  accent: "#147B8A",
+                                  tint: "#DAF4F6",
+                                  role: user.user.role
+                                }}
+                              />
+                              <div>
+                                <div className={groupsStyles.assignmentTitle}>
+                                  {user.user.first_name} {user.user.last_name}
+                                </div>
+                                <div className={groupsStyles.assignmentMeta}>
+                                  {user.user.role ?? "Representative"}
+                                </div>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline-transparent"
+                              size="sm"
+                              onClick={() => onRemoveMember(user.user)}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex w-full center h-32 font-semibold text-lg">
+                          No user found
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent
+                      value="lists"
+                      className={groupsStyles.assignmentList}
+                    >
+                      {group.list_assignments.length ? (
+                        group.list_assignments.map((assignedList, i) => (
+                          <div
+                            key={assignedList.id}
+                            className={groupsStyles.assignmentRow}
+                          >
+                            <div>
+                              <div className={groupsStyles.assignmentTitle}>
+                                {assignedList.list.name}
+                              </div>
+                              <div className={groupsStyles.assignmentMeta}>
+                                {assignedList.list.total_leads} Leads
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size={"sm"}
+                              onClick={() => onUnassignList(assignedList)}
+                            >
+                              Unassign
+                            </Button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="flex w-full center h-32 font-semibold text-lg">
+                          No lists assigned yet.
+                        </div>
+                      )}
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </div>
+
+              <div className={groupsStyles.footerActions}>
+                <Button variant="outline" onClick={onAddMembers}>
+                  Add Member
+                </Button>
+                <Button onClick={onAssignLists}>Assign List</Button>
+              </div>
+            </>
+          )}
         </section>
       </aside>
     </>

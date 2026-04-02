@@ -1,29 +1,41 @@
 "use client";
 
 import React from "react";
+import { Loader2Icon } from "lucide-react";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import GroupConfirmDialog from "@/features/groups/components/GroupConfirmDialog";
 import CreateGroupDialog from "@/features/groups/components/CreateGroupDialog";
+import DeactivateGroupDialog from "@/features/groups/components/DeactivateGroupDialog";
+import DeleteGroupDialog from "@/features/groups/components/DeleteGroupDialog";
+import EditGroupDialog from "@/features/groups/components/EditGroupDialog";
 import GroupDetailsSheet from "@/features/groups/components/GroupDetailsSheet";
 import GroupSelectionDialog from "@/features/groups/components/GroupSelectionDialog";
 import GroupsEmptyState from "@/features/groups/components/GroupsEmptyState";
 import GroupsTable, {
   GroupsCreatedBanner
 } from "@/features/groups/components/GroupsTable";
-import {
-  GroupAssignedList,
-  GroupMember,
-  GroupRecord,
-  GroupStatus,
-  availableListsCatalog,
-  groupMembers,
-  groupsSeedData
-} from "@/features/groups/data/groupsData";
+import { GroupStatus, groupMembers } from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import {
+  useGetGroups,
+  useAddUsersToGroup,
+  useRemoveUserFromGroup,
+  useUpdateGroupStatus,
+  useDeleteGroup
+} from "@/features/groups/services/groupService";
+import { groupKeys } from "@/features/groups/query-keys";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { Group, GroupInfo, GroupUser } from "@/features/groups/types/groupTypes";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+
+type ListAssignment = GroupInfo["list_assignments"][number];
 
 const GroupsView = () => {
-  const [groups, setGroups] = React.useState<GroupRecord[]>(groupsSeedData);
+  const queryClient = useQueryClient();
+
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createdName, setCreatedName] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
@@ -39,179 +51,103 @@ const GroupsView = () => {
   >("members");
   const [addMembersOpen, setAddMembersOpen] = React.useState(false);
   const [assignListsOpen, setAssignListsOpen] = React.useState(false);
-  const [memberToRemove, setMemberToRemove] =
-    React.useState<GroupMember | null>(null);
+  const [memberToRemove, setMemberToRemove] = React.useState<GroupUser | null>(
+    null
+  );
   const [listToUnassign, setListToUnassign] =
-    React.useState<GroupAssignedList | null>(null);
+    React.useState<ListAssignment | null>(null);
   const [deactivateOpen, setDeactivateOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [editOpen, setEditOpen] = React.useState(false);
 
-  const handleCreateGroup = ({
-    name,
-    description,
-    memberIds
-  }: {
-    name: string;
-    description: string;
-    memberIds: string[];
-  }) => {
-    const selectedMembers = groupMembers.filter((member) =>
-      memberIds.includes(member.id)
-    );
+  const isActiveFilter =
+    statusFilter === "All Status" ? undefined : statusFilter === "Active";
 
-    const createdGroup: GroupRecord = {
-      id: name.toLowerCase().replaceAll(" ", "-"),
-      name,
-      description,
-      members: selectedMembers,
-      assignedLists: [
-        { id: "gold-coast-event", name: "Gold Cost Event", leads: 150 },
-        { id: "live-event-brisbane", name: "Live Event Brisbane", leads: 80 }
-      ],
-      createdOn: "04/12/26",
-      status: "Active"
-    };
+  const { data, isPending, error } = useGetGroups({
+    limit: 10,
+    search: searchValue || undefined,
+    is_active: isActiveFilter
+  });
 
-    setGroups((current) => [
-      current[0] ?? groupsSeedData[0],
-      createdGroup,
-      ...current.slice(1)
-    ]);
-    setCreatedName(name);
-  };
+  const groups: Group[] = transformInfiniteData(data, "data");
 
-  const filteredGroups = React.useMemo(() => {
-    return groups.filter((group) => {
-      const matchesSearch = group.name
-        .toLowerCase()
-        .includes(searchValue.trim().toLowerCase());
-      const matchesStatus =
-        statusFilter === "All Status" || group.status === statusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
-  }, [groups, searchValue, statusFilter]);
-
-  const selectedGroup =
-    groups.find((group) => group.id === selectedGroupId) ??
-    filteredGroups[0] ??
-    null;
-
-  const availableMembersForSelectedGroup = React.useMemo(() => {
-    if (!selectedGroup) {
-      return [];
-    }
-
-    const existingMemberIds = new Set(
-      selectedGroup.members.map((member) => member.id)
-    );
-
-    return groupMembers.filter((member) => !existingMemberIds.has(member.id));
-  }, [selectedGroup]);
-
-  const availableListsForSelectedGroup = React.useMemo(() => {
-    if (!selectedGroup) {
-      return [];
-    }
-
-    const existingListIds = new Set(
-      selectedGroup.assignedLists.map((assignedList) => assignedList.id)
-    );
-
-    return availableListsCatalog.filter(
-      (list) => !existingListIds.has(list.id)
-    );
-  }, [selectedGroup]);
-
-  const updateGroup = React.useCallback(
-    (groupId: string, updater: (group: GroupRecord) => GroupRecord | null) => {
-      setGroups(
-        (current) =>
-          current
-            .map((group) => (group.id === groupId ? updater(group) : group))
-            .filter(Boolean) as GroupRecord[]
-      );
-    },
-    []
-  );
+  const { mutate: addUsers, isPending: isAddingUsers } = useAddUsersToGroup();
+  const { mutate: removeUser, isPending: isRemoving } =
+    useRemoveUserFromGroup();
+  const { mutate: updateStatus, isPending: isDeactivating } =
+    useUpdateGroupStatus();
+  const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
 
   const handleAddMembers = (memberIds: string[]) => {
-    if (!selectedGroup) {
-      return;
-    }
-
-    const newMembers = groupMembers.filter((member) =>
-      memberIds.includes(member.id)
+    if (!selectedGroupId) return;
+    addUsers(
+      { payload: { id: selectedGroupId, user_ids: memberIds } },
+      {
+        onSuccess: () => {
+          toast.success("Members added successfully");
+          queryClient.invalidateQueries({
+            queryKey: groupKeys.info(selectedGroupId)
+          });
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+        },
+        onError: handleMutationError
+      }
     );
-
-    updateGroup(selectedGroup.id, (group) => ({
-      ...group,
-      members: [...group.members, ...newMembers]
-    }));
-  };
-
-  const handleAssignLists = (listIds: string[]) => {
-    if (!selectedGroup) {
-      return;
-    }
-
-    const newLists = availableListsCatalog.filter((list) =>
-      listIds.includes(list.id)
-    );
-
-    updateGroup(selectedGroup.id, (group) => ({
-      ...group,
-      assignedLists: [...group.assignedLists, ...newLists]
-    }));
   };
 
   const handleRemoveMember = () => {
-    if (!selectedGroup || !memberToRemove) {
-      return;
-    }
-
-    updateGroup(selectedGroup.id, (group) => ({
-      ...group,
-      members: group.members.filter((member) => member.id !== memberToRemove.id)
-    }));
-    setMemberToRemove(null);
-  };
-
-  const handleUnassignList = () => {
-    if (!selectedGroup || !listToUnassign) {
-      return;
-    }
-
-    updateGroup(selectedGroup.id, (group) => ({
-      ...group,
-      assignedLists: group.assignedLists.filter(
-        (assignedList) => assignedList.id !== listToUnassign.id
-      )
-    }));
-    setListToUnassign(null);
+    if (!selectedGroupId || !memberToRemove) return;
+    removeUser(
+      { group_id: selectedGroupId, user_id: memberToRemove.id },
+      {
+        onSuccess: () => {
+          toast.success(
+            `${memberToRemove.first_name} removed from group`
+          );
+          queryClient.invalidateQueries({
+            queryKey: groupKeys.info(selectedGroupId)
+          });
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setMemberToRemove(null);
+        },
+        onError: handleMutationError
+      }
+    );
   };
 
   const handleDeactivate = () => {
-    if (!selectedGroup) {
-      return;
-    }
-
-    updateGroup(selectedGroup.id, (group) => ({
-      ...group,
-      status: "Inactive"
-    }));
-    setDeactivateOpen(false);
+    if (!selectedGroupId) return;
+    updateStatus(
+      { payload: { id: selectedGroupId } },
+      {
+        onSuccess: () => {
+          toast.success("Group status updated");
+          queryClient.invalidateQueries({
+            queryKey: groupKeys.info(selectedGroupId)
+          });
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setDeactivateOpen(false);
+        },
+        onError: handleMutationError
+      }
+    );
   };
 
   const handleDelete = () => {
-    if (!selectedGroup) {
-      return;
-    }
-
-    updateGroup(selectedGroup.id, () => null);
-    setDeleteOpen(false);
-    setSheetOpen(false);
-    setSelectedGroupId(null);
+    if (!selectedGroupId) return;
+    deleteGroup(
+      { id: selectedGroupId },
+      {
+        onSuccess: () => {
+          toast.success("Group deleted successfully");
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setDeleteOpen(false);
+          setSheetOpen(false);
+          setSelectedGroupId(null);
+        },
+        onError: handleMutationError
+      }
+    );
   };
 
   const openDetails = (groupId: string, tab: "members" | "lists") => {
@@ -223,7 +159,17 @@ const GroupsView = () => {
   return (
     <div className={groupsStyles.page}>
       <div className={groupsStyles.pageInner}>
-        {groups.length === 0 ? (
+        {isPending ? (
+          <div className="flex flex-1 items-center justify-center py-20">
+            <Loader2Icon className="size-8 animate-spin text-secondary" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
+            Failed to load groups. Please try again.
+          </div>
+        ) : groups.length === 0 &&
+          !searchValue &&
+          statusFilter === "All Status" ? (
           <GroupsEmptyState onCreate={() => setCreateOpen(true)} />
         ) : (
           <>
@@ -241,7 +187,7 @@ const GroupsView = () => {
             </div>
 
             <GroupsTable
-              groups={filteredGroups}
+              groups={groups}
               searchValue={searchValue}
               statusFilter={statusFilter}
               onSearchChange={setSearchValue}
@@ -256,13 +202,15 @@ const GroupsView = () => {
 
       <CreateGroupDialog
         open={createOpen}
-        onOpenChange={setCreateOpen}
-        members={groupMembers.slice(0, 5)}
-        onCreate={handleCreateGroup}
+        onOpenChange={(open) => {
+          setCreateOpen(open);
+          if (!open && createdName) setCreatedName("");
+        }}
+        members={groupMembers}
       />
 
       <GroupDetailsSheet
-        group={selectedGroup}
+        groupId={selectedGroupId}
         open={sheetOpen}
         activeTab={activeSheetTab}
         onTabChange={setActiveSheetTab}
@@ -273,6 +221,7 @@ const GroupsView = () => {
         onUnassignList={setListToUnassign}
         onDeactivate={() => setDeactivateOpen(true)}
         onDelete={() => setDeleteOpen(true)}
+        onEdit={() => setEditOpen(true)}
       />
 
       <GroupSelectionDialog
@@ -283,11 +232,11 @@ const GroupsView = () => {
         fieldLabel="Members"
         triggerLabel="Select Members"
         searchPlaceholder="Search..."
-        submitLabel="Add"
+        submitLabel={isAddingUsers ? "Adding..." : "Add"}
         emptyTitle="No available users found"
         emptyDescription="All active users are already part of this group."
         emptyKind="members"
-        items={availableMembersForSelectedGroup.map((member) => ({
+        items={groupMembers.map((member) => ({
           id: member.id,
           title: member.name,
           member
@@ -307,26 +256,22 @@ const GroupsView = () => {
         emptyTitle="No available lists found"
         emptyDescription="All available lists are already assigned to this group."
         emptyKind="lists"
-        items={availableListsForSelectedGroup.map((list) => ({
-          id: list.id,
-          title: list.name,
-          subtitle: `${list.leads} Leads`
-        }))}
-        onSubmit={handleAssignLists}
+        items={[]}
+        onSubmit={() => {}}
       />
 
       <GroupConfirmDialog
         open={Boolean(memberToRemove)}
         onOpenChange={(open) => {
-          if (!open) {
-            setMemberToRemove(null);
-          }
+          if (!open) setMemberToRemove(null);
         }}
         title={
           <>
             Remove{" "}
-            <span className="text-secondary">{memberToRemove?.name}</span> from
-            this Group?
+            <span className="text-secondary">
+              {memberToRemove?.first_name} {memberToRemove?.last_name}
+            </span>{" "}
+            from this Group?
           </>
         }
         description={
@@ -337,16 +282,14 @@ const GroupsView = () => {
           </>
         }
         prompt="Are you sure you want to remove this member?"
-        actionLabel="Remove Member"
+        actionLabel={isRemoving ? "Removing..." : "Remove Member"}
         onConfirm={handleRemoveMember}
       />
 
       <GroupConfirmDialog
         open={Boolean(listToUnassign)}
         onOpenChange={(open) => {
-          if (!open) {
-            setListToUnassign(null);
-          }
+          if (!open) setListToUnassign(null);
         }}
         title="Unassign List from Group?"
         description={
@@ -358,26 +301,29 @@ const GroupsView = () => {
         }
         prompt="Do you want to continue?"
         actionLabel="Unassign List"
-        onConfirm={handleUnassignList}
+        onConfirm={() => {
+          // unassign list API to be wired when endpoint is available
+          setListToUnassign(null);
+        }}
       />
 
-      <GroupConfirmDialog
+      <DeactivateGroupDialog
         open={deactivateOpen}
         onOpenChange={setDeactivateOpen}
-        title="Deactivate Group"
-        description="This group will no longer receive new leads or be available for list assignment."
-        prompt="Do you want to continue?"
-        actionLabel="Deactivate Group"
         onConfirm={handleDeactivate}
       />
 
-      <GroupConfirmDialog
+      <DeleteGroupDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title="Delete Group"
-        description="Deleting this group will remove all members and stop lead distribution to this group. Deleting this group will remove all members and stop lead distribution to this group."
-        actionLabel="Delete Group"
         onConfirm={handleDelete}
+      />
+
+      <EditGroupDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        groupId={selectedGroupId}
+        members={groupMembers}
       />
     </div>
   );

@@ -28,7 +28,8 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { GroupRecord, GroupStatus } from "@/features/groups/data/groupsData";
+import { GroupStatus } from "@/features/groups/data/groupsData";
+import { Group } from "@/features/groups/types/groupTypes";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import TextInput from "@/components/ui/text-input";
 import DateSelector from "@/components/custom/date-selector.component";
@@ -49,7 +50,7 @@ const GroupsTable = ({
   onAssignList,
   onAddMember
 }: {
-  groups: GroupRecord[];
+  groups: Group[];
   searchValue: string;
   statusFilter: "All Status" | GroupStatus;
   onSearchChange: (value: string) => void;
@@ -139,23 +140,27 @@ const GroupsTable = ({
                   {group.name}
                 </TableCell>
                 <TableCell className="flex-1 px-4 text-sm text-gray-800">
-                  {group.members.length}
+                  {group.total_users ?? 0}
                 </TableCell>
                 <TableCell className="flex-1 px-4 text-sm text-gray-800">
-                  {group.assignedLists.length}
+                  {group.total_lists ?? 0}
                 </TableCell>
                 <TableCell className="flex-1 px-4 text-sm text-gray-800">
-                  {group.createdOn}
+                  {new Date(group.created_at).toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "2-digit"
+                  })}
                 </TableCell>
                 <TableCell className="flex-1 px-4">
                   <span
                     className={`${groupsStyles.statusBadge} ${
-                      group.status === "Active"
+                      group.is_active
                         ? groupsStyles.statusActive
                         : groupsStyles.statusInactive
                     }`}
                   >
-                    {group.status}
+                    {group.is_active ? "Active" : "Inactive"}
                   </span>
                 </TableCell>
                 <TableCell
@@ -210,7 +215,7 @@ const GroupsTable = ({
           <ChevronDownIcon className="size-4 text-gray-500" />
         </div>
         <span className="text-xs text-gray-800">
-          1-{Math.min(10, groups.length)} of {groups.length}
+          1–{Math.min(10, groups.length)} of {groups.length}
         </span>
         <div className="flex items-center">
           <button type="button" className={groupsStyles.pagerButton}>

@@ -92,7 +92,7 @@ export const groupsStyles = {
   dialogContent: cn("max-w-[790px] rounded-[30px] p-0"),
   selectionDialogContent: cn("max-w-[790px] rounded-[30px] p-0"),
   dialogHeader: cn("items-start p-4 px-6"),
-  dialogTitle: cn("mt-0 text-[24px] font-semibold text-text-primary"),
+  dialogTitle: cn("mt-0 text-[18px] font-medium text-text-primary"),
   dialogSubtitle: cn("mt-0 text-[14px] leading-7 text-panel-muted"),
   dialogBody: cn("border-t border-border px-6 py-4"),
   formGrid: cn("flex flex-col gap-4"),
@@ -127,6 +127,6 @@ export const groupsStyles = {
   confirmDialogTitle: cn("text-[24px] font-medium text-text-primary"),
   confirmDialogSubtitle: cn("mt-2 text-text-secondary"),
   confirmDialogBody: cn("px-6 py-6"),
-  confirmDialogPrompt: cn("text-text-secondary"),
+  confirmDialogPrompt: cn("text-text-secondary text-[14px]"),
   confirmDialogFooter: cn("justify-end gap-4 px-6 pt-0 pb-6")
 };

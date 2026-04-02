@@ -55,7 +55,7 @@ const WorkflowRuleCard = ({
   onDelete: () => void;
 }) => {
   const stats = buildStats(disposition);
-  const title = DISPOSITION_LABELS[disposition.disposition_type] ?? disposition.name;
+  const title = DISPOSITION_LABELS[disposition.disposition_type] ?? disposition.disposition_type;
 
   return (
     <article className={workflowsStyles.ruleCard}>
