@@ -141,10 +141,6 @@ const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
             </Button>
           ) : (
             <>
-              <Button variant="outline" disabled>
-                <BookOpenIcon className="size-5" />
-                Draft
-              </Button>
               <Button
                 onClick={() => handleStatusChange("publish")}
                 disabled={isUpdatingStatus}

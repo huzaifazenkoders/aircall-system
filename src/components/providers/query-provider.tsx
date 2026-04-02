@@ -29,8 +29,12 @@ export default function QueryProvider({ children }: Props) {
         toastOptions={{
           success: {
             iconTheme: {
-              primary: "var(--primary)",
+              primary: "#15B79F",
               secondary: ""
+            },
+            style: {
+              background:
+                "linear-gradient(0deg, #15B79E, #15B79E), linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))"
             }
           },
           error: {

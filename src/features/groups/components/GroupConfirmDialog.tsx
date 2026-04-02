@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 
@@ -22,7 +22,7 @@ const GroupConfirmDialog = ({
   description,
   prompt,
   actionLabel,
-  onConfirm,
+  onConfirm
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,7 +37,9 @@ const GroupConfirmDialog = ({
       <DialogContent className={groupsStyles.confirmDialogContent}>
         <DialogHeader className={groupsStyles.confirmDialogHeader}>
           <div>
-            <DialogTitle className={groupsStyles.confirmDialogTitle}>{title}</DialogTitle>
+            <DialogTitle className={groupsStyles.confirmDialogTitle}>
+              {title}
+            </DialogTitle>
             <DialogDescription className={groupsStyles.confirmDialogSubtitle}>
               {description}
             </DialogDescription>
@@ -45,18 +47,16 @@ const GroupConfirmDialog = ({
           <DialogIconClose />
         </DialogHeader>
         <DialogBody className={groupsStyles.confirmDialogBody}>
-          {prompt ? <p className={groupsStyles.confirmDialogPrompt}>{prompt}</p> : null}
+          {prompt ? (
+            <p className={groupsStyles.confirmDialogPrompt}>{prompt}</p>
+          ) : null}
         </DialogBody>
         <DialogFooter className={groupsStyles.confirmDialogFooter}>
-          <Button
-            variant="outline"
-            className={groupsStyles.confirmCancelButton}
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            className={groupsStyles.dangerButton}
+            variant={"destructive"}
             onClick={() => {
               onConfirm();
               onOpenChange(false);

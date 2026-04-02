@@ -63,9 +63,9 @@ interface ButtonProps {
 //
 // --------------------------------------------------------------
 
-const MainBackground = "bg-primary";
+const MainBackground = "bg-primary/20";
 const SecondaryBackground = "bg-background-secondary";
-const BackgroundColor = "bg-background";
+const BackgroundColor = "bg-white";
 
 const TextColorMain = "text-text-primary";
 const TextColorSecondary = "text-text-secondary";

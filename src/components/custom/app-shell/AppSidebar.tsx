@@ -11,23 +11,33 @@ import {
   WorkflowIcon,
   PhoneCallIcon,
   SettingsIcon,
-  HexagonIcon,
+  HexagonIcon
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { key: "dashboard", label: "Dashboard", href: "#", icon: LayoutDashboardIcon },
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    href: "#",
+    icon: LayoutDashboardIcon
+  },
   { key: "list", label: "List Management", href: "/list", icon: ListIcon },
   { key: "users", label: "Users", href: "/users", icon: UsersIcon },
   { key: "groups", label: "Groups", href: "/groups", icon: UsersRoundIcon },
-  { key: "workflows", label: "Workflows", href: "/workflows", icon: WorkflowIcon },
+  {
+    key: "workflows",
+    label: "Workflows",
+    href: "/workflows",
+    icon: WorkflowIcon
+  },
   { key: "logs", label: "Call Logs", href: "/call-logs", icon: PhoneCallIcon },
-  { key: "settings", label: "Settings", href: "#", icon: SettingsIcon },
+  { key: "settings", label: "Settings", href: "#", icon: SettingsIcon }
 ] as const;
 
 const AppSidebar = ({
-  activeKey,
+  activeKey
 }: {
   activeKey?:
     | "dashboard"
@@ -45,19 +55,22 @@ const AppSidebar = ({
       ? "users"
       : pathname.startsWith("/groups")
         ? "groups"
-      : pathname.startsWith("/workflows")
-        ? "workflows"
-      : pathname.startsWith("/call-logs")
-        ? "logs"
-      : pathname.startsWith("/list")
-        ? "list"
-        : "dashboard");
+        : pathname.startsWith("/workflows")
+          ? "workflows"
+          : pathname.startsWith("/call-logs")
+            ? "logs"
+            : pathname.startsWith("/list")
+              ? "list"
+              : "dashboard");
 
   return (
-    <aside className="sticky top-3 hidden h-[calc(100vh-24px)] flex-col rounded-4xl bg-[image:var(--gradient)] px-7 py-8 text-white lg:flex">
+    <aside className="sticky top-3 hidden h-[calc(100vh-24px)] flex-col rounded-xl bg-[image:var(--gradient)] px-7 py-8 text-white lg:flex">
       <div className="flex items-center gap-3">
         <div className="grid size-10 place-items-center rounded-xl bg-brand-accent/20">
-          <HexagonIcon className="size-6 text-brand-accent" aria-hidden="true" />
+          <HexagonIcon
+            className="size-6 text-brand-accent"
+            aria-hidden="true"
+          />
         </div>
         <div className="text-[26px] font-semibold tracking-tight">
           Aircall System

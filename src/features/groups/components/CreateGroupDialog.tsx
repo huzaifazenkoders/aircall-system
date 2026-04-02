@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  SearchIcon,
-} from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogBody,
@@ -17,17 +18,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import GroupAvatar from "@/features/groups/components/GroupAvatar";
 import { GroupMember } from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import TextInput from "@/components/ui/text-input";
+import TextArea from "@/components/ui/text-area";
 
 const CreateGroupDialog = ({
   open,
   onOpenChange,
   members,
-  onCreate,
+  onCreate
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -61,12 +64,16 @@ const CreateGroupDialog = ({
       return members;
     }
 
-    return members.filter((member) => member.name.toLowerCase().includes(search));
+    return members.filter((member) =>
+      member.name.toLowerCase().includes(search)
+    );
   }, [members, query]);
 
   const toggleMember = (memberId: string, checked: boolean) => {
     setSelectedIds((current) =>
-      checked ? [...current, memberId] : current.filter((item) => item !== memberId)
+      checked
+        ? [...current, memberId]
+        : current.filter((item) => item !== memberId)
     );
   };
 
@@ -74,19 +81,26 @@ const CreateGroupDialog = ({
     onCreate({
       name,
       description,
-      memberIds: selectedIds,
+      memberIds: selectedIds
     });
     onOpenChange(false);
   };
 
-  const isDisabled = !name.trim() || !description.trim() || selectedIds.length === 0;
+  const isDisabled =
+    !name.trim() || !description.trim() || selectedIds.length === 0;
+  const triggerLabel =
+    selectedIds.length > 0
+      ? `${selectedIds.length} member${selectedIds.length === 1 ? "" : "s"} selected`
+      : "Select members";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={groupsStyles.dialogContent}>
         <DialogHeader className={groupsStyles.dialogHeader}>
           <div>
-            <DialogTitle className={groupsStyles.dialogTitle}>Create New Group</DialogTitle>
+            <DialogTitle className={groupsStyles.dialogTitle}>
+              Create New Group
+            </DialogTitle>
             <DialogDescription className={groupsStyles.dialogSubtitle}>
               Group representatives together for structured lead distribution.
             </DialogDescription>
@@ -96,51 +110,52 @@ const CreateGroupDialog = ({
 
         <DialogBody className={groupsStyles.dialogBody}>
           <div className={groupsStyles.formGrid}>
-            <label className={groupsStyles.fieldGroup}>
-              <span className={groupsStyles.fieldLabel}>Group Name</span>
-              <input
-                className={groupsStyles.input}
-                placeholder="eg, Team Alpha"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-            </label>
+            <TextInput
+              placeholder="eg, Team Alpha"
+              value={name}
+              setValue={(val) => setName(val)}
+              label="Group Name"
+            />
 
-            <label className={groupsStyles.fieldGroup}>
-              <span className={groupsStyles.fieldLabel}>Description</span>
-              <textarea
-                className={groupsStyles.textarea}
-                placeholder="eg, Primary calling team for Sydney live events."
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-              />
-            </label>
+            <TextArea
+              label="Description"
+              placeholder="eg, Primary calling team for Sydney live events."
+              value={description}
+              setValue={(val) => setDescription(val)}
+            />
 
             <div className={groupsStyles.fieldGroup}>
               <span className={groupsStyles.fieldLabel}>Add Members</span>
 
-              <button
-                type="button"
-                className={groupsStyles.memberTrigger}
-                onClick={() => setPickerOpen((current) => !current)}
-              >
-                <span>Select members</span>
-                {pickerOpen ? (
-                  <ChevronUpIcon className="size-6 text-panel-muted" />
-                ) : (
-                  <ChevronDownIcon className="size-6 text-panel-muted" />
-                )}
-              </button>
+              <DropdownMenu open={pickerOpen} onOpenChange={setPickerOpen}>
+                <DropdownMenuTrigger
+                  render={
+                    <button
+                      type="button"
+                      className={groupsStyles.memberTrigger}
+                    >
+                      <span>{triggerLabel}</span>
+                      {pickerOpen ? (
+                        <ChevronUpIcon className="size-6 text-panel-muted" />
+                      ) : (
+                        <ChevronDownIcon className="size-6 text-panel-muted" />
+                      )}
+                    </button>
+                  }
+                />
 
-              {pickerOpen ? (
-                <div className={groupsStyles.memberPanel}>
-                  <div className={groupsStyles.memberSearchField}>
-                    <SearchIcon className="size-6 text-panel-muted" />
-                    <input
-                      className={groupsStyles.memberSearchInput}
+                <DropdownMenuContent
+                  className={`${groupsStyles.memberPanel} w-(--anchor-width) p-0`}
+                  sideOffset={8}
+                >
+                  <div className="px-3 pt-3">
+                    <TextInput
+                      startIcon={
+                        <SearchIcon className="size-6 text-panel-muted" />
+                      }
                       placeholder="Search..."
                       value={query}
-                      onChange={(event) => setQuery(event.target.value)}
+                      setValue={(val) => setQuery(val)}
                     />
                   </div>
 
@@ -149,38 +164,37 @@ const CreateGroupDialog = ({
                       const checked = selectedIds.includes(member.id);
 
                       return (
-                        <label key={member.id} className={groupsStyles.memberRow}>
+                        <label
+                          key={member.id}
+                          className={groupsStyles.memberRow}
+                        >
                           <Checkbox
                             checked={checked}
-                            onCheckedChange={(value) => toggleMember(member.id, Boolean(value))}
-                            className="size-7 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary"
+                            onCheckedChange={(value) =>
+                              toggleMember(member.id, Boolean(value))
+                            }
+                            className="size-6 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary"
                           />
                           <GroupAvatar member={member} />
-                          <span className="text-[18px] text-text-primary">{member.name}</span>
+                          <span className="text-sm text-text-primary">
+                            {member.name}
+                          </span>
                         </label>
                       );
                     })}
                   </div>
-                </div>
-              ) : null}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </DialogBody>
 
         <DialogFooter className={groupsStyles.dialogFooter}>
-          <Button
-            variant="outline"
-            className={groupsStyles.cancelButton}
-            onClick={() => onOpenChange(false)}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            className={groupsStyles.submitButton}
-            disabled={isDisabled}
-            onClick={handleSubmit}
-          >
-            {pickerOpen ? "Create Group" : "Create"}
+          <Button disabled={isDisabled} onClick={handleSubmit}>
+            Create Group
           </Button>
         </DialogFooter>
       </DialogContent>

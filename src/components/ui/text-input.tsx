@@ -19,7 +19,7 @@ const TextInput = ({
   value?: string;
   startIcon?: React.ReactNode;
   endIcon?: React.ReactNode;
-  setValue: ReactDispatch<string>;
+  setValue: (args: string) => void;
   containerClassName?: string;
   labelClassName?: string;
 }) => {

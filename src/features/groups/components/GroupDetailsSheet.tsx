@@ -6,7 +6,7 @@ import {
   EllipsisVerticalIcon,
   PencilIcon,
   RotateCcwIcon,
-  Trash2Icon,
+  Trash2Icon
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,15 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GroupAvatar from "@/features/groups/components/GroupAvatar";
-import { GroupAssignedList, GroupMember, GroupRecord } from "@/features/groups/data/groupsData";
+import {
+  GroupAssignedList,
+  GroupMember,
+  GroupRecord
+} from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 
 const GroupDetailsSheet = ({
@@ -32,7 +36,7 @@ const GroupDetailsSheet = ({
   onRemoveMember,
   onUnassignList,
   onDeactivate,
-  onDelete,
+  onDelete
 }: {
   group: GroupRecord | null;
   open: boolean;
@@ -58,71 +62,107 @@ const GroupDetailsSheet = ({
           <header className={groupsStyles.sheetHeader}>
             <div className={groupsStyles.sheetHeaderTop}>
               <div className={groupsStyles.backRow}>
-                <button type="button" className={groupsStyles.backButton} onClick={onClose}>
-                  <ArrowLeftIcon className="size-8" />
+                <button
+                  type="button"
+                  className={groupsStyles.backButton}
+                  onClick={onClose}
+                >
+                  <ArrowLeftIcon className="size-6" />
                 </button>
                 <h2 className={groupsStyles.sheetTitle}>Group Details</h2>
               </div>
 
               <DropdownMenu>
                 <DropdownMenuTrigger className={groupsStyles.iconActionButton}>
-                  <EllipsisVerticalIcon className="size-6" />
+                  <EllipsisVerticalIcon className="size-5" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className={groupsStyles.menuContent} align="end" sideOffset={12}>
+                <DropdownMenuContent
+                  className={groupsStyles.menuContent}
+                  align="end"
+                  sideOffset={12}
+                >
                   <DropdownMenuItem className={groupsStyles.menuItem}>
                     <PencilIcon className="size-5 text-panel-muted" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className={groupsStyles.menuItem} onClick={onDeactivate}>
+                  <DropdownMenuItem
+                    className={groupsStyles.menuItem}
+                    onClick={onDeactivate}
+                  >
                     <RotateCcwIcon className="size-5 text-panel-muted" />
                     Deactivate
                   </DropdownMenuItem>
-                  <DropdownMenuItem className={groupsStyles.menuItem} onClick={onDelete}>
+                  <DropdownMenuItem
+                    className={groupsStyles.menuItem}
+                    onClick={onDelete}
+                  >
                     <Trash2Icon className="size-5 text-danger" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-
-            <div className={groupsStyles.sheetLeadRow}>
-              <div>
-                <div className={groupsStyles.sheetGroupName}>{group.name}</div>
-                <p className={groupsStyles.sheetDescription}>{group.description}</p>
-              </div>
-              <span className={groupsStyles.sheetStatus}>{group.status}</span>
-            </div>
           </header>
 
+          <div className={groupsStyles.sheetLeadRow}>
+            <div>
+              <div className={groupsStyles.sheetGroupName}>{group.name}</div>
+              <p className={groupsStyles.sheetDescription}>
+                {group.description}
+              </p>
+            </div>
+            <span className={groupsStyles.sheetStatus}>{group.status}</span>
+          </div>
+
           <div className={groupsStyles.tabsWrap}>
-            <Tabs value={activeTab} onValueChange={(value) => onTabChange(value as "members" | "lists")}>
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) =>
+                onTabChange(value as "members" | "lists")
+              }
+            >
               <TabsList variant="line" className={groupsStyles.tabsList}>
-                <TabsTrigger value="members" className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}>
+                <TabsTrigger
+                  value="members"
+                  className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
+                >
                   Members
-                  <span className={groupsStyles.countBadge}>{group.members.length}</span>
+                  <span className={groupsStyles.countBadge}>
+                    {group.members.length}
+                  </span>
                 </TabsTrigger>
-                <TabsTrigger value="lists" className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}>
+                <TabsTrigger
+                  value="lists"
+                  className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
+                >
                   Assigned Lists
-                  <span className={groupsStyles.countBadge}>{group.assignedLists.length}</span>
+                  <span className={groupsStyles.countBadge}>
+                    {group.assignedLists.length}
+                  </span>
                 </TabsTrigger>
               </TabsList>
 
               <div className={groupsStyles.sheetBody}>
-                <TabsContent value="members" className={groupsStyles.assignmentList}>
+                <TabsContent
+                  value="members"
+                  className={groupsStyles.assignmentList}
+                >
                   {group.members.map((member) => (
                     <div key={member.id} className={groupsStyles.assignmentRow}>
                       <div className={groupsStyles.memberMetaRow}>
                         <GroupAvatar member={member} />
                         <div>
-                          <div className={groupsStyles.assignmentTitle}>{member.name}</div>
+                          <div className={groupsStyles.assignmentTitle}>
+                            {member.name}
+                          </div>
                           <div className={groupsStyles.assignmentMeta}>
                             {member.role ?? "Representative"}
                           </div>
                         </div>
                       </div>
                       <Button
-                        variant="outline"
-                        className={groupsStyles.memberButton}
+                        variant="outline-transparent"
+                        size={"sm"}
                         onClick={() => onRemoveMember(member)}
                       >
                         Remove
@@ -131,16 +171,26 @@ const GroupDetailsSheet = ({
                   ))}
                 </TabsContent>
 
-                <TabsContent value="lists" className={groupsStyles.assignmentList}>
+                <TabsContent
+                  value="lists"
+                  className={groupsStyles.assignmentList}
+                >
                   {group.assignedLists.map((assignedList) => (
-                    <div key={assignedList.id} className={groupsStyles.assignmentRow}>
+                    <div
+                      key={assignedList.id}
+                      className={groupsStyles.assignmentRow}
+                    >
                       <div>
-                        <div className={groupsStyles.assignmentTitle}>{assignedList.name}</div>
-                        <div className={groupsStyles.assignmentMeta}>{assignedList.leads} Leads</div>
+                        <div className={groupsStyles.assignmentTitle}>
+                          {assignedList.name}
+                        </div>
+                        <div className={groupsStyles.assignmentMeta}>
+                          {assignedList.leads} Leads
+                        </div>
                       </div>
                       <Button
                         variant="outline"
-                        className={groupsStyles.memberButton}
+                        size={"sm"}
                         onClick={() => onUnassignList(assignedList)}
                       >
                         Unassign
@@ -148,21 +198,14 @@ const GroupDetailsSheet = ({
                     </div>
                   ))}
                 </TabsContent>
-
-                <div className={groupsStyles.footerActions}>
-                  <Button
-                    variant="outline"
-                    className={groupsStyles.secondaryButton}
-                    onClick={onAddMembers}
-                  >
-                    Add Member
-                  </Button>
-                  <Button className={groupsStyles.primaryButton} onClick={onAssignLists}>
-                    Assign List
-                  </Button>
-                </div>
               </div>
             </Tabs>
+          </div>
+          <div className={groupsStyles.footerActions}>
+            <Button variant="outline" onClick={onAddMembers}>
+              Add Member
+            </Button>
+            <Button onClick={onAssignLists}>Assign List</Button>
           </div>
         </section>
       </aside>

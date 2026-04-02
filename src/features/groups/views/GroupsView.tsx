@@ -9,7 +9,7 @@ import GroupDetailsSheet from "@/features/groups/components/GroupDetailsSheet";
 import GroupSelectionDialog from "@/features/groups/components/GroupSelectionDialog";
 import GroupsEmptyState from "@/features/groups/components/GroupsEmptyState";
 import GroupsTable, {
-  GroupsCreatedBanner,
+  GroupsCreatedBanner
 } from "@/features/groups/components/GroupsTable";
 import {
   GroupAssignedList,
@@ -18,7 +18,7 @@ import {
   GroupStatus,
   availableListsCatalog,
   groupMembers,
-  groupsSeedData,
+  groupsSeedData
 } from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 
@@ -27,27 +27,37 @@ const GroupsView = () => {
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createdName, setCreatedName] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
-  const [statusFilter, setStatusFilter] = React.useState<"All Status" | GroupStatus>("All Status");
-  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = React.useState<
+    "All Status" | GroupStatus
+  >("All Status");
+  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(
+    null
+  );
   const [sheetOpen, setSheetOpen] = React.useState(false);
-  const [activeSheetTab, setActiveSheetTab] = React.useState<"members" | "lists">("members");
+  const [activeSheetTab, setActiveSheetTab] = React.useState<
+    "members" | "lists"
+  >("members");
   const [addMembersOpen, setAddMembersOpen] = React.useState(false);
   const [assignListsOpen, setAssignListsOpen] = React.useState(false);
-  const [memberToRemove, setMemberToRemove] = React.useState<GroupMember | null>(null);
-  const [listToUnassign, setListToUnassign] = React.useState<GroupAssignedList | null>(null);
+  const [memberToRemove, setMemberToRemove] =
+    React.useState<GroupMember | null>(null);
+  const [listToUnassign, setListToUnassign] =
+    React.useState<GroupAssignedList | null>(null);
   const [deactivateOpen, setDeactivateOpen] = React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
 
   const handleCreateGroup = ({
     name,
     description,
-    memberIds,
+    memberIds
   }: {
     name: string;
     description: string;
     memberIds: string[];
   }) => {
-    const selectedMembers = groupMembers.filter((member) => memberIds.includes(member.id));
+    const selectedMembers = groupMembers.filter((member) =>
+      memberIds.includes(member.id)
+    );
 
     const createdGroup: GroupRecord = {
       id: name.toLowerCase().replaceAll(" ", "-"),
@@ -56,24 +66,27 @@ const GroupsView = () => {
       members: selectedMembers,
       assignedLists: [
         { id: "gold-coast-event", name: "Gold Cost Event", leads: 150 },
-        { id: "live-event-brisbane", name: "Live Event Brisbane", leads: 80 },
+        { id: "live-event-brisbane", name: "Live Event Brisbane", leads: 80 }
       ],
       createdOn: "04/12/26",
-      status: "Active",
+      status: "Active"
     };
 
     setGroups((current) => [
       current[0] ?? groupsSeedData[0],
       createdGroup,
-      ...current.slice(1),
+      ...current.slice(1)
     ]);
     setCreatedName(name);
   };
 
   const filteredGroups = React.useMemo(() => {
     return groups.filter((group) => {
-      const matchesSearch = group.name.toLowerCase().includes(searchValue.trim().toLowerCase());
-      const matchesStatus = statusFilter === "All Status" || group.status === statusFilter;
+      const matchesSearch = group.name
+        .toLowerCase()
+        .includes(searchValue.trim().toLowerCase());
+      const matchesStatus =
+        statusFilter === "All Status" || group.status === statusFilter;
 
       return matchesSearch && matchesStatus;
     });
@@ -89,7 +102,9 @@ const GroupsView = () => {
       return [];
     }
 
-    const existingMemberIds = new Set(selectedGroup.members.map((member) => member.id));
+    const existingMemberIds = new Set(
+      selectedGroup.members.map((member) => member.id)
+    );
 
     return groupMembers.filter((member) => !existingMemberIds.has(member.id));
   }, [selectedGroup]);
@@ -99,17 +114,22 @@ const GroupsView = () => {
       return [];
     }
 
-    const existingListIds = new Set(selectedGroup.assignedLists.map((assignedList) => assignedList.id));
+    const existingListIds = new Set(
+      selectedGroup.assignedLists.map((assignedList) => assignedList.id)
+    );
 
-    return availableListsCatalog.filter((list) => !existingListIds.has(list.id));
+    return availableListsCatalog.filter(
+      (list) => !existingListIds.has(list.id)
+    );
   }, [selectedGroup]);
 
   const updateGroup = React.useCallback(
     (groupId: string, updater: (group: GroupRecord) => GroupRecord | null) => {
-      setGroups((current) =>
-        current
-          .map((group) => (group.id === groupId ? updater(group) : group))
-          .filter(Boolean) as GroupRecord[]
+      setGroups(
+        (current) =>
+          current
+            .map((group) => (group.id === groupId ? updater(group) : group))
+            .filter(Boolean) as GroupRecord[]
       );
     },
     []
@@ -120,11 +140,13 @@ const GroupsView = () => {
       return;
     }
 
-    const newMembers = groupMembers.filter((member) => memberIds.includes(member.id));
+    const newMembers = groupMembers.filter((member) =>
+      memberIds.includes(member.id)
+    );
 
     updateGroup(selectedGroup.id, (group) => ({
       ...group,
-      members: [...group.members, ...newMembers],
+      members: [...group.members, ...newMembers]
     }));
   };
 
@@ -133,11 +155,13 @@ const GroupsView = () => {
       return;
     }
 
-    const newLists = availableListsCatalog.filter((list) => listIds.includes(list.id));
+    const newLists = availableListsCatalog.filter((list) =>
+      listIds.includes(list.id)
+    );
 
     updateGroup(selectedGroup.id, (group) => ({
       ...group,
-      assignedLists: [...group.assignedLists, ...newLists],
+      assignedLists: [...group.assignedLists, ...newLists]
     }));
   };
 
@@ -148,7 +172,7 @@ const GroupsView = () => {
 
     updateGroup(selectedGroup.id, (group) => ({
       ...group,
-      members: group.members.filter((member) => member.id !== memberToRemove.id),
+      members: group.members.filter((member) => member.id !== memberToRemove.id)
     }));
     setMemberToRemove(null);
   };
@@ -160,7 +184,9 @@ const GroupsView = () => {
 
     updateGroup(selectedGroup.id, (group) => ({
       ...group,
-      assignedLists: group.assignedLists.filter((assignedList) => assignedList.id !== listToUnassign.id),
+      assignedLists: group.assignedLists.filter(
+        (assignedList) => assignedList.id !== listToUnassign.id
+      )
     }));
     setListToUnassign(null);
   };
@@ -172,7 +198,7 @@ const GroupsView = () => {
 
     updateGroup(selectedGroup.id, (group) => ({
       ...group,
-      status: "Inactive",
+      status: "Inactive"
     }));
     setDeactivateOpen(false);
   };
@@ -205,7 +231,11 @@ const GroupsView = () => {
 
             <div className={groupsStyles.pageHeader}>
               <h1 className={groupsStyles.title}>Groups</h1>
-              <Button className={groupsStyles.createButton} onClick={() => setCreateOpen(true)}>
+              <Button
+                size="xl"
+                className={groupsStyles.createButton}
+                onClick={() => setCreateOpen(true)}
+              >
                 Create Group
               </Button>
             </div>
@@ -260,7 +290,7 @@ const GroupsView = () => {
         items={availableMembersForSelectedGroup.map((member) => ({
           id: member.id,
           title: member.name,
-          member,
+          member
         }))}
         onSubmit={handleAddMembers}
       />
@@ -280,7 +310,7 @@ const GroupsView = () => {
         items={availableListsForSelectedGroup.map((list) => ({
           id: list.id,
           title: list.name,
-          subtitle: `${list.leads} Leads`,
+          subtitle: `${list.leads} Leads`
         }))}
         onSubmit={handleAssignLists}
       />
@@ -294,7 +324,9 @@ const GroupsView = () => {
         }}
         title={
           <>
-            Remove <span className="text-secondary">{memberToRemove?.name}</span> from this Group?
+            Remove{" "}
+            <span className="text-secondary">{memberToRemove?.name}</span> from
+            this Group?
           </>
         }
         description={
