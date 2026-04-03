@@ -2,15 +2,16 @@
 
 import React from "react";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
+import { ListDetail } from "@/features/list/types/listTypes";
 
-const LeadOverviewCard = () => {
+const LeadOverviewCard = ({ list }: { list: ListDetail }) => {
   const stats = [
-    { label: "Total Leads", value: 148 },
-    { label: "Available to Call", value: 32 },
-    { label: "Leads in Cooldown", value: 41 },
-    { label: "Calls Completed", value: 67 },
-    { label: "Scheduled Callback", value: 6 },
-    { label: "Invalid / Banned", value: 2 },
+    { label: "Total Leads", value: list.total_leads ?? 0 },
+    { label: "Available to Call", value: list.available_leads ?? 0 },
+    { label: "Leads in Cooldown", value: list.cooldown_leads ?? 0 },
+    { label: "Calls Completed", value: "N/A" },
+    { label: "Scheduled Callback", value: "N/A" },
+    { label: "Invalid / Banned", value: "N/A" }
   ];
 
   return (
@@ -29,4 +30,3 @@ const LeadOverviewCard = () => {
 };
 
 export default LeadOverviewCard;
-

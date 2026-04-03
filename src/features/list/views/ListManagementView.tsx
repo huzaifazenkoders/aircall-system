@@ -13,7 +13,7 @@ const ListManagementView = () => {
   const [hasLists, setHasLists] = React.useState(true);
 
   return (
-    <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col">
+    <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col mt-5 px-4 md:px-6">
       <div className={listStyles.pageHeader}>
         <h1 className={listStyles.pageTitle}>List Management</h1>
         <Button

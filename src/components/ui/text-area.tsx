@@ -48,7 +48,7 @@ const TextArea = ({
             "rounded-lg",
             "border",
             "border-border-primary",
-            "bg-white",
+            "bg-input",
             "px-3",
             "py-2",
             "text-base",

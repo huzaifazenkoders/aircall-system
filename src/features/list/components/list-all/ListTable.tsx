@@ -6,7 +6,8 @@ import {
   MoreVerticalIcon,
   CalendarIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Loader2Icon
 } from "lucide-react";
 import Link from "next/link";
 
@@ -32,92 +33,46 @@ import {
 import { cn } from "@/lib/utils";
 import { listStyles } from "@/features/list/styles/listStyles";
 import DateSelector from "@/components/custom/date-selector.component";
+import { useGetLists } from "@/features/list/services/listService";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { List, ListStatus } from "@/features/list/types/listTypes";
 
-type ListRow = {
-  id: string;
-  name: string;
-  priority: number;
-  cooldownHours: number;
-  inCooldown: number;
-  availableToCall: number;
-  total: number | "-";
-  assignedTo: string;
-  status: "Active" | "Waiting" | "Inactive";
-};
-
-const rows: ListRow[] = [
-  {
-    id: "101",
-    name: "Gold Cost Event",
-    priority: 1,
-    cooldownHours: 19,
-    inCooldown: 1,
-    availableToCall: 19,
-    total: 40,
-    assignedTo: "Group-1",
-    status: "Active"
-  },
-  {
-    id: "102",
-    name: "Masterclass Follow-Up",
-    priority: 2,
-    cooldownHours: 24,
-    inCooldown: 2,
-    availableToCall: 24,
-    total: 0,
-    assignedTo: "4 Individuals",
-    status: "Waiting"
-  },
-  {
-    id: "103",
-    name: "COD New Registrations",
-    priority: 3,
-    cooldownHours: 16,
-    inCooldown: 3,
-    availableToCall: 16,
-    total: 56,
-    assignedTo: "Team Beta",
-    status: "Inactive"
-  },
-  {
-    id: "104",
-    name: "RMS Replay Follow-Up",
-    priority: 4,
-    cooldownHours: 0,
-    inCooldown: 0,
-    availableToCall: 0,
-    total: "-",
-    assignedTo: "Team Alpha",
-    status: "Waiting"
-  },
-  {
-    id: "105",
-    name: "Live Event Brisbane",
-    priority: 5,
-    cooldownHours: 16,
-    inCooldown: 5,
-    availableToCall: 16,
-    total: 45,
-    assignedTo: "Team Beta",
-    status: "Active"
-  }
-];
+const LIMIT = 10;
 
 const ListTable = () => {
   const [query, setQuery] = React.useState("");
-  const [tabs, setTabs] = useState("shared");
+  const [tabs, setTabs] = useState<"shared" | "idv">("shared");
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter(
-      (r) => r.name.toLowerCase().includes(q) || r.id.includes(q)
-    );
-  }, [query]);
+  const sharedQuery = useGetLists({
+    limit: LIMIT,
+    search: query || undefined,
+    list_type: "shared"
+  });
+
+  const idvQuery = useGetLists({
+    limit: LIMIT,
+    search: query || undefined,
+    list_type: "individual"
+  });
+
+  const sharedLists = transformInfiniteData(sharedQuery.data, "data");
+  const idvLists = transformInfiniteData(idvQuery.data, "data");
+
+  const sharedTotal =
+    sharedQuery.data?.pages[0]?.data?.meta?.total ?? 0;
+  const idvTotal =
+    idvQuery.data?.pages[0]?.data?.meta?.total ?? 0;
+
+  const activeQuery = tabs === "shared" ? sharedQuery : idvQuery;
+  const activeLists = tabs === "shared" ? sharedLists : idvLists;
 
   return (
     <div className={listStyles.card}>
-      <Tabs className="w-full gap-0" value={tabs} onValueChange={setTabs}>
+      <Tabs
+        className="w-full gap-0"
+        value={tabs}
+        onValueChange={(v) => setTabs(v as "shared" | "idv")}
+      >
         <div className={listStyles.cardHeader}>
           <TabsList className={cn("bg-transparent p-0", listStyles.tabsWrap)}>
             <TabsTrigger
@@ -129,7 +84,7 @@ const ListTable = () => {
             >
               Shared List{" "}
               <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-foreground">
-                40
+                {sharedTotal}
               </span>
             </TabsTrigger>
             <TabsTrigger
@@ -141,7 +96,7 @@ const ListTable = () => {
             >
               IDV List{" "}
               <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-foreground">
-                11
+                {idvTotal}
               </span>
             </TabsTrigger>
           </TabsList>
@@ -178,122 +133,144 @@ const ListTable = () => {
           </DropdownMenu>
         </div>
 
-        <TabsContent value="shared" className="m-0">
-          <div className={listStyles.tableWrap}>
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-background">
-                  <TableHead className="w-28">ID</TableHead>
-                  <TableHead className="min-w-60">Name</TableHead>
-                  <TableHead className="w-24">Priority</TableHead>
-                  <TableHead className="w-36">Cooldown (hrs)</TableHead>
-                  <TableHead className="w-32">In Cooldown</TableHead>
-                  <TableHead className="w-32">Avail to Call</TableHead>
-                  <TableHead className="w-24">Total</TableHead>
-                  <TableHead className="min-w-40">Assigned To</TableHead>
-                  <TableHead className="w-32">Status</TableHead>
-                  <TableHead className="w-14" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((r) => (
-                  <TableRow key={r.id} className="h-15.5">
-                    <TableCell className="font-medium text-foreground">
-                      {r.id}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      <Link
-                        href={`/list/${r.id}`}
-                        className="font-medium text-foreground hover:underline"
-                      >
-                        {r.name}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{r.priority}</TableCell>
-                    <TableCell>{r.cooldownHours}</TableCell>
-                    <TableCell>{r.inCooldown}</TableCell>
-                    <TableCell>{r.availableToCall}</TableCell>
-                    <TableCell>{r.total}</TableCell>
-                    <TableCell>{r.assignedTo}</TableCell>
-                    <TableCell>
-                      <StatusBadge status={r.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger
-                          className={cn(
-                            buttonVariants({
-                              variant: "outline",
-                              size: "icon",
-                              className: "size-10 rounded-xl"
-                            })
-                          )}
-                        >
-                          <MoreVerticalIcon
-                            className="size-5"
-                            aria-hidden="true"
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem>
-                            <Link href={`/list/${r.id}`} className="w-full">
-                              View
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+        {(["shared", "idv"] as const).map((tab) => {
+          const lists = tab === "shared" ? sharedLists : idvLists;
+          const q = tab === "shared" ? sharedQuery : idvQuery;
+          const total = tab === "shared" ? sharedTotal : idvTotal;
 
-          <div className="flex items-center justify-end gap-5 px-6 py-4 text-sm text-muted-foreground">
-            <span>Rows per page: 10</span>
-            <span className="text-foreground">1-5 of 13</span>
-            <button
-              type="button"
-              className="grid size-9 place-items-center rounded-lg hover:bg-muted"
-            >
-              <ChevronLeft />
-            </button>
-            <button
-              type="button"
-              className="grid size-9 place-items-center rounded-lg hover:bg-muted"
-            >
-              <ChevronRight />
-            </button>
-          </div>
-        </TabsContent>
+          return (
+            <TabsContent key={tab} value={tab} className="m-0">
+              {q.isPending ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2Icon className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : q.isError ? (
+                <div className="px-6 py-10 text-sm text-destructive">
+                  Failed to load lists.
+                </div>
+              ) : lists.length === 0 ? (
+                <div className="px-6 py-10 text-sm text-muted-foreground">
+                  No {tab === "shared" ? "shared" : "IDV"} lists to show.
+                </div>
+              ) : (
+                <>
+                  <div className={listStyles.tableWrap}>
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-background">
+                          <TableHead className="w-28">ID</TableHead>
+                          <TableHead className="min-w-60">Name</TableHead>
+                          <TableHead className="w-24">Priority</TableHead>
+                          <TableHead className="w-24">Total</TableHead>
+                          <TableHead className="w-32">Status</TableHead>
+                          <TableHead className="w-14" />
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {lists.map((r) => (
+                          <ListRow key={r?.id} row={r!} />
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
 
-        <TabsContent value="idv" className="m-0">
-          <div className="px-6 py-10 text-sm text-muted-foreground">
-            No IDV lists to show.
-          </div>
-        </TabsContent>
+                  <div className="flex items-center justify-end gap-5 px-6 py-4 text-sm text-muted-foreground">
+                    <span>Rows per page: {LIMIT}</span>
+                    <span className="text-foreground">
+                      1-{lists.length} of {total}
+                    </span>
+                    <button
+                      type="button"
+                      className="grid size-9 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
+                      disabled={!q.hasPreviousPage}
+                    >
+                      <ChevronLeft />
+                    </button>
+                    <button
+                      type="button"
+                      className="grid size-9 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
+                      onClick={() => q.fetchNextPage()}
+                      disabled={!q.hasNextPage || q.isFetchingNextPage}
+                    >
+                      {q.isFetchingNextPage ? (
+                        <Loader2Icon className="size-4 animate-spin" />
+                      ) : (
+                        <ChevronRight />
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+          );
+        })}
       </Tabs>
     </div>
   );
 };
 
-const StatusBadge = ({ status }: { status: ListRow["status"] }) => {
+const ListRow = ({ row }: { row: List }) => (
+  <TableRow className="h-15.5">
+    <TableCell className="font-medium text-foreground">{row.id}</TableCell>
+    <TableCell className="text-foreground">
+      <Link
+        href={`/list/${row.id}`}
+        className="font-medium text-foreground hover:underline"
+      >
+        {row.name}
+      </Link>
+    </TableCell>
+    <TableCell>{row.priority}</TableCell>
+    <TableCell>{row.total_leads ?? "-"}</TableCell>
+    <TableCell>
+      <StatusBadge status={row.status} />
+    </TableCell>
+    <TableCell className="text-right">
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className={cn(
+            buttonVariants({
+              variant: "outline-transparent",
+              size: "icon",
+              className: "size-10 rounded-xl"
+            })
+          )}
+        >
+          <MoreVerticalIcon className="size-5" aria-hidden="true" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-36">
+          <DropdownMenuItem>
+            <Link href={`/list/${row.id}`} className="w-full">
+              View
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>Edit</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </TableCell>
+  </TableRow>
+);
+
+const StatusBadge = ({ status }: { status: ListStatus }) => {
   const classes =
-    status === "Active"
+    status === "active"
       ? "bg-status-active-bg text-status-active-fg"
-      : status === "Waiting"
+      : status === "waiting"
         ? "bg-status-waiting-bg text-status-waiting-fg"
         : "bg-muted text-muted-foreground";
+
+  const label =
+    status === "active"
+      ? "Active"
+      : status === "waiting"
+        ? "Waiting"
+        : "Inactive";
 
   return (
     <Badge
       className={cn("rounded-md px-4 py-1 h-auto text-sm font-medium", classes)}
     >
-      {status}
+      {label}
     </Badge>
   );
 };

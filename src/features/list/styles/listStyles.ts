@@ -2,11 +2,11 @@ import { cn } from "@/lib/utils";
 
 export const listStyles = {
   pageHeader: cn("flex items-start justify-between gap-6"),
-  pageTitle: cn("text-[34px] font-semibold tracking-tight"),
-  primaryCta: cn("h-11 rounded-xl px-6 text-sm font-medium"),
+  pageTitle: cn("text-[24px] font-medium"),
+  primaryCta: cn("h-11 rounded-lg px-6 text-sm font-medium"),
 
   card: cn(
-    "mt-5 overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-border"
+    "mt-5 overflow-hidden rounded-lg bg-card shadow-xs ring-1 ring-border"
   ),
   cardHeader: cn("border-b border-border"),
   tabsWrap: cn("flex items-end gap-10 px-6 pt-2 h-auto"),
