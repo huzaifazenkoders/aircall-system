@@ -4,6 +4,8 @@ export interface List {
   priority: number;
   status: ListStatus;
   total_leads: number;
+  list_type?: ListType;
 }
 
-export type ListStatus = "waiting";
+export type ListStatus = "active" | "inactive" | "waiting";
+export type ListType = "shared" | "individual";

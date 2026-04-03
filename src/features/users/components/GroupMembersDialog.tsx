@@ -71,22 +71,23 @@ const GroupMembersDialog = ({
             <DialogTitle className={usersStyles.groupMembersModalTitle}>
               {groupInfo?.name ?? groupName ?? "Group Members"}
             </DialogTitle>
-            <DialogDescription className={usersStyles.groupMembersModalSubtitle}>
-              {groupInfo?.total_users ?? 0} member
-              {(groupInfo?.total_users ?? 0) === 1 ? "" : "s"}
+            <DialogDescription
+              className={usersStyles.groupMembersModalSubtitle}
+            >
+              {groupInfo?.user_groups?.length ?? 0} member
+              {(groupInfo?.user_groups?.length ?? 0) === 1 ? "" : "s"}
             </DialogDescription>
           </div>
           <DialogIconClose className="mt-1 size-10 rounded-full text-panel-muted hover:bg-muted" />
         </DialogHeader>
 
         <DialogBody className={usersStyles.groupMembersModalBody}>
-          <div className="border-b border-border px-8 py-6">
+          <div className="border-b border-border px-6 py-4">
             <TextInput
               value={searchValue}
               setValue={setSearchValue}
               placeholder="Search..."
-              className={usersStyles.groupMembersSearch}
-              startIcon={<SearchIcon className="size-8 text-[#667085]" />}
+              startIcon={<SearchIcon className="" />}
             />
           </div>
 

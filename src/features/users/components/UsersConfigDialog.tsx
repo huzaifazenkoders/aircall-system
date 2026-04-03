@@ -3,9 +3,10 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,54 +17,43 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import TextInput from "@/components/ui/text-input";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { useInviteUser } from "@/features/users/services/userService";
 import { userKeys } from "@/features/users/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useGetGroups } from "@/features/groups/services/groupService";
+import { useGetWorkflows } from "@/features/workflows/services/workflowService";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
-// Step 1 schema
 const step1Schema = Yup.object({
   keap_id: Yup.string().required("Keap ID is required"),
   first_name: Yup.string().required("First name is required"),
   last_name: Yup.string().required("Last name is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   phone_number: Yup.string().required("Phone number is required"),
-  group_ids: Yup.array().of(Yup.string()),
+  group_ids: Yup.array().of(Yup.string())
 });
 
-// Full schema (step 2 adds list fields)
 const fullSchema = step1Schema.shape({
   list_description: Yup.string().required("Description is required"),
   workflow_id: Yup.string().required("Workflow is required"),
   cooldown_minimum_hours: Yup.number().min(0).required("Required"),
-  cooldown_minimum_minutes: Yup.number().min(0).max(59).required("Required"),
+  cooldown_minimum_minutes: Yup.number().min(0).max(59).required("Required")
 });
-
-const groupOptions = [
-  { id: "group-1", name: "Sales" },
-  { id: "group-2", name: "Support" },
-  { id: "group-3", name: "Retention" },
-];
-
-const workflowOptions = [
-  { id: "wf-1", label: "Default Sales Workflow", suffix: "(Default)" },
-  { id: "wf-2", label: "High-Intent Lead Closer" },
-  { id: "wf-3", label: "Trial User Conversion" },
-];
 
 const UsersConfigDialog = ({
   open,
-  onOpenChange,
+  onOpenChange
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -71,6 +61,33 @@ const UsersConfigDialog = ({
   const queryClient = useQueryClient();
   const [step, setStep] = React.useState<1 | 2>(1);
   const { mutate: inviteUser, isPending } = useInviteUser();
+
+  const {
+    data: groupsData,
+    isPending: isGroupsPending,
+    hasNextPage: hasMoreGroups,
+    fetchNextPage: fetchMoreGroups
+  } = useGetGroups({
+    limit: 20
+  });
+
+  const {
+    data: workflowsData,
+    isPending: isWorkflowsPending,
+    hasNextPage: hasMoreWorkflows,
+    fetchNextPage: fetchMoreWorkflows
+  } = useGetWorkflows({
+    limit: 20
+  });
+
+  const groups = React.useMemo(
+    () => transformInfiniteData(groupsData, "data"),
+    [groupsData]
+  );
+  const workflows = React.useMemo(
+    () => transformInfiniteData(workflowsData, "data"),
+    [workflowsData]
+  );
 
   const formik = useFormik({
     initialValues: {
@@ -81,9 +98,9 @@ const UsersConfigDialog = ({
       phone_number: "",
       group_ids: [] as string[],
       list_description: "",
-      workflow_id: workflowOptions[0].id,
+      workflow_id: "",
       cooldown_minimum_hours: 12,
-      cooldown_minimum_minutes: 30,
+      cooldown_minimum_minutes: 30
     },
     validationSchema: step === 1 ? step1Schema : fullSchema,
     validateOnChange: false,
@@ -107,20 +124,20 @@ const UsersConfigDialog = ({
               call_type: "hot_lead",
               cooldown_minimum_hours: values.cooldown_minimum_hours,
               cooldown_minimum_minutes: values.cooldown_minimum_minutes,
-              workflow_id: values.workflow_id,
-            },
-          },
+              workflow_id: values.workflow_id
+            }
+          }
         },
         {
           onSuccess: () => {
             toast.success("Invitation sent successfully");
-            queryClient.invalidateQueries({ queryKey: userKeys.all });
+            void queryClient.invalidateQueries({ queryKey: userKeys.all });
             onOpenChange(false);
           },
-          onError: handleMutationError,
+          onError: handleMutationError
         }
       );
-    },
+    }
   });
 
   React.useEffect(() => {
@@ -128,7 +145,13 @@ const UsersConfigDialog = ({
       setStep(1);
       formik.resetForm();
     }
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  React.useEffect(() => {
+    if (!formik.values.workflow_id && workflows[0]?.id) {
+      void formik.setFieldValue("workflow_id", workflows[0].id);
+    }
+  }, [formik.values.workflow_id, workflows]);
 
   const e = formik.errors;
   const t = formik.touched;
@@ -143,7 +166,7 @@ const UsersConfigDialog = ({
                 <span>Add New User</span>
               ) : (
                 <>
-                  <ArrowLeftIcon className="mt-1 size-5 mb-3 shrink-0 text-[#64748B]" />
+                  <ArrowLeftIcon className="mb-3 mt-1 size-5 shrink-0 text-[#64748B]" />
                   <span>List Configuration</span>
                 </>
               )}
@@ -167,7 +190,7 @@ const UsersConfigDialog = ({
                 <TextInput
                   label="Keap Id"
                   value={formik.values.keap_id}
-                  setValue={(val) => formik.setFieldValue("keap_id", val)}
+                  setValue={(val) => void formik.setFieldValue("keap_id", val)}
                   placeholder="eg. 123"
                   error={t.keap_id ? e.keap_id : undefined}
                 />
@@ -175,14 +198,18 @@ const UsersConfigDialog = ({
                   <TextInput
                     label="First Name"
                     value={formik.values.first_name}
-                    setValue={(val) => formik.setFieldValue("first_name", val)}
+                    setValue={(val) =>
+                      void formik.setFieldValue("first_name", val)
+                    }
                     placeholder="eg. James"
                     error={t.first_name ? e.first_name : undefined}
                   />
                   <TextInput
                     label="Last Name"
                     value={formik.values.last_name}
-                    setValue={(val) => formik.setFieldValue("last_name", val)}
+                    setValue={(val) =>
+                      void formik.setFieldValue("last_name", val)
+                    }
                     placeholder="eg. Williams"
                     error={t.last_name ? e.last_name : undefined}
                   />
@@ -191,36 +218,63 @@ const UsersConfigDialog = ({
                   <TextInput
                     label="Email"
                     value={formik.values.email}
-                    setValue={(val) => formik.setFieldValue("email", val)}
+                    setValue={(val) => void formik.setFieldValue("email", val)}
                     placeholder="eg. james@gmail.com"
                     error={t.email ? e.email : undefined}
                   />
                   <TextInput
                     label="Phone number"
                     value={formik.values.phone_number}
-                    setValue={(val) => formik.setFieldValue("phone_number", val)}
+                    setValue={(val) =>
+                      void formik.setFieldValue("phone_number", val)
+                    }
                     placeholder="eg. +1 224 776 885"
                     error={t.phone_number ? e.phone_number : undefined}
                   />
                 </div>
 
                 <div>
-                  <label className={usersStyles.sectionLabel}>Add to Groups</label>
+                  <label className={usersStyles.sectionLabel}>
+                    Add to Groups
+                  </label>
                   <Select
                     value={formik.values.group_ids[0] ?? ""}
                     onValueChange={(val) =>
-                      formik.setFieldValue("group_ids", val ? [val] : [])
+                      void formik.setFieldValue("group_ids", val ? [val] : [])
                     }
                   >
                     <SelectTrigger className={usersStyles.triggerField}>
-                      <SelectValue placeholder="Select groups" />
+                      <SelectValue placeholder="Select groups">
+                        {
+                          groups.find(
+                            (t) => t.id === formik.values.group_ids[0]
+                          )?.name
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {groupOptions.map((g) => (
-                        <SelectItem key={g.id} value={g.id}>
-                          {g.name}
-                        </SelectItem>
-                      ))}
+                      {isGroupsPending && !groups.length ? (
+                        <div className="flex items-center justify-center px-4 py-3">
+                          <Loader2Icon className="size-4 animate-spin text-secondary" />
+                        </div>
+                      ) : (
+                        <InfiniteScroll
+                          dataLength={groups.length}
+                          next={() => void fetchMoreGroups()}
+                          hasMore={Boolean(hasMoreGroups)}
+                          loader={
+                            <div className="flex items-center justify-center px-4 py-3">
+                              <Loader2Icon className="size-4 animate-spin text-secondary" />
+                            </div>
+                          }
+                        >
+                          {groups.map((g) => (
+                            <SelectItem key={g.id} value={g.id}>
+                              {g.name}
+                            </SelectItem>
+                          ))}
+                        </InfiniteScroll>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -233,34 +287,64 @@ const UsersConfigDialog = ({
                   </label>
                   <Select
                     value={formik.values.workflow_id}
-                    onValueChange={(val) => formik.setFieldValue("workflow_id", val)}
+                    onValueChange={(val) =>
+                      void formik.setFieldValue("workflow_id", val)
+                    }
                   >
                     <SelectTrigger className={usersStyles.triggerField}>
-                      <SelectValue placeholder="Select template" />
+                      <SelectValue placeholder="Select template">
+                        {
+                          workflows?.find(
+                            (f) => f.id === formik.values.workflow_id
+                          )?.name
+                        }
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {workflowOptions.map((opt) => (
-                        <SelectItem key={opt.id} value={opt.id}>
-                          <span>{opt.label}</span>
-                          {opt.suffix ? (
-                            <span className={usersStyles.menuItemMuted}>
-                              {" "}{opt.suffix}
-                            </span>
-                          ) : null}
-                        </SelectItem>
-                      ))}
+                      {isWorkflowsPending && !workflows.length ? (
+                        <div className="flex items-center justify-center px-4 py-3">
+                          <Loader2Icon className="size-4 animate-spin text-secondary" />
+                        </div>
+                      ) : (
+                        <InfiniteScroll
+                          dataLength={workflows.length}
+                          next={() => void fetchMoreWorkflows()}
+                          hasMore={Boolean(hasMoreWorkflows)}
+                          loader={
+                            <div className="flex items-center justify-center px-4 py-3">
+                              <Loader2Icon className="size-4 animate-spin text-secondary" />
+                            </div>
+                          }
+                        >
+                          {workflows.map((workflow) => (
+                            <SelectItem key={workflow.id} value={workflow.id}>
+                              <span>{workflow.name}</span>
+                              {workflow.is_default ? (
+                                <span className={usersStyles.menuItemMuted}>
+                                  {" "}
+                                  (Default)
+                                </span>
+                              ) : null}
+                            </SelectItem>
+                          ))}
+                        </InfiniteScroll>
+                      )}
                     </SelectContent>
                   </Select>
-                  {t.workflow_id && e.workflow_id && (
-                    <span className="mt-1 text-xs text-red-500">{e.workflow_id}</span>
-                  )}
+                  {t.workflow_id && e.workflow_id ? (
+                    <span className="mt-1 text-xs text-red-500">
+                      {e.workflow_id}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="mt-5">
                   <TextInput
                     label="List Description"
                     value={formik.values.list_description}
-                    setValue={(val) => formik.setFieldValue("list_description", val)}
+                    setValue={(val) =>
+                      void formik.setFieldValue("list_description", val)
+                    }
                     placeholder="eg. IDV list for James"
                     error={t.list_description ? e.list_description : undefined}
                   />
@@ -274,7 +358,10 @@ const UsersConfigDialog = ({
                     <TextInput
                       value={String(formik.values.cooldown_minimum_hours)}
                       setValue={(val) =>
-                        formik.setFieldValue("cooldown_minimum_hours", Number(val))
+                        void formik.setFieldValue(
+                          "cooldown_minimum_hours",
+                          Number(val)
+                        )
                       }
                       placeholder="12"
                       error={
@@ -291,7 +378,10 @@ const UsersConfigDialog = ({
                     <TextInput
                       value={String(formik.values.cooldown_minimum_minutes)}
                       setValue={(val) =>
-                        formik.setFieldValue("cooldown_minimum_minutes", Number(val))
+                        void formik.setFieldValue(
+                          "cooldown_minimum_minutes",
+                          Number(val)
+                        )
                       }
                       placeholder="30"
                       error={
@@ -307,8 +397,8 @@ const UsersConfigDialog = ({
                     />
                   </div>
                   <p className={usersStyles.helperText}>
-                    Prevents the same contact from being called multiple times within
-                    this time frame.
+                    Prevents the same contact from being called multiple times
+                    within this time frame.
                   </p>
                 </div>
               </div>
@@ -317,16 +407,28 @@ const UsersConfigDialog = ({
 
           <DialogFooter className={usersStyles.modalFooter}>
             {step === 2 ? (
-              <Button type="button" variant="outline" onClick={() => setStep(1)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setStep(1)}
+              >
                 Back
               </Button>
             ) : (
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
             )}
             <Button type="submit" disabled={isPending}>
-              {step === 1 ? "Continue" : isPending ? "Sending..." : "Send Invitation"}
+              {step === 1
+                ? "Continue"
+                : isPending
+                  ? "Sending..."
+                  : "Send Invitation"}
             </Button>
           </DialogFooter>
         </form>

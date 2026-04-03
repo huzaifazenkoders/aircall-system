@@ -117,3 +117,77 @@ export const useInviteUser = () =>
       return res.data as InviteUserRes;
     }
   });
+
+// ─── Update User ─────────────────────────────────────────────────────────────
+
+interface UpdateUserReq {
+  payload: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+  };
+}
+
+interface UpdateUserRes {
+  data: User;
+  message: string;
+}
+
+export const useUpdateUser = () =>
+  useMutation({
+    mutationFn: async ({ payload }: UpdateUserReq) => {
+      const res = await axiosInstance.patch("/users", payload);
+      return res.data as UpdateUserRes;
+    }
+  });
+
+// ─── Deactivate / Activate User ──────────────────────────────────────────────
+
+interface ToggleUserStatusReq {
+  payload: {
+    id: string;
+  };
+}
+
+interface ToggleUserStatusRes {
+  data: User;
+  message: string;
+}
+
+interface AddListsToUserReq {
+  payload: {
+    user_id: string;
+    list_ids: string[];
+  };
+}
+
+interface AddListsToUserRes {
+  data: User;
+  message: string;
+}
+
+export const useDeactivateUser = () =>
+  useMutation({
+    mutationFn: async ({ payload }: ToggleUserStatusReq) => {
+      const res = await axiosInstance.patch("/users/inactive", payload);
+      return res.data as ToggleUserStatusRes;
+    }
+  });
+
+export const useActivateUser = () =>
+  useMutation({
+    mutationFn: async ({ payload }: ToggleUserStatusReq) => {
+      const res = await axiosInstance.patch("/users/active", payload);
+      return res.data as ToggleUserStatusRes;
+    }
+  });
+
+export const useAddListsToUser = () =>
+  useMutation({
+    mutationFn: async ({ payload }: AddListsToUserReq) => {
+      const res = await axiosInstance.post("/users/add-lists", payload);
+      return res.data as AddListsToUserRes;
+    }
+  });

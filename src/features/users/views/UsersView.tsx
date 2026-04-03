@@ -4,6 +4,7 @@ import React from "react";
 import { Loader2Icon } from "lucide-react";
 
 import AddUserToGroupDialog from "@/features/users/components/AddUserToGroupDialog";
+import AssignListsToUserDialog from "@/features/users/components/AssignListsToUserDialog";
 import GroupMembersDialog from "@/features/users/components/GroupMembersDialog";
 import RemoveGroupDialog from "@/features/users/components/RemoveGroupDialog";
 import UsersConfigDialog from "@/features/users/components/UsersConfigDialog";
@@ -18,11 +19,15 @@ import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 const UsersView = () => {
   const [searchValue, setSearchValue] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState<
+    "All Status" | "active" | "suspend" | "invited"
+  >("All Status");
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(
     null
   );
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [isConfigOpen, setIsConfigOpen] = React.useState(false);
+  const [isAssignListsOpen, setIsAssignListsOpen] = React.useState(false);
   const [isAddGroupOpen, setIsAddGroupOpen] = React.useState(false);
   const [isRemoveGroupOpen, setIsRemoveGroupOpen] = React.useState(false);
   const [isGroupMembersOpen, setIsGroupMembersOpen] = React.useState(false);
@@ -38,12 +43,22 @@ const UsersView = () => {
 
   const { data, isPending, error } = useGetUsers({
     limit: 10,
-    search: searchValue || undefined
+    search: searchValue || undefined,
+    status: statusFilter === "All Status" ? undefined : statusFilter
   });
   const { data: selectedUserData } = useGetUserById(selectedUserId ?? "");
 
   const users = transformInfiniteData(data, "data");
   const selectedUserGroups = selectedUserData?.data.user_groups ?? [];
+  const selectedUserLists = selectedUserData?.data.list_assignments ?? [];
+  const selectedUserGroupIds = React.useMemo(
+    () => selectedUserGroups.map((group) => group.group.id),
+    [selectedUserGroups]
+  );
+  const selectedUserListIds = React.useMemo(
+    () => selectedUserLists.map((list) => list.list.id),
+    [selectedUserLists]
+  );
 
   return (
     <div className={usersStyles.page}>
@@ -61,7 +76,9 @@ const UsersView = () => {
             users={users}
             selectedUserId={selectedUserId ?? ""}
             searchValue={searchValue}
+            statusFilter={statusFilter}
             onSearchChange={setSearchValue}
+            onStatusChange={setStatusFilter}
             onSelectUser={(userId) => {
               setSelectedUserId(userId as string);
               setIsSheetOpen(true);
@@ -72,7 +89,7 @@ const UsersView = () => {
             }}
             onAssignList={(userId) => {
               setSelectedUserId(userId as string);
-              setIsConfigOpen(true);
+              setIsAssignListsOpen(true);
             }}
             onAddToGroup={(userId) => {
               setSelectedUserId(userId as string);
@@ -88,7 +105,7 @@ const UsersView = () => {
         open={isSheetOpen}
         onClose={() => setIsSheetOpen(false)}
         onAddGroup={() => setIsAddGroupOpen(true)}
-        onAssignList={() => setIsConfigOpen(true)}
+        onAssignList={() => setIsAssignListsOpen(true)}
         onRemoveGroup={(group) => {
           setGroupToRemove(group);
           setIsRemoveGroupOpen(true);
@@ -103,7 +120,13 @@ const UsersView = () => {
         open={isAddGroupOpen}
         onOpenChange={setIsAddGroupOpen}
         userId={selectedUserId}
-        preselectedGroupIds={selectedUserGroups.map((group) => group.group.id)}
+        preselectedGroupIds={selectedUserGroupIds}
+      />
+      <AssignListsToUserDialog
+        open={isAssignListsOpen}
+        onOpenChange={setIsAssignListsOpen}
+        userId={selectedUserId}
+        preselectedListIds={selectedUserListIds}
       />
       <GroupMembersDialog
         open={isGroupMembersOpen}

@@ -89,6 +89,9 @@
 }
 
 :root {
+    --custom-scrollbar: #e4e4e4;
+  --custom-scrollbar-2: #000000;
+  
   --background: #F9FAFB;
   --foreground: #212636;
   --card: oklch(1 0 0);
@@ -225,4 +228,27 @@
     transform: scale(4);
     opacity: 0;
   }
+}
+
+/* ========================|| Custom Thin Scrollbar Variant ||======================== */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--custom-scrollbar);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--custom-scrollbar-2);
+}
+
+.scrollbar-h-3::-webkit-scrollbar {
+  height: 3px;
 }

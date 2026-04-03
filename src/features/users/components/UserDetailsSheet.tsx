@@ -10,6 +10,9 @@ import {
   RotateCcwIcon
 } from "lucide-react";
 import React from "react";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,8 +22,16 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EditUserDialog from "@/features/users/components/EditUserDialog";
+import UnassignUserListDialog from "@/features/users/components/UnassignUserListDialog";
 import { usersStyles } from "@/features/users/styles/usersStyles";
-import { useGetUserById } from "@/features/users/services/userService";
+import {
+  useActivateUser,
+  useDeactivateUser,
+  useGetUserById
+} from "@/features/users/services/userService";
+import { userKeys } from "@/features/users/query-keys";
+import { handleMutationError } from "@/utils/handleMutationError";
 
 const stats = [
   { key: "total_calls_made" as const, label: "Total Calls Made" },
@@ -46,16 +57,57 @@ const UserDetailsSheet = ({
   onRemoveGroup: (group: { id: string; name: string }) => void;
   onViewGroupMembers: (group: { id: string; name: string }) => void;
 }) => {
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = React.useState<"groups" | "lists">(
     "groups"
   );
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [isUnassignListOpen, setIsUnassignListOpen] = React.useState(false);
+  const [selectedList, setSelectedList] = React.useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const { data, isPending } = useGetUserById(userId ?? "");
+  const { mutate: deactivateUser, isPending: isDeactivating } =
+    useDeactivateUser();
+  const { mutate: activateUser, isPending: isActivating } = useActivateUser();
   const user = data?.data;
 
   React.useEffect(() => {
     if (open) setActiveTab("groups");
   }, [open, userId]);
+
+  React.useEffect(() => {
+    if (!open) {
+      setIsEditOpen(false);
+      setIsUnassignListOpen(false);
+      setSelectedList(null);
+    }
+  }, [open]);
+
+  const handleToggleStatus = React.useCallback(() => {
+    if (!userId || !user) return;
+
+    const mutation = user.status === "suspend" ? activateUser : deactivateUser;
+    mutation(
+      { payload: { id: userId } },
+      {
+        onSuccess: (res) => {
+          toast.success(
+            res.message ||
+              (user.status === "suspend"
+                ? "User activated successfully"
+                : "User deactivated successfully")
+          );
+          void queryClient.invalidateQueries({ queryKey: userKeys.all });
+          void queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+        },
+        onError: handleMutationError
+      }
+    );
+  }, [activateUser, deactivateUser, queryClient, user, userId]);
 
   if (!open) return null;
 
@@ -107,13 +159,20 @@ const UserDetailsSheet = ({
                   align="end"
                   sideOffset={12}
                 >
-                  <DropdownMenuItem className={usersStyles.menuItem}>
+                  <DropdownMenuItem
+                    className={usersStyles.menuItem}
+                    onClick={() => setIsEditOpen(true)}
+                  >
                     <PencilIcon className="size-5 text-panel-muted" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className={usersStyles.menuItem}>
+                  <DropdownMenuItem
+                    className={usersStyles.menuItem}
+                    disabled={isDeactivating || isActivating}
+                    onClick={handleToggleStatus}
+                  >
                     <RotateCcwIcon className="size-5 text-panel-muted" />
-                    Inactive
+                    {user?.status === "suspend" ? "Active" : "Inactive"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -268,11 +327,23 @@ const UserDetailsSheet = ({
                             align="end"
                             sideOffset={12}
                           >
-                            <DropdownMenuItem className={usersStyles.menuItem}>
+                            <DropdownMenuItem
+                              className={usersStyles.menuItem}
+                              onClick={() => router.push(`/lists/${list.list.id}`)}
+                            >
                               View Details
                             </DropdownMenuItem>
-                            <DropdownMenuItem className={usersStyles.menuItem}>
-                              Manage
+                            <DropdownMenuItem
+                              className={usersStyles.menuItem}
+                              onClick={() => {
+                                setSelectedList({
+                                  id: list.list.id,
+                                  name: list.list.name
+                                });
+                                setIsUnassignListOpen(true);
+                              }}
+                            >
+                              Unassign
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -292,6 +363,32 @@ const UserDetailsSheet = ({
           )}
         </section>
       </aside>
+
+      <EditUserDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        user={
+          user
+            ? {
+                id: user.id,
+                email: user.email,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                phone_number: user.phone_number
+              }
+            : null
+        }
+      />
+
+      <UnassignUserListDialog
+        open={isUnassignListOpen}
+        onOpenChange={(nextOpen) => {
+          setIsUnassignListOpen(nextOpen);
+          if (!nextOpen) setSelectedList(null);
+        }}
+        userId={userId}
+        listId={selectedList?.id ?? null}
+      />
     </>
   );
 };

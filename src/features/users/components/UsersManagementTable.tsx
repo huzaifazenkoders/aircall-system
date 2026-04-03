@@ -65,7 +65,9 @@ const UsersManagementTable = ({
   users,
   selectedUserId,
   searchValue,
+  statusFilter,
   onSearchChange,
+  onStatusChange,
   onSelectUser,
   onAddUser,
   onViewDetails,
@@ -75,28 +77,23 @@ const UsersManagementTable = ({
   users: User[];
   selectedUserId: string;
   searchValue: string;
+  statusFilter: "All Status" | "active" | "suspend" | "invited";
   onSearchChange: ReactDispatch<string>;
+  onStatusChange: ReactDispatch<
+    "All Status" | "active" | "suspend" | "invited"
+  >;
   onSelectUser: ReactDispatch<string>;
   onAddUser?: () => void;
   onViewDetails?: ReactDispatch<string>;
   onAssignList?: ReactDispatch<string>;
   onAddToGroup?: ReactDispatch<string>;
 }) => {
-  type StatusFilter = "All Status" | "active" | "suspend" | "invited";
-
-  const [statusFilter, setStatusFilter] =
-    React.useState<StatusFilter>("All Status");
   const [page, setPage] = React.useState(1);
 
-  const filtered = React.useMemo(() => {
-    if (statusFilter === "All Status") return users;
-    return users.filter((u) => u.status === statusFilter);
-  }, [users, statusFilter]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const start = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end = Math.min(page * PAGE_SIZE, filtered.length);
+  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
+  const paginated = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const start = users.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, users.length);
 
   React.useEffect(() => {
     setPage(1);
@@ -129,7 +126,11 @@ const UsersManagementTable = ({
           <div className="flex flex-1 justify-end">
             <Select
               value={statusFilter}
-              onValueChange={(val) => setStatusFilter(val as StatusFilter)}
+              onValueChange={(val) =>
+                onStatusChange(
+                  val as "All Status" | "active" | "suspend" | "invited"
+                )
+              }
             >
               <SelectTrigger className="h-9 min-w-[110px] rounded-lg border-zinc-200 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]">
                 <SelectValue />
@@ -252,7 +253,7 @@ const UsersManagementTable = ({
             <ChevronDownIcon className="size-4 text-gray-500" />
           </div>
           <span className="text-xs text-gray-800">
-            {start}-{end} of {filtered.length}
+            {start}-{end} of {users.length}
           </span>
           <div className="flex items-center">
             <Button

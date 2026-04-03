@@ -33,8 +33,7 @@ export default function QueryProvider({ children }: Props) {
               secondary: ""
             },
             style: {
-              background:
-                "linear-gradient(0deg, #15B79E, #15B79E), linear-gradient(0deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))"
+              background: "#e8f8f5"
             }
           },
           error: {
