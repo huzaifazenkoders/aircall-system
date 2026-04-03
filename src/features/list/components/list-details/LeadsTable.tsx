@@ -40,10 +40,7 @@ import DateSelector from "@/components/custom/date-selector.component";
 import { cn } from "@/lib/utils";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
 import { useGetLeads } from "@/features/list/services/listService";
-import {
-  Lead,
-  LeadActivityStatus
-} from "@/features/list/types/leadTypes";
+import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
 
 const PAGE_SIZE = 10;
 
@@ -73,9 +70,7 @@ const LeadsTable = ({ listId }: { listId: string }) => {
     list_id: listId,
     search: query || undefined,
     status:
-      statusFilter === "all"
-        ? undefined
-        : (statusFilter as LeadActivityStatus),
+      statusFilter === "all" ? undefined : (statusFilter as LeadActivityStatus),
     startDate: startDate || undefined,
     endDate: endDate || undefined
   });
@@ -113,9 +108,7 @@ const LeadsTable = ({ listId }: { listId: string }) => {
         <div className={listDetailsStyles.leadFilters}>
           <Select
             value={statusFilter}
-            onValueChange={(value) =>
-              setStatusFilter(value ?? "all")
-            }
+            onValueChange={(value) => setStatusFilter(value ?? "all")}
           >
             <SelectTrigger
               className={cn(
@@ -123,7 +116,9 @@ const LeadsTable = ({ listId }: { listId: string }) => {
                 "flex min-w-[170px] items-center gap-2"
               )}
             >
-              <SelectValue />
+              <SelectValue className={"capitalize"}>
+                {statusFilter.replaceAll("_", " ")}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {statusOptions.map((option) => (
@@ -213,13 +208,19 @@ const LeadsTable = ({ listId }: { listId: string }) => {
               </TableRow>
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-destructive">
+                <TableCell
+                  colSpan={6}
+                  className="h-32 text-center text-destructive"
+                >
                   Failed to load leads.
                 </TableCell>
               </TableRow>
             ) : !leads.length ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                <TableCell
+                  colSpan={6}
+                  className="h-32 text-center text-muted-foreground"
+                >
                   No leads found.
                 </TableCell>
               </TableRow>
@@ -271,11 +272,16 @@ const LeadsTable = ({ listId }: { listId: string }) => {
                           })
                         )}
                       >
-                        <MoreVerticalIcon className="size-5" aria-hidden="true" />
+                        <MoreVerticalIcon
+                          className="size-5"
+                          aria-hidden="true"
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem
-                          onClick={() => router.push(`/list/${listId}/${lead.id}`)}
+                          onClick={() =>
+                            router.push(`/list/${listId}/${lead.id}`)
+                          }
                         >
                           View Lead
                         </DropdownMenuItem>
