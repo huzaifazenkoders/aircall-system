@@ -26,3 +26,5 @@ export interface GroupInfo extends Group {
     user: GroupUser;
   }[];
 }
+
+export type GroupStatus = "Active" | "Inactive";

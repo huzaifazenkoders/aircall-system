@@ -17,7 +17,7 @@ export const useMe = () =>
     queryFn: async () => {
       const res = await axiosInstance.get("/users/me");
       return res.data as MeRes;
-    },
+    }
   });
 
 // ─── Get Paginated Users ──────────────────────────────────────────────────────
@@ -28,22 +28,42 @@ interface GetUsersReq extends PaginationReq {
 }
 
 interface GetUsersRes {
-  data: User[];
-  meta: IPagination;
+  data: {
+    data: User[];
+    meta: IPagination;
+  };
+  message: string;
 }
 
-export function useGetUsers({ limit, search, sortBy, sortOrder, role, status }: GetUsersReq) {
+export function useGetUsers({
+  limit,
+  search,
+  sortBy,
+  sortOrder,
+  role,
+  status
+}: GetUsersReq) {
   return useInfiniteQuery({
     queryKey: userKeys.list({ limit, search, sortBy, sortOrder, role, status }),
     queryFn: async ({ pageParam }) => {
       const res = await axiosInstance.get("/users", {
-        params: { page: pageParam, limit, search, sortBy, sortOrder, role, status },
+        params: {
+          page: pageParam,
+          limit,
+          search,
+          sortBy,
+          sortOrder,
+          role,
+          status
+        }
       });
       return res.data as GetUsersRes;
     },
     getNextPageParam: (lastPage: GetUsersRes) =>
-      lastPage.meta?.hasNextPage ? Number(lastPage.meta.page) + 1 : undefined,
-    initialPageParam: 1,
+      lastPage.data?.meta?.hasNextPage
+        ? Number(lastPage.data?.meta.page) + 1
+        : undefined,
+    initialPageParam: 1
   });
 }
 
@@ -57,10 +77,12 @@ export const useGetUserById = (id: string) =>
   useQuery({
     queryKey: userKeys.detail(id),
     queryFn: async () => {
-      const res = await axiosInstance.get("/users/get-details", { params: { id } });
+      const res = await axiosInstance.get("/users/get-details", {
+        params: { id }
+      });
       return res.data as GetUserByIdRes;
     },
-    enabled: Boolean(id),
+    enabled: Boolean(id)
   });
 
 // ─── Invite User ──────────────────────────────────────────────────────────────
@@ -93,5 +115,5 @@ export const useInviteUser = () =>
     mutationFn: async ({ payload }: InviteUserReq) => {
       const res = await axiosInstance.post("/users/invite", payload);
       return res.data as InviteUserRes;
-    },
+    }
   });

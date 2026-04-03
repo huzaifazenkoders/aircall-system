@@ -15,10 +15,10 @@ import GroupsEmptyState from "@/features/groups/components/GroupsEmptyState";
 import GroupsTable, {
   GroupsCreatedBanner
 } from "@/features/groups/components/GroupsTable";
-import { GroupStatus, groupMembers } from "@/features/groups/data/groupsData";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import {
   useGetGroups,
+  useGetGroupInfo,
   useAddUsersToGroup,
   useRemoveUserFromGroup,
   useUpdateGroupStatus,
@@ -30,6 +30,7 @@ import { handleMutationError } from "@/utils/handleMutationError";
 import {
   Group,
   GroupInfo,
+  GroupStatus,
   GroupUser
 } from "@/features/groups/types/groupTypes";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
@@ -72,8 +73,14 @@ const GroupsView = () => {
     search: searchValue || undefined,
     is_active: isActiveFilter
   });
+  const { data: selectedGroupInfoData } = useGetGroupInfo(selectedGroupId ?? "");
 
   const groups: Group[] = transformInfiniteData(data, "data");
+  const existingMemberIds = React.useMemo(
+    () =>
+      selectedGroupInfoData?.data.user_groups.map((entry) => entry.user.id) ?? [],
+    [selectedGroupInfoData]
+  );
 
   const { mutate: addUsers, isPending: isAddingUsers } = useAddUsersToGroup();
   const { mutate: removeUser, isPending: isRemoving } =
@@ -86,8 +93,11 @@ const GroupsView = () => {
 
   const handleAddMembers = (memberIds: string[]) => {
     if (!selectedGroupId) return;
+    const newMemberIds = memberIds.filter((id) => !existingMemberIds.includes(id));
+    if (!newMemberIds.length) return;
+
     addUsers(
-      { payload: { id: selectedGroupId, user_ids: memberIds } },
+      { payload: { id: selectedGroupId, user_ids: newMemberIds } },
       {
         onSuccess: () => {
           toast.success("Members added successfully");
@@ -239,7 +249,6 @@ const GroupsView = () => {
           setCreateOpen(open);
           if (!open && createdName) setCreatedName("");
         }}
-        members={groupMembers}
       />
 
       <GroupDetailsSheet
@@ -269,11 +278,7 @@ const GroupsView = () => {
         emptyTitle="No available users found"
         emptyDescription="All active users are already part of this group."
         emptyKind="members"
-        items={groupMembers.map((member) => ({
-          id: member.id,
-          title: member.name,
-          member
-        }))}
+        initialSelectedIds={existingMemberIds}
         onSubmit={handleAddMembers}
       />
 

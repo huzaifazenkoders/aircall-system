@@ -86,5 +86,16 @@ export const usersStyles = {
   timeValue: cn("text-sm text-text-primary"),
   timeUnit: cn("text-sm text-panel-muted"),
   helperText: cn("mt-3 text-sm text-panel-muted"),
-  modalFooter: cn("justify-end gap-4 px-8 pt-10 pb-8")
+  modalFooter: cn("justify-end gap-4 px-8 pt-10 pb-8"),
+  groupMembersModalContent: cn("max-w-[1180px] rounded-[36px] p-0"),
+  groupMembersModalHeader: cn("items-start border-b border-border px-10 pt-10 pb-8"),
+  groupMembersModalTitle: cn("text-[46px] leading-none font-medium text-[#273043]"),
+  groupMembersModalSubtitle: cn("mt-6 text-[28px] leading-none text-[#667085]"),
+  groupMembersModalBody: cn("px-0 py-0"),
+  groupMembersSearch: cn("h-[72px] rounded-[18px] border-border px-6 text-[24px] text-[#667085] shadow-[0_3px_12px_rgba(16,24,40,0.10)]"),
+  groupMembersList: cn("max-h-[520px] overflow-y-auto px-10 py-8"),
+  groupMembersRow: cn("flex items-center gap-6 py-6"),
+  groupMembersAvatar: cn("grid size-16 shrink-0 place-items-center rounded-full text-xl font-semibold"),
+  groupMembersName: cn("text-[28px] leading-none text-[#273043]"),
+  groupMembersState: cn("flex min-h-[260px] items-center justify-center text-lg text-panel-muted")
 };

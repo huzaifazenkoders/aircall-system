@@ -5,9 +5,11 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   ListChecksIcon,
+  Loader2Icon,
   SearchIcon,
   UsersRoundIcon
 } from "lucide-react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,17 +28,31 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import GroupAvatar from "@/features/groups/components/GroupAvatar";
-import { GroupMember } from "@/features/groups/data/groupsData";
-import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import TextInput from "@/components/ui/text-input";
+import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import { useGetUsers } from "@/features/users/services/userService";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 type SelectionItem = {
   id: string;
   title: string;
   subtitle?: string;
-  member?: GroupMember;
 };
+
+const avatarPalettes = [
+  { bg: "#DAF4F6", fg: "#147B8A" },
+  { bg: "#E0EAFF", fg: "#1D4ED8" },
+  { bg: "#FDEAD7", fg: "#B54708" },
+  { bg: "#FCE7F3", fg: "#BE185D" }
+];
+
+const getInitials = (label: string) =>
+  label
+    .split(" ")
+    .map((part) => part[0] ?? "")
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
 const GroupSelectionDialog = ({
   open,
@@ -50,7 +66,7 @@ const GroupSelectionDialog = ({
   emptyTitle,
   emptyDescription,
   emptyKind,
-  items,
+  items = [],
   initialSelectedIds,
   onSubmit
 }: {
@@ -65,7 +81,7 @@ const GroupSelectionDialog = ({
   emptyTitle: string;
   emptyDescription: string;
   emptyKind: "members" | "lists";
-  items: SelectionItem[];
+  items?: SelectionItem[];
   initialSelectedIds?: string[];
   onSubmit: (selectedIds: string[]) => void;
 }) => {
@@ -74,19 +90,49 @@ const GroupSelectionDialog = ({
   const [selectedIds, setSelectedIds] = React.useState<string[]>(
     initialSelectedIds ?? []
   );
+  const initialSelectedKey = React.useMemo(
+    () => (initialSelectedIds ?? []).slice().sort().join(","),
+    [initialSelectedIds]
+  );
   const lockedIds = React.useMemo(
     () => new Set(initialSelectedIds ?? []),
     [initialSelectedIds]
   );
+  const usesUserQuery = emptyKind === "members";
+
+  const {
+    data: usersData,
+    isPending: isUsersPending,
+    hasNextPage,
+    fetchNextPage
+  } = useGetUsers({
+    limit: 20,
+    search: usesUserQuery ? query || undefined : undefined
+  });
 
   React.useEffect(() => {
     if (open) {
       setQuery("");
-      setSelectedIds(initialSelectedIds ?? []);
+      setSelectedIds((current) => {
+        const next = initialSelectedIds ?? [];
+        const currentKey = [...current].sort().join(",");
+        return currentKey === initialSelectedKey ? current : next;
+      });
+    } else {
+      setPickerOpen(false);
     }
-  }, [initialSelectedIds, open]);
+  }, [initialSelectedIds, initialSelectedKey, open]);
 
-  const filteredItems = React.useMemo(() => {
+  const resolvedItems = React.useMemo(() => {
+    if (usesUserQuery) {
+      const users = transformInfiniteData(usersData, "data");
+      return users.map((user) => ({
+        id: user.id,
+        title: `${user.first_name} ${user.last_name}`,
+        subtitle: user.email
+      }));
+    }
+
     const search = query.trim().toLowerCase();
 
     if (!search) {
@@ -98,24 +144,30 @@ const GroupSelectionDialog = ({
       const subtitleMatch = item.subtitle?.toLowerCase().includes(search);
       return titleMatch || subtitleMatch;
     });
-  }, [items, query]);
+  }, [items, query, usersData, usesUserQuery]);
 
-  const toggleItem = (itemId: string, checked: boolean) => {
-    if (lockedIds.has(itemId)) {
-      return;
-    }
+  const toggleItem = React.useCallback(
+    (itemId: string, checked: boolean) => {
+      if (lockedIds.has(itemId)) return;
 
-    setSelectedIds((current) => {
-      if (checked) {
-        return current.includes(itemId) ? current : [...current, itemId];
-      }
+      setSelectedIds((current) => {
+        if (checked) {
+          return current.includes(itemId) ? current : [...current, itemId];
+        }
 
-      return current.filter((value) => value !== itemId);
-    });
-  };
+        return current.filter((value) => value !== itemId);
+      });
+    },
+    [lockedIds]
+  );
 
   const resolvedTriggerLabel =
     selectedIds.length > 0 ? `${selectedIds.length} selected` : triggerLabel;
+  const newSelectedIds = React.useMemo(
+    () => selectedIds.filter((id) => !lockedIds.has(id)),
+    [lockedIds, selectedIds]
+  );
+  const shouldShowUsersLoading = usesUserQuery && isUsersPending;
 
   const EmptyIcon = emptyKind === "members" ? UsersRoundIcon : ListChecksIcon;
 
@@ -171,45 +223,76 @@ const GroupSelectionDialog = ({
                     />
                   </div>
 
-                  {filteredItems.length ? (
-                    <div className={groupsStyles.memberList}>
-                      {filteredItems.map((item) => {
-                        const checked = selectedIds.includes(item.id);
-                        const isLocked = lockedIds.has(item.id);
+                  {shouldShowUsersLoading ? (
+                    <div className="flex items-center justify-center px-4 py-8">
+                      <Loader2Icon className="size-6 animate-spin text-secondary" />
+                    </div>
+                  ) : resolvedItems.length ? (
+                    <div
+                      id="group-selection-scroll-area"
+                      className={groupsStyles.memberList}
+                    >
+                      <InfiniteScroll
+                        dataLength={resolvedItems.length}
+                        next={() => void fetchNextPage()}
+                        hasMore={usesUserQuery ? Boolean(hasNextPage) : false}
+                        loader={
+                          <div className="flex items-center justify-center px-4 py-4">
+                            <Loader2Icon className="size-5 animate-spin text-secondary" />
+                          </div>
+                        }
+                        scrollThreshold="120px"
+                        scrollableTarget="group-selection-scroll-area"
+                      >
+                        {resolvedItems.map((item, index) => {
+                          const checked = selectedIds.includes(item.id);
+                          const isLocked = lockedIds.has(item.id);
+                          const palette =
+                            avatarPalettes[index % avatarPalettes.length];
 
-                        return (
-                          <label
-                            key={item.id}
-                            className={groupsStyles.selectionRow}
-                          >
-                            <Checkbox
-                              checked={checked}
-                              disabled={isLocked}
-                              onCheckedChange={(value) =>
-                                toggleItem(item.id, Boolean(value))
-                              }
-                              className="size-7 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary disabled:opacity-100"
-                            />
-                            {item.member ? (
-                              <GroupAvatar member={item.member} />
-                            ) : (
-                              <div
-                                className={groupsStyles.listCheckboxSpacer}
+                          return (
+                            <label
+                              key={item.id}
+                              className={`${groupsStyles.selectionRow} ${isLocked ? "cursor-not-allowed opacity-70" : ""}`}
+                              title={isLocked ? "Already a member" : undefined}
+                            >
+                              <Checkbox
+                                checked={checked}
+                                disabled={isLocked}
+                                onCheckedChange={(value) =>
+                                  toggleItem(item.id, Boolean(value))
+                                }
+                                className="size-7 rounded-[8px] border-border data-checked:border-primary data-checked:bg-primary disabled:opacity-100"
                               />
-                            )}
-                            <div>
-                              <div className={groupsStyles.assignmentTitle}>
-                                {item.title}
-                              </div>
-                              {item.subtitle ? (
-                                <div className={groupsStyles.assignmentMeta}>
-                                  {item.subtitle}
+                              {emptyKind === "members" ? (
+                                <div
+                                  className={groupsStyles.avatar}
+                                  style={{
+                                    backgroundColor: palette.bg,
+                                    color: palette.fg
+                                  }}
+                                >
+                                  {getInitials(item.title)}
                                 </div>
-                              ) : null}
-                            </div>
-                          </label>
-                        );
-                      })}
+                              ) : (
+                                <div
+                                  className={groupsStyles.listCheckboxSpacer}
+                                />
+                              )}
+                              <div>
+                                <div className={groupsStyles.assignmentTitle}>
+                                  {item.title}
+                                </div>
+                                {item.subtitle ? (
+                                  <div className={groupsStyles.assignmentMeta}>
+                                    {item.subtitle}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </InfiniteScroll>
                     </div>
                   ) : (
                     <div className={groupsStyles.selectionEmptyState}>
@@ -235,9 +318,9 @@ const GroupSelectionDialog = ({
             Cancel
           </Button>
           <Button
-            disabled={!selectedIds.length}
+            disabled={!newSelectedIds.length}
             onClick={() => {
-              onSubmit(selectedIds);
+              onSubmit(newSelectedIds);
               onOpenChange(false);
             }}
           >

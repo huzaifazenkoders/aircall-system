@@ -1,10 +1,18 @@
 "use client";
 
 import React from "react";
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  Loader2Icon,
+  SearchIcon
+} from "lucide-react";
+import toast from "react-hot-toast";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogBody,
@@ -20,27 +28,126 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { availableGroups } from "@/features/users/data/usersData";
+import TextInput from "@/components/ui/text-input";
+import {
+  useAddGroupsToUser,
+  useGetGroups
+} from "@/features/groups/services/groupService";
 import { usersStyles } from "@/features/users/styles/usersStyles";
+import { userKeys } from "@/features/users/query-keys";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { handleMutationError } from "@/utils/handleMutationError";
+
+type GroupOption = {
+  id: string;
+  name: string;
+  total_users?: number;
+};
 
 const AddUserToGroupDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
+  userId,
+  preselectedGroupIds
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  userId: string | null;
+  preselectedGroupIds: string[];
 }) => {
-  const [pickerOpen, setPickerOpen] = React.useState(true);
-  const [selectedGroups, setSelectedGroups] = React.useState<string[]>([
-    "group-2"
-  ]);
+  const queryClient = useQueryClient();
+  const [pickerOpen, setPickerOpen] = React.useState(false);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [selectedGroups, setSelectedGroups] = React.useState<string[]>([]);
+
+  const {
+    data,
+    isPending,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage
+  } = useGetGroups({
+    limit: 20,
+    search: searchValue || undefined
+  });
+
+  const { mutate: addGroupsToUser, isPending: isAddingGroups } =
+    useAddGroupsToUser();
+
+  const availableGroups = React.useMemo(
+    () => transformInfiniteData(data, "data") as GroupOption[],
+    [data]
+  );
+
+  const preselectedGroupIdsSet = React.useMemo(
+    () => new Set(preselectedGroupIds),
+    [preselectedGroupIds]
+  );
+
+  const newlySelectedGroupIds = React.useMemo(
+    () => selectedGroups.filter((id) => !preselectedGroupIdsSet.has(id)),
+    [preselectedGroupIdsSet, selectedGroups]
+  );
 
   React.useEffect(() => {
-    if (open) {
-      setPickerOpen(true);
-      setSelectedGroups(["group-2"]);
+    if (!open) {
+      setPickerOpen(false);
+      setSearchValue("");
+      setSelectedGroups([]);
+      return;
     }
-  }, [open]);
+
+    setSelectedGroups((current) =>
+      current.length === 0
+        ? preselectedGroupIds
+        : Array.from(new Set([...current, ...preselectedGroupIds]))
+    );
+  }, [open, preselectedGroupIds]);
+
+  const handleGroupToggle = React.useCallback(
+    (groupId: string, nextChecked: boolean) => {
+      if (preselectedGroupIdsSet.has(groupId)) return;
+
+      setSelectedGroups((current) => {
+        if (nextChecked) {
+          return current.includes(groupId) ? current : [...current, groupId];
+        }
+
+        return current.filter((id) => id !== groupId);
+      });
+    },
+    [preselectedGroupIdsSet]
+  );
+
+  const handleSubmit = React.useCallback(() => {
+    if (!userId || newlySelectedGroupIds.length === 0) {
+      onOpenChange(false);
+      return;
+    }
+
+    addGroupsToUser(
+      {
+        payload: {
+          id: userId,
+          group_ids: newlySelectedGroupIds
+        }
+      },
+      {
+        onSuccess: (res) => {
+          toast.success(res.message || "Groups added successfully");
+          void queryClient.invalidateQueries({ queryKey: userKeys.all });
+          onOpenChange(false);
+        },
+        onError: handleMutationError
+      }
+    );
+  }, [
+    addGroupsToUser,
+    newlySelectedGroupIds,
+    onOpenChange,
+    queryClient,
+    userId
+  ]);
 
   const triggerLabel =
     selectedGroups.length > 0
@@ -84,30 +191,67 @@ const AddUserToGroupDialog = ({
                 className={`${usersStyles.menuPanel} mt-0 w-(--anchor-width) p-0`}
                 sideOffset={8}
               >
-                <div className={usersStyles.menuList}>
-                  {availableGroups.map((group) => {
-                    const checked = selectedGroups.includes(group.id);
+                <div className="border-b border-border p-3">
+                  <TextInput
+                    value={searchValue}
+                    setValue={setSearchValue}
+                    placeholder="Search groups"
+                    className="w-full text-sm"
+                    startIcon={<SearchIcon className="size-4 text-gray-500" />}
+                  />
+                </div>
 
-                    return (
-                      <label key={group.id} className={usersStyles.optionRow}>
-                        <Checkbox
-                          checked={checked}
-                          onCheckedChange={(next) => {
-                            setSelectedGroups((current) =>
-                              next
-                                ? [...current, group.id]
-                                : current.filter((id) => id !== group.id)
-                            );
-                          }}
-                          className="size-6 rounded-[8px] border-[#98A2B3] data-checked:border-secondary data-checked:bg-secondary"
-                        />
-                        <span>{group.name}</span>
-                        <span className={usersStyles.optionMuted}>
-                          ({group.users} users)
-                        </span>
-                      </label>
-                    );
-                  })}
+                <div
+                  id="add-user-groups-scroll-area"
+                  className={`${usersStyles.menuList} max-h-72 overflow-y-auto`}
+                >
+                  {isPending ? (
+                    <div className="flex items-center justify-center px-4 py-6">
+                      <Loader2Icon className="size-5 animate-spin text-secondary" />
+                    </div>
+                  ) : !availableGroups.length ? (
+                    <div className="px-4 py-6 text-center text-sm text-panel-muted">
+                      No groups found.
+                    </div>
+                  ) : (
+                    <InfiniteScroll
+                      dataLength={availableGroups.length}
+                      next={() => void fetchNextPage()}
+                      hasMore={Boolean(hasNextPage)}
+                      loader={
+                        <div className="flex items-center justify-center px-4 py-4">
+                          <Loader2Icon className="size-4 animate-spin text-secondary" />
+                        </div>
+                      }
+                      scrollThreshold="120px"
+                      scrollableTarget="add-user-groups-scroll-area"
+                    >
+                      {availableGroups.map((group) => {
+                        const checked = selectedGroups.includes(group.id);
+                        const isLocked = preselectedGroupIdsSet.has(group.id);
+
+                        return (
+                          <label
+                            key={group.id}
+                            className={`${usersStyles.optionRow} ${isLocked ? "cursor-not-allowed opacity-70" : ""}`}
+                          >
+                            <Checkbox
+                              checked={checked}
+                              disabled={isLocked}
+                              onCheckedChange={(next) =>
+                                handleGroupToggle(group.id, Boolean(next))
+                              }
+                              className="size-6 rounded-[8px] border-[#98A2B3] data-checked:border-secondary data-checked:bg-secondary"
+                            />
+                            <span>{group.name}</span>
+                            <span className={usersStyles.optionMuted}>
+                              ({group.total_users ?? 0} users)
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </InfiniteScroll>
+                  )}
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -115,10 +259,22 @@ const AddUserToGroupDialog = ({
         </DialogBody>
 
         <DialogFooter className={usersStyles.modalFooter}>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            variant="outline"
+            disabled={isAddingGroups}
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
-          <Button onClick={() => onOpenChange(false)}>Add to Group</Button>
+          <Button
+            disabled={!userId || newlySelectedGroupIds.length === 0 || isAddingGroups}
+            onClick={handleSubmit}
+          >
+            {isAddingGroups ? (
+              <Loader2Icon className="size-4 animate-spin" />
+            ) : null}
+            Add to Group
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

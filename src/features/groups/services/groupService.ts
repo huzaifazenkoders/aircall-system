@@ -143,6 +143,27 @@ export const useRemoveUserFromGroup = () =>
     }
   });
 
+// ─── Add Groups to User ──────────────────────────────────────────────────────
+
+interface AddGroupsToUserReq {
+  payload: {
+    id: string;
+    group_ids: string[];
+  };
+}
+
+interface AddGroupsToUserRes {
+  message: string;
+}
+
+export const useAddGroupsToUser = () =>
+  useMutation({
+    mutationFn: async ({ payload }: AddGroupsToUserReq) => {
+      const res = await axiosInstance.post("/users/add-groups", payload);
+      return res.data as AddGroupsToUserRes;
+    }
+  });
+
 // ─── Add Users to Group ───────────────────────────────────────────────────────
 
 interface AddUsersToGroupReq {

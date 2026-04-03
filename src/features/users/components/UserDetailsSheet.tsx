@@ -7,7 +7,7 @@ import {
   MailIcon,
   PencilIcon,
   PhoneIcon,
-  RotateCcwIcon,
+  RotateCcwIcon
 } from "lucide-react";
 import React from "react";
 
@@ -16,17 +16,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { useGetUserById } from "@/features/users/services/userService";
 
 const stats = [
-  { key: "total_calls" as const, label: "Total Calls Made" },
-  { key: "no_answer" as const, label: "No Answer" },
-  { key: "scheduled" as const, label: "Call Scheduled" },
-  { key: "completed_leads" as const, label: "Completed Leads" },
+  { key: "total_calls_made" as const, label: "Total Calls Made" },
+  { key: "total_no_answer" as const, label: "No Answer" },
+  { key: "total_scheduled" as const, label: "Call Scheduled" },
+  { key: "total_completed" as const, label: "Completed Leads" }
 ];
 
 const UserDetailsSheet = ({
@@ -36,15 +36,19 @@ const UserDetailsSheet = ({
   onAddGroup,
   onAssignList,
   onRemoveGroup,
+  onViewGroupMembers
 }: {
   userId: string | null;
   open: boolean;
   onClose: () => void;
   onAddGroup: () => void;
   onAssignList: () => void;
-  onRemoveGroup: () => void;
+  onRemoveGroup: (group: { id: string; name: string }) => void;
+  onViewGroupMembers: (group: { id: string; name: string }) => void;
 }) => {
-  const [activeTab, setActiveTab] = React.useState<"groups" | "lists">("groups");
+  const [activeTab, setActiveTab] = React.useState<"groups" | "lists">(
+    "groups"
+  );
 
   const { data, isPending } = useGetUserById(userId ?? "");
   const user = data?.data;
@@ -76,7 +80,9 @@ const UserDetailsSheet = ({
                       {user ? `${user.first_name} ${user.last_name}` : "—"}
                     </h2>
                     {user && (
-                      <span className={usersStyles.statusPill}>{user.status}</span>
+                      <span className={usersStyles.statusPill}>
+                        {user.status}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -86,7 +92,7 @@ const UserDetailsSheet = ({
                     {new Date(user.created_at).toLocaleDateString("en-US", {
                       month: "2-digit",
                       day: "2-digit",
-                      year: "2-digit",
+                      year: "2-digit"
                     })}
                   </p>
                 )}
@@ -129,7 +135,7 @@ const UserDetailsSheet = ({
                   <div key={stat.key} className={usersStyles.statCard}>
                     <div className={usersStyles.statLabel}>{stat.label}</div>
                     <div className={usersStyles.statValue}>
-                      {user.stats?.[stat.key] ?? 0}
+                      {user?.[stat.key] ?? 0}
                     </div>
                   </div>
                 ))}
@@ -170,7 +176,7 @@ const UserDetailsSheet = ({
                     >
                       Groups
                       <span className={usersStyles.countBadge}>
-                        {user.groups?.length ?? 0}
+                        {user.user_groups?.length ?? 0}
                       </span>
                     </TabsTrigger>
                     <TabsTrigger
@@ -179,24 +185,29 @@ const UserDetailsSheet = ({
                     >
                       Assigned Lists
                       <span className={usersStyles.countBadge}>
-                        {user.lists?.length ?? 0}
+                        {user.list_assignments?.length ?? 0}
                       </span>
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="groups" className={usersStyles.assignmentList}>
-                    {(user.groups ?? []).slice(0, 4).map((group) => (
+                  <TabsContent
+                    value="groups"
+                    className={usersStyles.assignmentList}
+                  >
+                    {(user.user_groups ?? []).map((group) => (
                       <div key={group.id} className={usersStyles.assignmentRow}>
                         <div className="flex items-center">
                           <div className={usersStyles.assignmentTitle}>
-                            {group.name}
+                            {group.group.name}
                           </div>
                           <div className={usersStyles.assignmentMeta}>
-                            ({group.total_users ?? 0} members)
+                            ({group.group.total_users ?? 0} members)
                           </div>
                         </div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger className={usersStyles.iconButton}>
+                          <DropdownMenuTrigger
+                            className={usersStyles.iconButton}
+                          >
                             <EllipsisVerticalIcon className="size-5" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
@@ -204,12 +215,25 @@ const UserDetailsSheet = ({
                             align="end"
                             sideOffset={12}
                           >
-                            <DropdownMenuItem className={usersStyles.menuItem}>
+                            <DropdownMenuItem
+                              className={usersStyles.menuItem}
+                              onClick={() =>
+                                onViewGroupMembers({
+                                  id: group.group.id,
+                                  name: group.group.name
+                                })
+                              }
+                            >
                               View Members
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className={usersStyles.menuItem}
-                              onClick={onRemoveGroup}
+                              onClick={() =>
+                                onRemoveGroup({
+                                  id: group.group.id,
+                                  name: group.group.name
+                                })
+                              }
                             >
                               Remove
                             </DropdownMenuItem>
@@ -219,19 +243,24 @@ const UserDetailsSheet = ({
                     ))}
                   </TabsContent>
 
-                  <TabsContent value="lists" className={usersStyles.assignmentList}>
-                    {(user.lists ?? []).slice(0, 4).map((list) => (
+                  <TabsContent
+                    value="lists"
+                    className={usersStyles.assignmentList}
+                  >
+                    {(user.list_assignments ?? []).map((list) => (
                       <div key={list.id} className={usersStyles.assignmentRow}>
                         <div className="flex items-center">
                           <div className={usersStyles.assignmentTitle}>
-                            {list.name}
+                            {list.list.name}
                           </div>
                           <div className={usersStyles.assignmentMeta}>
-                            — {list.total_leads ?? 0} Leads
+                            - {list.list.total_leads ?? 0} Leads
                           </div>
                         </div>
                         <DropdownMenu>
-                          <DropdownMenuTrigger className={usersStyles.iconButton}>
+                          <DropdownMenuTrigger
+                            className={usersStyles.iconButton}
+                          >
                             <EllipsisVerticalIcon className="size-5" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent

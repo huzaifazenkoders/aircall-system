@@ -23,6 +23,7 @@ export interface UserGroup {
   id: string;
   name: string;
   total_users?: number;
+  is_active: boolean;
 }
 
 export interface UserList {
@@ -33,12 +34,11 @@ export interface UserList {
 
 export interface UserDetail extends User {
   keap_id?: string;
-  stats: {
-    total_calls: number;
-    no_answer: number;
-    scheduled: number;
-    completed_leads: number;
-  };
-  groups: UserGroup[];
-  lists: UserList[];
+  total_calls_made: number;
+  total_completed: number;
+  total_no_answer: number;
+  total_scheduled: number;
+
+  user_groups: { id: string; group: UserGroup }[];
+  list_assignments: { id: string; list: UserList }[];
 }
