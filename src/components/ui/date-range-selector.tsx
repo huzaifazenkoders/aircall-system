@@ -53,7 +53,7 @@ const selectorTriggerClassName = cn(
 );
 
 const selectorContentClassName = cn(
-  "w-[310px] rounded-lg border p-3 shadow-md",
+  "w-fit rounded-lg border p-4 shadow-md",
   BackgroundColor,
   MainBorder
 );
@@ -429,6 +429,9 @@ const formatDateRangeLabel = (
   ).format("DD MMM YYYY")}`;
 };
 
+const formatSingleDateLabel = (date: Date | null | undefined, placeholder: string) =>
+  date ? moment(date).format("DD MMM YYYY") : placeholder;
+
 const SelectorContent = ({
   children,
   className
@@ -498,12 +501,20 @@ const DateRangeSelector = ({
     });
   }, [value?.startDate, value?.endDate]);
 
-  const handleSelectDate = (date: Date) => {
+  const handleSelectStartDate = (date: Date) => {
+    const nextRange: DateRangeValue =
+      range.endDate && moment(date).isAfter(range.endDate, "day")
+        ? { startDate: date, endDate: null }
+        : { startDate: date, endDate: range.endDate };
+
+    setRange(nextRange);
+    setValue?.(nextRange);
+  };
+
+  const handleSelectEndDate = (date: Date) => {
     let nextRange: DateRangeValue;
 
-    if (!range.startDate || (range.startDate && range.endDate)) {
-      nextRange = { startDate: date, endDate: null };
-    } else if (moment(date).isBefore(range.startDate, "day")) {
+    if (!range.startDate || moment(date).isBefore(range.startDate, "day")) {
       nextRange = { startDate: date, endDate: null };
     } else {
       nextRange = { startDate: range.startDate, endDate: date };
@@ -520,15 +531,37 @@ const DateRangeSelector = ({
   return (
     <SelectorRoot {...rest} triggerLabel={formatDateRangeLabel(range)}>
       <SelectorContent>
-        <CalendarPanel
-          rangeStart={range.startDate}
-          rangeEnd={range.endDate}
-          onSelectDate={handleSelectDate}
-          disabledDates={disabledDates}
-          minDate={minDate}
-          maxDate={maxDate}
-          initialViewDate={range.startDate}
-        />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="min-w-[310px]">
+            <div className="mb-4 text-sm font-medium text-text-primary">
+              {formatSingleDateLabel(range.startDate, "Start Date")}
+            </div>
+            <CalendarPanel
+              rangeStart={range.startDate}
+              rangeEnd={range.endDate}
+              onSelectDate={handleSelectStartDate}
+              disabledDates={disabledDates}
+              minDate={minDate}
+              maxDate={range.endDate ?? maxDate}
+              initialViewDate={range.startDate}
+            />
+          </div>
+
+          <div className="min-w-[310px] border-t border-border-primary pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-4">
+            <div className="mb-4 text-sm font-medium text-text-primary">
+              {formatSingleDateLabel(range.endDate, "End Date")}
+            </div>
+            <CalendarPanel
+              rangeStart={range.startDate}
+              rangeEnd={range.endDate}
+              onSelectDate={handleSelectEndDate}
+              disabledDates={disabledDates}
+              minDate={range.startDate ?? minDate}
+              maxDate={maxDate}
+              initialViewDate={range.endDate ?? range.startDate}
+            />
+          </div>
+        </div>
       </SelectorContent>
     </SelectorRoot>
   );

@@ -59,7 +59,12 @@ function Button({
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
       onMouseDown={(e) => {
-        handleRippleAnimation(e);
+        handleRippleAnimation(
+          e,
+          variant && ["outline-transparent", "ghost"].includes(variant)
+            ? "bg-black/30"
+            : undefined
+        );
         props.onMouseDown?.(e);
       }}
     />
