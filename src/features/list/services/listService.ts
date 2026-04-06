@@ -137,10 +137,35 @@ interface CreateListRes {
   message: string;
 }
 
+interface UpdateListReq {
+  payload: {
+    id: string;
+    name: string;
+    description: string;
+    cooldown_minimum_hours: number;
+    cooldown_minimum_minutes: number;
+    priority: number;
+    call_type: CallType;
+    assign_type: AssignType;
+    list_type: ListType;
+    workflow_id: string;
+    group_ids: string[];
+    user_ids: string[];
+  };
+}
+
 export const useCreateList = () =>
   useMutation({
     mutationFn: async ({ payload }: CreateListReq) => {
       const res = await axiosInstance.post("/lists", payload);
+      return res.data as CreateListRes;
+    }
+  });
+
+export const useUpdateList = () =>
+  useMutation({
+    mutationFn: async ({ payload }: UpdateListReq) => {
+      const res = await axiosInstance.patch("/lists", payload);
       return res.data as CreateListRes;
     }
   });
@@ -179,7 +204,8 @@ export const useDeactivateList = () =>
 interface UnassignListReq {
   payload: {
     list_id: string;
-    group_id: string;
+    group_id?: string;
+    user_id?: string;
   };
 }
 
@@ -207,7 +233,7 @@ interface UnassignUserListReq {
 export const useUnassignUserList = () =>
   useMutation({
     mutationFn: async ({ payload }: UnassignUserListReq) => {
-      const res = await axiosInstance.patch("/lists/unassign-user", payload);
+      const res = await axiosInstance.patch("/lists/unassign-list", payload);
       return res.data as UnassignListRes;
     }
   });

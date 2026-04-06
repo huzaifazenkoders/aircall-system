@@ -33,14 +33,17 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useCreateList } from "@/features/list/services/listService";
+import {
+  useCreateList,
+  useUpdateList
+} from "@/features/list/services/listService";
 import { useGetWorkflows } from "@/features/workflows/services/workflowService";
 import { useGetGroups } from "@/features/groups/services/groupService";
 import { useGetUsers } from "@/features/users/services/userService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { listKeys } from "@/features/list/query-keys";
-import { AssignType } from "@/features/list/types/listTypes";
+import { AssignType, ListDetail } from "@/features/list/types/listTypes";
 import RadioSelector from "../RadioSelector";
 
 const validationSchema = Yup.object({
@@ -98,13 +101,19 @@ const validationSchema = Yup.object({
 
 const CreateListDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
+  mode = "create",
+  initialList
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode?: "create" | "edit";
+  initialList?: ListDetail | null;
 }) => {
   const queryClient = useQueryClient();
   const { mutate: createList, isPending } = useCreateList();
+  const { mutate: updateList, isPending: isUpdating } = useUpdateList();
+  const isSubmitting = isPending || isUpdating;
 
   const { data: workflowsData } = useGetWorkflows({ limit: 100 });
   const workflows = transformInfiniteData(workflowsData, "data");
@@ -118,45 +127,96 @@ const CreateListDialog = ({
   const [groupOpen, setGroupOpen] = React.useState(false);
   const [userOpen, setUserOpen] = React.useState(false);
 
+  const initialValues = React.useMemo(
+    () => ({
+      name: initialList?.name ?? "",
+      description: initialList?.description ?? "",
+      call_type: (initialList?.call_type ?? "") as "hot_lead" | "inbound" | "",
+      workflow_id: initialList?.workflow_id ?? "",
+      priority: initialList?.priority ?? 1,
+      cooldown_minimum_hours: initialList?.cooldown_minimum_hours ?? 0,
+      cooldown_minimum_minutes: initialList?.cooldown_minimum_minutes ?? 0,
+      assign_type: (initialList?.assign_type ?? "group") as AssignType,
+      list_type: (initialList?.list_type ?? "shared") as
+        | "shared"
+        | "individual",
+      group_ids: initialList
+        ? Array.from(
+            new Set(
+              initialList.assignments
+                .filter((assignment) => assignment.group?.id)
+                .map((assignment) => assignment.group!.id)
+            )
+          )
+        : ([] as string[]),
+      user_ids: initialList
+        ? Array.from(
+            new Set(
+              initialList.assignments
+                .filter((assignment) => assignment.user?.id)
+                .map((assignment) => assignment.user!.id)
+            )
+          )
+        : ([] as string[])
+    }),
+    [initialList]
+  );
+
   const formik = useFormik({
-    initialValues: {
-      name: "",
-      description: "",
-      call_type: "" as "hot_lead" | "inbound" | "",
-      workflow_id: "",
-      priority: 1,
-      cooldown_minimum_hours: 0,
-      cooldown_minimum_minutes: 0,
-      assign_type: "group" as AssignType,
-      list_type: "shared" as "shared" | "individual",
-      group_ids: [] as string[],
-      user_ids: [] as string[]
-    },
+    enableReinitialize: true,
+    initialValues,
     validationSchema,
     onSubmit: (values) => {
-      createList(
-        {
-          payload: {
-            name: values.name.trim(),
-            description: values.description.trim(),
-            call_type: values.call_type as "hot_lead" | "inbound",
-            workflow_id: values.workflow_id.trim(),
-            priority: values.priority,
-            cooldown_minimum_hours: values.cooldown_minimum_hours,
-            cooldown_minimum_minutes: values.cooldown_minimum_minutes,
-            assign_type: values.assign_type,
-            list_type: values.list_type,
-            group_ids: values.assign_type === "group" ? values.group_ids : [],
-            user_ids: values.assign_type === "individual" ? values.user_ids : []
-          }
-        },
-        {
-          onSuccess: () => {
-            toast.success("List created successfully");
-            queryClient.invalidateQueries({ queryKey: listKeys.all });
-            onOpenChange(false);
-            formik.resetForm();
+      const payload = {
+        name: values.name.trim(),
+        description: values.description.trim(),
+        call_type: values.call_type as "hot_lead" | "inbound",
+        workflow_id: values.workflow_id.trim(),
+        priority: values.priority,
+        cooldown_minimum_hours: values.cooldown_minimum_hours,
+        cooldown_minimum_minutes: values.cooldown_minimum_minutes,
+        assign_type: values.assign_type,
+        list_type: values.list_type,
+        group_ids: values.assign_type === "group" ? values.group_ids : [],
+        user_ids: values.assign_type === "individual" ? values.user_ids : []
+      };
+
+      const onSuccess = () => {
+        toast.success(
+          mode === "edit"
+            ? "List updated successfully"
+            : "List created successfully"
+        );
+        queryClient.invalidateQueries({ queryKey: listKeys.all });
+        if (initialList?.id) {
+          queryClient.invalidateQueries({
+            queryKey: listKeys.detail(initialList.id)
+          });
+        }
+        onOpenChange(false);
+        formik.resetForm();
+      };
+
+      if (mode === "edit" && initialList?.id) {
+        updateList(
+          {
+            payload: {
+              id: initialList.id,
+              ...payload
+            }
           },
+          {
+            onSuccess,
+            onError: handleMutationError
+          }
+        );
+        return;
+      }
+
+      createList(
+        { payload },
+        {
+          onSuccess,
           onError: handleMutationError
         }
       );
@@ -187,7 +247,9 @@ const CreateListDialog = ({
       <DialogContent className="max-w-3xl overflow-visible">
         <DialogHeader>
           <div className="min-w-0">
-            <DialogTitle>Create List</DialogTitle>
+            <DialogTitle>
+              {mode === "edit" ? "Edit List" : "Create List"}
+            </DialogTitle>
             <DialogDescription>
               Manage priority based lead routing and assignment rules for your
               outbound sales team.
@@ -205,7 +267,7 @@ const CreateListDialog = ({
                 setValue={(v) => formik.setFieldValue("name", v)}
                 onBlur={formik.handleBlur}
                 placeholder="eg, Gold Cost Event"
-                className="border-input px-4 text-sm shadow-xs bg-transparent"
+                className="px-4 text-sm bg-transparent"
                 error={formik.touched.name ? formik.errors.name : undefined}
               />
             </Field>
@@ -217,7 +279,7 @@ const CreateListDialog = ({
                 setValue={(v) => formik.setFieldValue("description", v)}
                 onBlur={formik.handleBlur}
                 placeholder="eg, Follow-up list for gold coast event leads"
-                className="border-input px-4 text-sm shadow-xs bg-transparent"
+                className="px-4 text-sm bg-transparent"
                 error={
                   formik.touched.description
                     ? formik.errors.description
@@ -237,7 +299,7 @@ const CreateListDialog = ({
                   value={formik.values.call_type}
                   onValueChange={(v) => formik.setFieldValue("call_type", v)}
                 >
-                  <SelectTrigger className="h-11 w-full px-4 text-sm text-muted-foreground">
+                  <SelectTrigger className="h-11 w-full border border-border-primary px-4 text-sm text-muted-foreground">
                     <SelectValue placeholder="Select call type" />
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
@@ -259,7 +321,7 @@ const CreateListDialog = ({
                   value={formik.values.workflow_id}
                   onValueChange={(v) => formik.setFieldValue("workflow_id", v)}
                 >
-                  <SelectTrigger className="h-11 w-full px-4 text-sm text-muted-foreground">
+                  <SelectTrigger className="h-11 border border-border-primary w-full px-4 text-sm text-muted-foreground">
                     <SelectValue placeholder="Select template" />
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
@@ -284,7 +346,7 @@ const CreateListDialog = ({
                   value={formik.values.list_type}
                   onValueChange={(v) => formik.setFieldValue("list_type", v)}
                 >
-                  <SelectTrigger className="h-11 w-full px-4 text-sm text-muted-foreground">
+                  <SelectTrigger className="h-11 border border-border-primary w-full px-4 text-sm text-muted-foreground">
                     <SelectValue placeholder="Select list type" />
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
@@ -303,7 +365,7 @@ const CreateListDialog = ({
                       formik.setFieldValue("priority", Number(v) || 1)
                     }
                     onBlur={formik.handleBlur}
-                    className="border-input px-4 text-sm shadow-xs bg-transparent w-full"
+                    className="px-4 text-sm bg-transparent w-full"
                     containerClassName="w-full"
                     error={
                       formik.touched.priority
@@ -362,7 +424,7 @@ const CreateListDialog = ({
                       hr
                     </span>
                   }
-                  className="border-input px-4 pr-12 text-sm bg-transparent shadow-xs"
+                  className="px-4 pr-12 text-sm bg-transparent"
                   error={
                     formik.touched.cooldown_minimum_hours
                       ? formik.errors.cooldown_minimum_hours
@@ -384,7 +446,7 @@ const CreateListDialog = ({
                       Min
                     </span>
                   }
-                  className="border-input px-4 pr-12 text-sm bg-transparent shadow-xs"
+                  className="px-4 pr-12 text-sm bg-transparent"
                   error={
                     formik.touched.cooldown_minimum_minutes
                       ? formik.errors.cooldown_minimum_minutes
@@ -430,7 +492,7 @@ const CreateListDialog = ({
                       <button
                         type="button"
                         className={cn(
-                          "flex h-11 w-full items-center rounded-lg justify-between border border-input bg-background px-4 text-sm text-muted-foreground shadow-xs",
+                          "flex h-11 w-full items-center rounded-lg justify-between border px-4 text-sm text-muted-foreground",
                           groupOpen && "border-secondary"
                         )}
                       >
@@ -489,7 +551,7 @@ const CreateListDialog = ({
                       <button
                         type="button"
                         className={cn(
-                          "flex h-11 w-full items-center rounded-lg justify-between border border-input bg-background px-4 text-sm text-muted-foreground shadow-xs",
+                          "flex h-11 w-full items-center rounded-lg justify-between border bg-background px-4 text-sm text-muted-foreground",
                           userOpen && "border-secondary"
                         )}
                       >
@@ -542,17 +604,19 @@ const CreateListDialog = ({
               variant="outline"
               className="h-11 px-7 text-sm font-medium"
               onClick={() => handleClose(false)}
-              disabled={isPending}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
               className="h-11 px-7 text-sm font-medium"
-              disabled={isPending}
+              disabled={isSubmitting}
             >
-              {isPending ? (
+              {isSubmitting ? (
                 <Loader2Icon className="size-4 animate-spin" />
+              ) : mode === "edit" ? (
+                "Update"
               ) : (
                 "Create"
               )}

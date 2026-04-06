@@ -21,6 +21,12 @@ export interface LeadDisposition {
   title?: string;
 }
 
+export type LeadDisplayStatus =
+  | LeadActivityStatus
+  | "invalid"
+  | "banned"
+  | "expired";
+
 export interface Lead {
   call_priority: number;
   created_at: string;
@@ -42,4 +48,13 @@ export interface Lead {
   referred_by: string;
   timezone: string;
   updated_at: string;
+  status?: LeadDisplayStatus;
+  lead_status?: LeadDisplayStatus;
+  activity_status?: LeadDisplayStatus;
+  disposition?: string;
+  last_disposition?: string;
+  attempt?: number;
+  attempts?: number;
+  days_to_expiry?: number;
+  assigned_rep?: LeadAssignedRep | null;
 }

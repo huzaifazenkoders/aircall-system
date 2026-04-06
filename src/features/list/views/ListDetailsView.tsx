@@ -24,14 +24,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import ListOverviewCard from "@/features/list/components/list-details/ListOverviewCard";
-import LeadOverviewCard from "@/features/list/components/list-details/LeadOverviewCard";
-import AssignmentCard from "@/features/list/components/list-details/AssignmentCard";
-import LeadsTable from "@/features/list/components/list-details/LeadsTable";
 import DeactivateListDialog from "@/features/list/components/list-all/DeactivateListDialog";
+import CreateListDialog from "@/features/list/components/list-all/CreateListDialog";
 import ClearListNowDialog from "@/features/list/components/list-details/ClearListNowDialog";
 import ScheduleListClearDialog from "@/features/list/components/list-details/ScheduleListClearDialog";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
+import SharedListDetailsBodyView from "@/features/list/views/SharedListDetailsBodyView";
+import IndividualListDetailsBodyView from "@/features/list/views/IndividualListDetailsBodyView";
 import {
   useGetListById,
   useActivateList,
@@ -50,6 +49,7 @@ const ListDetailsView = () => {
   const [deactivateOpen, setDeactivateOpen] = React.useState(false);
   const [clearNowOpen, setClearNowOpen] = React.useState(false);
   const [scheduleOpen, setScheduleOpen] = React.useState(false);
+  const [editOpen, setEditOpen] = React.useState(false);
 
   const { data, isPending, isError } = useGetListById(listId);
   const list = data?.data;
@@ -171,74 +171,100 @@ const ListDetailsView = () => {
         </div>
 
         <div className={listDetailsStyles.headerActions}>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  type="button"
-                  variant="outline-transparent"
+          {list.list_type === "individual" ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline-transparent"
+                    disabled={isCreatingCleanup}
+                  >
+                    <Trash2Icon className="size-4 text-destructive" />
+                    Clear
+                    <ChevronDownIcon className="size-4 text-muted-foreground" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem
+                  onClick={() => setClearNowOpen(true)}
+                  disabled={isCreatingCleanup}
+                >
+                  Clear Now
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setScheduleOpen(true)}
+                  disabled={isCreatingCleanup}
+                >
+                  Schedule
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline-transparent"
+                    disabled={isMutatingStatus || isCreatingCleanup}
+                  >
+                    More Action
+                    <ChevronDownIcon className="size-4 text-muted-foreground" />
+                  </Button>
+                }
+              />
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem
+                  onClick={
+                    isActive ? () => setDeactivateOpen(true) : handleActivate
+                  }
                   disabled={isMutatingStatus || isCreatingCleanup}
                 >
-                  More Action
-                  <ChevronDownIcon className="size-4 text-muted-foreground" />
-                </Button>
-              }
-            />
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem
-                onClick={
-                  isActive ? () => setDeactivateOpen(true) : handleActivate
-                }
-                disabled={isMutatingStatus || isCreatingCleanup}
-              >
-                <RotateCcwIcon
-                  className={cn(
-                    "size-4 text-muted-foreground",
-                    isMutatingStatus ? "animate-spin" : ""
-                  )}
-                />
-                {isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="text-destructive [&_svg]:text-destructive">
-                  <Trash2Icon className="size-4" />
-                  Clear
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-44">
-                  <DropdownMenuItem
-                    onClick={() => setClearNowOpen(true)}
-                    disabled={isCreatingCleanup}
-                  >
-                    Clear Now
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setScheduleOpen(true)}
-                    disabled={isCreatingCleanup}
-                  >
-                    Schedule
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button>
+                  <RotateCcwIcon
+                    className={cn(
+                      "size-4 text-muted-foreground",
+                      isMutatingStatus ? "animate-spin" : ""
+                    )}
+                  />
+                  {isActive ? "Deactivate" : "Activate"}
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="text-destructive [&_svg]:text-destructive">
+                    <Trash2Icon className="size-4" />
+                    Clear
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-44">
+                    <DropdownMenuItem
+                      onClick={() => setClearNowOpen(true)}
+                      disabled={isCreatingCleanup}
+                    >
+                      Clear Now
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setScheduleOpen(true)}
+                      disabled={isCreatingCleanup}
+                    >
+                      Schedule
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <Button type="button" onClick={() => setEditOpen(true)}>
             <PencilIcon className="size-4" aria-hidden="true" />
             Edit
           </Button>
         </div>
       </div>
 
-      <div className={listDetailsStyles.grid}>
-        <div className="flex flex-col gap-6">
-          <ListOverviewCard list={list} />
-          <AssignmentCard list={list} />
-        </div>
-
-        <div className="min-w-0">
-          <LeadOverviewCard list={list} />
-          <LeadsTable listId={listId} />
-        </div>
-      </div>
+      {list.list_type === "individual" ? (
+        <IndividualListDetailsBodyView list={list} listId={listId} />
+      ) : (
+        <SharedListDetailsBodyView list={list} listId={listId} />
+      )}
 
       <DeactivateListDialog
         open={deactivateOpen}
@@ -257,6 +283,12 @@ const ListDetailsView = () => {
         onOpenChange={setScheduleOpen}
         onSubmit={handleCreateCleanup}
         isPending={isCreatingCleanup}
+      />
+      <CreateListDialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        mode="edit"
+        initialList={list}
       />
     </div>
   );

@@ -9,6 +9,8 @@ export const listDetailsStyles = {
   headerActions: cn("flex items-center gap-3"),
 
   grid: cn("mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[420px_1fr]"),
+  idvLayout: cn("mt-6 flex flex-col gap-6"),
+  idvOverviewGrid: cn("grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.15fr]"),
   card: cn("overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-border"),
   cardHeader: cn(
     "flex items-center justify-between gap-4 border-b border-border px-6 py-5"
@@ -16,8 +18,10 @@ export const listDetailsStyles = {
   cardTitle: cn("text-lg font-medium"),
 
   kvList: cn("grid grid-cols-[140px_1fr] gap-y-6 px-6 py-6 text-sm"),
+  idvKvGrid: cn("grid grid-cols-1 gap-x-10 gap-y-8 px-6 py-6 text-sm md:grid-cols-2"),
   kvKey: cn("text-muted-foreground"),
   kvVal: cn("font-medium text-foreground"),
+  idvKvVal: cn("mt-2 text-[20px] font-medium text-foreground"),
 
   assignmentList: cn("flex flex-col gap-2"),
   assignmentRow: cn(
@@ -43,6 +47,9 @@ export const listDetailsStyles = {
 
   leadTableWrap: cn(
     "mt-6 overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-border"
+  ),
+  leadTableWrapFlush: cn(
+    "overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-border"
   ),
   leadToolbar: cn(
     "flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4"
