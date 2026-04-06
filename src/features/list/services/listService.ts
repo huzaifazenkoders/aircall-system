@@ -18,7 +18,7 @@ import { listKeys } from "@/features/list/query-keys";
 
 interface GetListsReq extends PaginationReq {
   status?: ListStatus;
-  list_type?: ListType;
+  list_type: ListType;
 }
 
 interface GetListsRes {
@@ -29,12 +29,7 @@ interface GetListsRes {
   message: string;
 }
 
-export function useGetLists({
-  limit,
-  search,
-  status,
-  list_type
-}: GetListsReq) {
+export function useGetLists({ limit, search, status, list_type }: GetListsReq) {
   return useInfiniteQuery({
     queryKey: listKeys.list({ limit, search, status, list_type }),
     queryFn: async ({ pageParam }) => {

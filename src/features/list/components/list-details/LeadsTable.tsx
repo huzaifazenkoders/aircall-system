@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React from "react";
 import {
   CalendarIcon,
@@ -43,6 +41,8 @@ import { useGetLeads } from "@/features/list/services/listService";
 import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
 import Image from "next/image";
 import NoImage from "@/../public/assets/list/no-leads.png";
+import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
+import LeadDetailsDialog from "@/features/list/components/list-details/LeadDetailsDialog";
 
 const PAGE_SIZE = 10;
 
@@ -57,7 +57,6 @@ const statusOptions = [
 ] as const;
 
 const LeadsTable = ({ listId }: { listId: string }) => {
-  const router = useRouter();
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
@@ -65,6 +64,10 @@ const LeadsTable = ({ listId }: { listId: string }) => {
   const [endDate, setEndDate] = React.useState("");
   const [isStartDateOpen, setIsStartDateOpen] = React.useState(false);
   const [isEndDateOpen, setIsEndDateOpen] = React.useState(false);
+  const [leadDetailsOpen, setLeadDetailsOpen] = React.useState(false);
+  const [selectedLead, setSelectedLead] = React.useState<Lead | null>(null);
+  const [moveLeadOpen, setMoveLeadOpen] = React.useState(false);
+  const [moveLeadId, setMoveLeadId] = React.useState<string | null>(null);
 
   const { data, isPending, isError } = useGetLeads({
     page,
@@ -245,20 +248,24 @@ const LeadsTable = ({ listId }: { listId: string }) => {
               leads.map((lead) => (
                 <TableRow key={lead.id} className="h-16">
                   <TableCell>
-                    <Link
-                      href={`/list/${listId}/${lead.id}`}
-                      className="block outline-none"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedLead(lead);
+                        setLeadDetailsOpen(true);
+                      }}
+                      className="block w-full text-left outline-none"
                     >
                       <div className="font-semibold text-foreground">
                         {getLeadName(lead)}
                       </div>
                       <div className="mt-1 text-sm text-muted-foreground">
-                        {lead.phone_number ?? lead.phone ?? "—"}
+                        {lead.phone ?? "—"}
                       </div>
-                    </Link>
+                    </button>
                   </TableCell>
                   <TableCell>
-                    <LeadStatusBadge status={lead.status} />
+                    <LeadStatusBadge status={LeadActivityStatus.Completed} />
                   </TableCell>
                   <TableCell className="text-foreground">
                     {getAssignedRepName(lead)}
@@ -268,15 +275,11 @@ const LeadsTable = ({ listId }: { listId: string }) => {
                       {getDispositionName(lead)}
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      {formatLeadDate(
-                        lead.last_disposition_at ??
-                          lead.updated_at ??
-                          lead.created_at
-                      )}
+                      {formatLeadDate(lead.updated_at ?? lead.created_at)}
                     </div>
                   </TableCell>
                   <TableCell className="text-right font-medium text-foreground">
-                    {lead.attempt ?? lead.attempt_count ?? 0}
+                    {"N/A"}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
@@ -285,24 +288,32 @@ const LeadsTable = ({ listId }: { listId: string }) => {
                           buttonVariants({
                             variant: "outline-transparent",
                             size: "icon",
-                            className: "size-10 rounded-xl"
+                            className: "size-7 rounded-xl"
                           })
                         )}
                       >
                         <MoreVerticalIcon
-                          className="size-5"
+                          className="size-3"
                           aria-hidden="true"
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem
-                          onClick={() =>
-                            router.push(`/list/${listId}/${lead.id}`)
-                          }
+                          onClick={() => {
+                            setSelectedLead(lead);
+                            setLeadDetailsOpen(true);
+                          }}
                         >
                           View Lead
                         </DropdownMenuItem>
-                        <DropdownMenuItem>Move Lead</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setMoveLeadId(lead.id);
+                            setMoveLeadOpen(true);
+                          }}
+                        >
+                          Move Lead
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -336,36 +347,38 @@ const LeadsTable = ({ listId }: { listId: string }) => {
           </Button>
         </div>
       </div>
+
+      <LeadDetailsDialog
+        lead={selectedLead}
+        open={leadDetailsOpen}
+        onOpenChange={(open) => {
+          setLeadDetailsOpen(open);
+          if (!open) {
+            setSelectedLead(null);
+          }
+        }}
+      />
+
+      <MoveLeadDialog
+        open={moveLeadOpen}
+        onOpenChange={(open) => {
+          setMoveLeadOpen(open);
+          if (!open) {
+            setMoveLeadId(null);
+          }
+        }}
+        leadId={moveLeadId}
+        fromListId={listId}
+      />
     </div>
   );
 };
 
-const getLeadName = (lead: Lead) =>
-  lead.full_name ||
-  lead.name ||
-  [lead.first_name, lead.last_name].filter(Boolean).join(" ") ||
-  "Unnamed Lead";
+const getLeadName = (lead: Lead) => lead.first_name + " " + lead.last_name;
 
-const getAssignedRepName = (lead: Lead) => {
-  const rep = lead.assigned_rep ?? lead.assigned_user;
+const getAssignedRepName = (lead: Lead) => "N/A";
 
-  if (!rep) return "—";
-
-  return (
-    rep.name ||
-    [rep.first_name, rep.last_name].filter(Boolean).join(" ") ||
-    rep.email ||
-    "—"
-  );
-};
-
-const getDispositionName = (lead: Lead) => {
-  const disposition = lead.last_disposition;
-
-  if (!disposition) return "—";
-  if (typeof disposition === "string") return disposition;
-  return disposition.name || disposition.title || "—";
-};
+const getDispositionName = (lead: Lead) => "N/A";
 
 const formatLeadDate = (value?: string | null) => {
   if (!value) return "—";

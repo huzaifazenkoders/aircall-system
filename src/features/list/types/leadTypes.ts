@@ -22,20 +22,24 @@ export interface LeadDisposition {
 }
 
 export interface Lead {
+  call_priority: number;
+  created_at: string;
+  deleted_at: string | null;
+  email: string;
+  event_date: string;
+  event_location: string;
+  event_name: string;
+  first_name: string;
   id: string;
-  first_name?: string;
-  last_name?: string;
-  name?: string;
-  full_name?: string;
-  phone?: string | null;
-  phone_number?: string | null;
-  status: LeadActivityStatus;
-  assigned_rep?: LeadAssignedRep | null;
-  assigned_user?: LeadAssignedRep | null;
-  last_disposition?: LeadDisposition | string | null;
-  last_disposition_at?: string | null;
-  updated_at?: string | null;
-  created_at?: string | null;
-  attempt?: number | null;
-  attempt_count?: number | null;
+  is_referral: boolean;
+  keap_contact_url: string;
+  last_name: string;
+  lead_owner: string;
+  list_id: string;
+  notes: string;
+  phone: string;
+  referral_link: string;
+  referred_by: string;
+  timezone: string;
+  updated_at: string;
 }

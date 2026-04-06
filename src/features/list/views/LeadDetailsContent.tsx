@@ -15,87 +15,104 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import { Lead } from "@/features/list/types/leadTypes";
 
-const LeadDetailsContent = () => {
+const LeadDetailsContent = ({
+  lead,
+  onBack
+}: {
+  lead: Lead | null;
+  onBack?: () => void;
+}) => {
   const router = useRouter();
+  const leadName = getLeadName(lead);
+
+  if (!lead) return null;
 
   return (
-    <div className="overflow-hidden rounded-2xl">
-      <div className="flex flex-wrap items-center justify-between gap-6 border-b border-border px-8 py-6">
+    <div className="overflow-hidden rounded-lg">
+      <div className="flex flex-wrap items-center justify-between gap-6 border-b border-border px-6 py-6">
         <div className="flex min-w-0 items-center gap-3">
-          <button
+          <Button
             type="button"
-            onClick={() => router.back()}
-            className="inline-flex size-10 items-center justify-center rounded-xl border border-input bg-background text-muted-foreground hover:bg-muted"
-            aria-label="Back"
+            size={"icon"}
+            variant={"ghost"}
+            onClick={() => {
+              if (onBack) {
+                onBack();
+                return;
+              }
+
+              router.back();
+            }}
           >
-            <ArrowLeftIcon className="size-4" aria-hidden="true" />
-          </button>
-          <h1 className="truncate text-[26px] font-semibold tracking-tight">
-            Sarah Mitchell
-          </h1>
+            <ArrowLeftIcon aria-hidden="true" />
+          </Button>
+          <h1 className="truncate text-2xl font-medium">{leadName}</h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Button
-            variant="outline"
-            className="h-11 rounded-xl px-5 text-sm font-medium"
+            variant="outline-transparent"
+            type="button"
+            disabled={!lead.keap_contact_url}
+            onClick={() => {
+              if (lead.keap_contact_url) {
+                window.open(lead.keap_contact_url, "_blank", "noopener,noreferrer");
+              }
+            }}
           >
             <ExternalLinkIcon className="size-4" aria-hidden="true" />
             Open Contact in Keap
           </Button>
-          <Button
-            variant="outline"
-            className="h-11 rounded-xl px-5 text-sm font-medium"
-          >
+          <Button variant="outline" type="button" disabled>
             <MoveRightIcon className="size-4" aria-hidden="true" />
             Move Lead
           </Button>
         </div>
       </div>
 
-      <div className={cn("grid gap-10 px-8 py-8", "lg:grid-cols-[1fr_360px]")}>
+      <div className={cn("grid gap-5 px-6 py-6", "lg:grid-cols-[1fr_360px]")}>
         <div className="min-w-0">
           <SectionTitle>BASIC INFORMATION</SectionTitle>
-          <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-3">
-            <Info label="Email" value="sarah@gmail.com" />
-            <Info label="Phone" value="+61 412 778 992" />
-            <Info label="Send Timezone" value="Australia/Sydney" />
+          <div className="mt-3 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-3">
+            <Info label="Email" value={lead.email} />
+            <Info label="Phone" value={lead.phone} />
+            <Info label="Send Timezone" value={lead.timezone} />
 
-            <Info label="Latest Event Name" value="Sydney Masterclass" />
-            <Info label="Event Date" value="March 15, 2025" />
-            <Info label="Location" value="Yes" />
+            <Info label="Latest Event Name" value={lead.event_name} />
+            <Info label="Event Date" value={formatLeadDate(lead.event_date)} />
+            <Info label="Location" value={lead.event_location} />
 
-            <Info label="Referral" value="Yes" />
-            <Info label="Referred By" value="Michael Stevens" />
+            <Info label="Referral" value={lead.is_referral ? "Yes" : "No"} />
+            <Info label="Referred By" value={lead.referred_by} />
           </div>
 
-          <div className="my-10 h-px bg-border" />
+          <div className="my-5 h-px bg-border" />
 
           <SectionTitle>LEAD STATUS</SectionTitle>
-          <div className="mt-6 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
+          <div className="mt-3 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
             <div>
               <div className="text-sm text-muted-foreground">
                 Current Status
               </div>
-              <div className="mt-3 inline-flex rounded-lg bg-status-cooldown-bg px-4 py-1 text-xs font-medium text-status-cooldown-fg">
-                Cooldown
+              <div className="mt-3 inline-flex rounded-lg bg-muted px-4 py-1 text-xs font-medium text-muted-foreground">
+                Unavailable
               </div>
             </div>
-            <Info label="Last Assigned Representation" value="James Carter" />
-            <Info label="Timezone" value="Australia/Sydney" />
+            <Info label="Lead Owner" value={lead.lead_owner} />
+            <Info label="Timezone" value={lead.timezone} />
           </div>
 
-          <div className="mt-12 overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border">
+          <div className="mt-6 overflow-hidden rounded-2xl bg-muted/30 ring-1 ring-border">
             <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-5">
               <div className="text-lg font-semibold tracking-tight">
                 Purchase History
               </div>
               <div className="text-sm font-semibold text-muted-foreground">
-                TOTAL PURCHASE{" "}
-                <span className="ml-2 text-lg font-semibold text-secondary">
-                  $ 2,300
-                </span>
+                TOTAL PURCHASE
+                <span className="ml-2 text-lg font-semibold text-secondary">$0</span>
               </div>
             </div>
 
@@ -109,19 +126,14 @@ const LeadDetailsContent = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {Array.from({ length: 7 }).map((_, i) => (
-                    <TableRow key={i} className="h-14">
-                      <TableCell className="font-medium text-foreground">
-                        VIP Ticket
-                      </TableCell>
-                      <TableCell className="font-semibold text-foreground">
-                        $997
-                      </TableCell>
-                      <TableCell className="text-foreground">
-                        06/12/26
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  <TableRow className="h-14">
+                    <TableCell
+                      colSpan={3}
+                      className="text-center text-sm text-muted-foreground"
+                    >
+                      No purchase history available.
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </div>
@@ -130,16 +142,16 @@ const LeadDetailsContent = () => {
 
         <div className="min-w-0">
           <Tabs defaultValue="history" className="w-full">
-            <TabsList className="h-auto w-full justify-start gap-8 bg-transparent p-0">
+            <TabsList className={cn(groupsStyles.tabsList, "bg-transparent")}>
               <TabsTrigger
                 value="history"
-                className="px-0 pb-4 text-sm font-semibold"
+                className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
               >
                 Call History
               </TabsTrigger>
               <TabsTrigger
                 value="notes"
-                className="px-0 pb-4 text-sm font-semibold text-muted-foreground"
+                className={`${groupsStyles.tabsTrigger} ${groupsStyles.tabsUnderline}`}
               >
                 Keap Notes
               </TabsTrigger>
@@ -174,7 +186,7 @@ const LeadDetailsContent = () => {
 
             <TabsContent value="notes" className="m-0 pt-6">
               <div className="text-sm text-muted-foreground">
-                No notes available.
+                {lead.notes || "No notes available."}
               </div>
             </TabsContent>
           </Tabs>
@@ -192,11 +204,11 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const Info = ({ label, value }: { label: string; value: string }) => {
+const Info = ({ label, value }: { label: string; value?: string | null }) => {
   return (
     <div>
       <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="mt-2 text-sm font-medium text-foreground">{value}</div>
+      <div className="mt-2 text-sm font-medium text-foreground">{value || "—"}</div>
     </div>
   );
 };
@@ -210,16 +222,35 @@ const HistoryItem = ({
 }) => {
   return (
     <div className="relative">
-      <div className="absolute left-[-34px] top-0.5 grid size-8 place-items-center rounded-full bg-status-active-bg text-status-active-fg ring-4 ring-white">
+      <div className="absolute -left-8.5 top-0.5 grid size-8 place-items-center rounded-full bg-status-active-bg text-status-active-fg ring-4 ring-white">
         <span
           className="size-2.5 rounded-full bg-secondary"
           aria-hidden="true"
         />
       </div>
-      <div className="text-sm font-semibold text-foreground">{title}</div>
-      <div className="mt-1 text-sm text-muted-foreground">{subtitle}</div>
+      <div className="text-sm font-semibold text-foreground ms-2">{title}</div>
+      <div className="mt-1 text-sm text-muted-foreground ms-2">{subtitle}</div>
     </div>
   );
+};
+
+const getLeadName = (lead: Lead | null) => {
+  if (!lead) return "Lead Details";
+
+  return [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unnamed Lead";
+};
+
+const formatLeadDate = (value?: string | null) => {
+  if (!value) return "—";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  });
 };
 
 export default LeadDetailsContent;
