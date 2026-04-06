@@ -41,6 +41,8 @@ import { cn } from "@/lib/utils";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
 import { useGetLeads } from "@/features/list/services/listService";
 import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
+import Image from "next/image";
+import NoImage from "@/../public/assets/list/no-leads.png";
 
 const PAGE_SIZE = 10;
 
@@ -188,12 +190,12 @@ const LeadsTable = ({ listId }: { listId: string }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-56">Name</TableHead>
-              <TableHead className="w-40">Lead Status</TableHead>
-              <TableHead className="min-w-44">Assigned Rep</TableHead>
-              <TableHead className="min-w-52">Last Disposition</TableHead>
-              <TableHead className="w-24 text-right">Attempt</TableHead>
-              <TableHead className="w-14" />
+              <TableHead className="w-17 shrink-0">Name</TableHead>
+              <TableHead className="w-17 shrink-0">Lead Status</TableHead>
+              <TableHead className="w-17 shrink-0">Assigned Rep</TableHead>
+              <TableHead className="w-17 shrink-0">Last Disposition</TableHead>
+              <TableHead className="w-17 shrink-0">Attempt</TableHead>
+              <TableHead className="w-17" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -221,7 +223,22 @@ const LeadsTable = ({ listId }: { listId: string }) => {
                   colSpan={6}
                   className="h-32 text-center text-muted-foreground"
                 >
-                  No leads found.
+                  <div className="flex flex-1 flex-col items-center justify-center px-6 py-20 text-center">
+                    <Image
+                      src={NoImage}
+                      alt="No Leads Found"
+                      height={227}
+                      width={300}
+                    />
+
+                    <h2 className="mt-5 text-lg font-semibold tracking-tight">
+                      No Leads Assigned Yet
+                    </h2>
+                    <p className="mx-auto text-sm leading-6 text-muted-foreground">
+                      It looks like there are currently no leads assigned to
+                      this list.
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (

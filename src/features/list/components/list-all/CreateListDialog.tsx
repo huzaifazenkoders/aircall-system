@@ -41,6 +41,7 @@ import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { listKeys } from "@/features/list/query-keys";
 import { AssignType } from "@/features/list/types/listTypes";
+import RadioSelector from "../RadioSelector";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -146,8 +147,7 @@ const CreateListDialog = ({
             assign_type: values.assign_type,
             list_type: values.list_type,
             group_ids: values.assign_type === "group" ? values.group_ids : [],
-            user_ids:
-              values.assign_type === "individual" ? values.user_ids : []
+            user_ids: values.assign_type === "individual" ? values.user_ids : []
           }
         },
         {
@@ -400,12 +400,12 @@ const CreateListDialog = ({
 
             <Field label="Assignation">
               <div className="grid grid-cols-2 gap-4">
-                <AssignmentCard
+                <RadioSelector
                   label="Assign List to Group"
                   checked={formik.values.assign_type === "group"}
                   onClick={() => formik.setFieldValue("assign_type", "group")}
                 />
-                <AssignmentCard
+                <RadioSelector
                   label="Assign List to Individual"
                   checked={formik.values.assign_type === "individual"}
                   onClick={() =>
@@ -499,9 +499,7 @@ const CreateListDialog = ({
                                 .filter((u) =>
                                   formik.values.user_ids.includes(u?.id ?? "")
                                 )
-                                .map(
-                                  (u) => `${u?.first_name} ${u?.last_name}`
-                                )
+                                .map((u) => `${u?.first_name} ${u?.last_name}`)
                                 .join(", ")
                             : "Select individuals"}
                         </span>
@@ -582,36 +580,6 @@ const Field = ({
     <div className={cn(label && "mt-2")}>{children}</div>
     {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
   </div>
-);
-
-const AssignmentCard = ({
-  label,
-  checked,
-  onClick
-}: {
-  label: string;
-  checked: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      "flex h-12 items-center rounded-lg justify-center gap-3 border bg-background px-4 text-sm font-medium",
-      checked ? "border-[#1DAFA6] bg-[#F1FCFB]" : "border-border-primary"
-    )}
-  >
-    <span
-      className={cn(
-        "grid size-5 place-items-center rounded-full border-2",
-        checked ? "border-primary" : "border-muted-foreground/50"
-      )}
-      aria-hidden="true"
-    >
-      {checked ? <span className="size-2.5 rounded-full bg-secondary" /> : null}
-    </span>
-    <span className="text-foreground">{label}</span>
-  </button>
 );
 
 export default CreateListDialog;

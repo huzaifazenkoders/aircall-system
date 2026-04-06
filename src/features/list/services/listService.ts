@@ -238,3 +238,37 @@ export const useMoveLead = () =>
       return res.data as MoveLeadRes;
     }
   });
+
+// ─── List Cleanup ─────────────────────────────────────────────────────────────
+
+export type ListCleanupType = "one_time" | "recurring";
+export type ListCleanupRecurrenceType = "weekly" | "monthly";
+
+interface CreateListCleanupReq {
+  payload: {
+    list_id: string;
+    cleanup_type: ListCleanupType;
+    run_date?: string;
+    run_time?: string;
+    recurrence_type?: ListCleanupRecurrenceType;
+    day_of_week?: number;
+    week_of_month?: number;
+    timezone?: string;
+  };
+}
+
+interface CreateListCleanupRes {
+  data: {
+    id: string;
+    next_run_at: string;
+  };
+  message: string;
+}
+
+export const useListCleanup = () =>
+  useMutation({
+    mutationFn: async ({ payload }: CreateListCleanupReq) => {
+      const res = await axiosInstance.post("/list-cleanup", payload);
+      return res.data as CreateListCleanupRes;
+    }
+  });

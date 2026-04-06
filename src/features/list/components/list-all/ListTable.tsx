@@ -36,10 +36,16 @@ import DateSelector from "@/components/custom/date-selector.component";
 import { useGetLists } from "@/features/list/services/listService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { List, ListStatus } from "@/features/list/types/listTypes";
+import ListEmptyState from "./ListEmptyState";
+import { ReactDispatch } from "@/types/common";
 
 const LIMIT = 10;
 
-const ListTable = () => {
+const ListTable = ({
+  setCreateOpen
+}: {
+  setCreateOpen: ReactDispatch<boolean>;
+}) => {
   const [query, setQuery] = React.useState("");
   const [tabs, setTabs] = useState<"shared" | "idv">("shared");
 
@@ -58,10 +64,8 @@ const ListTable = () => {
   const sharedLists = transformInfiniteData(sharedQuery.data, "data");
   const idvLists = transformInfiniteData(idvQuery.data, "data");
 
-  const sharedTotal =
-    sharedQuery.data?.pages[0]?.data?.meta?.total ?? 0;
-  const idvTotal =
-    idvQuery.data?.pages[0]?.data?.meta?.total ?? 0;
+  const sharedTotal = sharedQuery.data?.pages[0]?.data?.meta?.total ?? 0;
+  const idvTotal = idvQuery.data?.pages[0]?.data?.meta?.total ?? 0;
 
   const activeQuery = tabs === "shared" ? sharedQuery : idvQuery;
   const activeLists = tabs === "shared" ? sharedLists : idvLists;
@@ -149,16 +153,18 @@ const ListTable = () => {
                   Failed to load lists.
                 </div>
               ) : lists.length === 0 ? (
-                <div className="px-6 py-10 text-sm text-muted-foreground">
-                  No {tab === "shared" ? "shared" : "IDV"} lists to show.
-                </div>
+                <TableRow>
+                  <TableCell colSpan={6} className="flex">
+                    <ListEmptyState onCreate={() => setCreateOpen(true)} />
+                  </TableCell>
+                </TableRow>
               ) : (
                 <>
                   <div className={listStyles.tableWrap}>
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-background">
-                          <TableHead className="w-28">ID</TableHead>
+                          <TableHead className="min-w-60">ID</TableHead>
                           <TableHead className="min-w-60">Name</TableHead>
                           <TableHead className="w-24">Priority</TableHead>
                           <TableHead className="w-24">Total</TableHead>

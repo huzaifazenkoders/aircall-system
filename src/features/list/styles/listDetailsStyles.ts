@@ -7,7 +7,6 @@ export const listDetailsStyles = {
   ),
   title: cn("mt-2 text-[34px] font-semibold tracking-tight"),
   headerActions: cn("flex items-center gap-3"),
-  headerEdit: cn("h-11 rounded-xl px-6 text-sm font-medium"),
 
   grid: cn("mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[420px_1fr]"),
   card: cn("overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-border"),
