@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { ListDetail } from "@/features/list/types/listTypes";
 import { AuthUser } from "@/features/auth/types/authTypes";
 import { Button } from "@/components/ui/button";
+import AssignGroupsToListDialog from "@/features/list/components/list-details/AssignGroupsToListDialog";
+import AssignUsersToListDialog from "@/features/list/components/list-details/AssignUsersToListDialog";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -20,31 +22,72 @@ const PREVIEW_COUNT = 3;
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const AssignmentCard = ({ list }: { list: ListDetail }) => {
+  const [assignGroupsOpen, setAssignGroupsOpen] = React.useState(false);
+  const [assignUsersOpen, setAssignUsersOpen] = React.useState(false);
+
+  const preselectedGroupIds = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          list.assignments
+            .filter((assignment) => assignment.group?.id)
+            .map((assignment) => assignment.group!.id)
+        )
+      ),
+    [list.assignments]
+  );
+
+  const preselectedUserIds = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          list.assignments
+            .filter((assignment) => assignment.user?.id)
+            .map((assignment) => assignment.user!.id)
+        )
+      ),
+    [list.assignments]
+  );
+
   if (list.assign_type === "group") {
     const groups = buildGroups(list);
     return (
-      <div className="self-stretch bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04)] shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex flex-col justify-start items-start gap-4 overflow-hidden w-full">
-        <div className="self-stretch px-4 py-4 border-b border-zinc-200 inline-flex justify-start items-center">
-          <div className="flex-1 py-1.5 inline-flex flex-col justify-start items-start">
-            <div className="self-stretch text-gray-800 text-lg font-medium leading-5">
-              Assignment
+      <>
+        <div className="self-stretch bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04)] shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex flex-col justify-start items-start gap-4 overflow-hidden w-full">
+          <div className="self-stretch px-4 py-4 border-b border-zinc-200 inline-flex justify-start items-center">
+            <div className="flex-1 py-1.5 inline-flex flex-col justify-start items-start">
+              <div className="self-stretch text-gray-800 text-lg font-medium leading-5">
+                Assignment
+              </div>
             </div>
+            <Button
+              variant={"outline-transparent"}
+              size={"sm"}
+              type="button"
+              onClick={() => setAssignGroupsOpen(true)}
+            >
+              <PlusIcon className="" />
+              Add
+            </Button>
           </div>
-          <Button variant={"outline-transparent"} size={"sm"} type="button">
-            <PlusIcon className="" />
-            Add
-          </Button>
+
+          <div className="self-stretch px-4 pb-4 flex flex-col justify-start items-start gap-4">
+            {groups.map((group) => (
+              <GroupCard key={group.id} group={group} />
+            ))}
+            {groups.length === 0 && (
+              <p className="text-sm text-gray-500">No groups assigned yet.</p>
+            )}
+          </div>
         </div>
 
-        <div className="self-stretch px-4 pb-4 flex flex-col justify-start items-start gap-4">
-          {groups.map((group) => (
-            <GroupCard key={group.id} group={group} />
-          ))}
-          {groups.length === 0 && (
-            <p className="text-sm text-gray-500">No groups assigned yet.</p>
-          )}
-        </div>
-      </div>
+        <AssignGroupsToListDialog
+          open={assignGroupsOpen}
+          onOpenChange={setAssignGroupsOpen}
+          listId={list.id}
+          preselectedGroupIds={preselectedGroupIds}
+        />
+      </>
     );
   }
 
@@ -54,28 +97,42 @@ const AssignmentCard = ({ list }: { list: ListDetail }) => {
     .map((a) => a.user!);
 
   return (
-    <div className="self-stretch bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04)] shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex flex-col justify-start items-start gap-4 overflow-hidden w-full">
-      <div className="self-stretch px-4 py-4 border-b border-zinc-200 inline-flex justify-start items-center">
-        <div className="flex-1 py-1.5">
-          <div className="text-gray-800 text-lg font-medium leading-5">
-            Assignment
+    <>
+      <div className="self-stretch bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04)] shadow-[0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex flex-col justify-start items-start gap-4 overflow-hidden w-full">
+        <div className="self-stretch px-4 py-4 border-b border-zinc-200 inline-flex justify-start items-center">
+          <div className="flex-1 py-1.5">
+            <div className="text-gray-800 text-lg font-medium leading-5">
+              Assignment
+            </div>
           </div>
+          <Button
+            variant={"outline-transparent"}
+            size={"sm"}
+            type="button"
+            onClick={() => setAssignUsersOpen(true)}
+          >
+            <PlusIcon className="" />
+            Add
+          </Button>
         </div>
-        <Button variant={"outline-transparent"} size={"sm"} type="button">
-          <PlusIcon className="" />
-          Add
-        </Button>
+
+        <div className="self-stretch px-4 pb-4 flex flex-col gap-2 max-h-[420px] overflow-auto">
+          {users.map((u) => (
+            <UserRow key={u.id} user={u} />
+          ))}
+          {users.length === 0 && (
+            <p className="text-sm text-gray-500">No individuals assigned yet.</p>
+          )}
+        </div>
       </div>
 
-      <div className="self-stretch px-4 pb-4 flex flex-col gap-2 max-h-[420px] overflow-auto">
-        {users.map((u) => (
-          <UserRow key={u.id} user={u} />
-        ))}
-        {users.length === 0 && (
-          <p className="text-sm text-gray-500">No individuals assigned yet.</p>
-        )}
-      </div>
-    </div>
+      <AssignUsersToListDialog
+        open={assignUsersOpen}
+        onOpenChange={setAssignUsersOpen}
+        listId={list.id}
+        preselectedUserIds={preselectedUserIds}
+      />
+    </>
   );
 };
 

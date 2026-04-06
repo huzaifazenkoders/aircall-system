@@ -243,6 +243,7 @@ export const useMoveLead = () =>
 
 export type ListCleanupType = "one_time" | "recurring";
 export type ListCleanupRecurrenceType = "weekly" | "monthly";
+export type ListAssignType = "group" | "individual";
 
 interface CreateListCleanupReq {
   payload: {
@@ -270,5 +271,29 @@ export const useListCleanup = () =>
     mutationFn: async ({ payload }: CreateListCleanupReq) => {
       const res = await axiosInstance.post("/list-cleanup", payload);
       return res.data as CreateListCleanupRes;
+    }
+  });
+
+// ─── Assign List ──────────────────────────────────────────────────────────────
+
+interface AssignListReq {
+  payload: {
+    list_id: string;
+    assign_type: ListAssignType;
+    group_ids: string[];
+    user_ids: string[];
+  };
+}
+
+interface AssignListRes {
+  data: List;
+  message: string;
+}
+
+export const useAssignList = () =>
+  useMutation({
+    mutationFn: async ({ payload }: AssignListReq) => {
+      const res = await axiosInstance.patch("/lists/assign", payload);
+      return res.data as AssignListRes;
     }
   });
