@@ -1,17 +1,15 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import * as Yup from "yup";
 
 import { Button } from "@/components/ui/button";
 import OtpInput from "@/components/ui/otp-input.component";
 import { authStyles } from "@/features/auth/styles/authStyles";
-import { useVerifyOtp, useResendOtp } from "../services/authService";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useResendOtp, useVerifyOtp } from "../services/authService";
 
 const validationSchema = Yup.object({
   code: Yup.string()
@@ -34,7 +32,7 @@ const OtpVerificationForm = () => {
       verifyOtp(
         { payload: { email, code: values.code } },
         {
-          onSuccess: (data) => {
+          onSuccess: ({ data }) => {
             toast.success("OTP verified");
             router.push(
               `/auth/reset-password?reset_token=${encodeURIComponent(data.reset_token)}`

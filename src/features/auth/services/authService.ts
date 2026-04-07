@@ -57,7 +57,9 @@ interface VerifyOtpReq {
 }
 
 interface VerifyOtpRes {
-  reset_token: string;
+  data: {
+    reset_token: string;
+  };
   message: string;
 }
 

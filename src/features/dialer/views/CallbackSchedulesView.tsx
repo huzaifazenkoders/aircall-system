@@ -39,6 +39,7 @@ const CallbackSchedulesView = () => {
     <>
       <div className={dialerShellStyles.titleRow}>
         <h1 className={dialerShellStyles.title}>Callback Schedule</h1>
+        <div className="opacity-0 w-28 h-11" />
       </div>
 
       <section className={callbackStyles.card}>

@@ -48,8 +48,10 @@ const MainBorder = "border-border-primary";
 
 const selectorTriggerClassName = cn(
   "bg-background-secondary px-3 py-2 pr-10 relative",
-  "text-base text-text-primary",
-  "rounded-lg whitespace-nowrap cursor-pointer"
+  "text-base",
+  "rounded-lg whitespace-nowrap cursor-pointer",
+  "flex items-center justify-between gap-2",
+  "h-11 border border-border-primary"
 );
 
 const selectorContentClassName = cn(
@@ -429,8 +431,10 @@ const formatDateRangeLabel = (
   ).format("DD MMM YYYY")}`;
 };
 
-const formatSingleDateLabel = (date: Date | null | undefined, placeholder: string) =>
-  date ? moment(date).format("DD MMM YYYY") : placeholder;
+const formatSingleDateLabel = (
+  date: Date | null | undefined,
+  placeholder: string
+) => (date ? moment(date).format("DD MMM YYYY") : placeholder);
 
 const SelectorContent = ({
   children,
@@ -529,7 +533,15 @@ const DateRangeSelector = ({
   };
 
   return (
-    <SelectorRoot {...rest} triggerLabel={formatDateRangeLabel(range)}>
+    <SelectorRoot
+      {...rest}
+      triggerLabel={formatDateRangeLabel(range)}
+      triggerClassName={
+        range.startDate || range.endDate
+          ? "text-text-primary"
+          : "text-text-secondary"
+      }
+    >
       <SelectorContent>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="min-w-[310px]">

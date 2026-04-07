@@ -1,17 +1,50 @@
 "use client";
 
 import { Mail } from "lucide-react";
-import React from "react";
+import * as Yup from "yup";
+import { useFormik } from "formik";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
 import { dialerAuthStyles } from "@/features/dialer-auth/styles/dialerAuthStyles";
+import { useForgotPassword } from "@/features/auth/services/authService";
+import { handleMutationError } from "@/utils/handleMutationError";
+
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .trim()
+    .email("Invalid email address")
+    .required("Email is required"),
+});
 
 const DialerAuthForgotPasswordForm = () => {
-  const [email, setEmail] = React.useState("john.doe@email.com");
+  const router = useRouter();
+  const { mutate: forgotPassword, isPending } = useForgotPassword();
+
+  const formik = useFormik({
+    initialValues: { email: "" },
+    validationSchema,
+    onSubmit: (values) => {
+      const email = values.email.trim().toLowerCase();
+      forgotPassword(
+        { payload: { email } },
+        {
+          onSuccess: () => {
+            toast.success("OTP sent to your email");
+            router.push(
+              `/dialer-auth/verify-code?email=${encodeURIComponent(email)}`
+            );
+          },
+          onError: handleMutationError,
+        }
+      );
+    },
+  });
 
   return (
-    <form className={dialerAuthStyles.formRoot}>
+    <form className={dialerAuthStyles.formRoot} onSubmit={formik.handleSubmit}>
       <div className={dialerAuthStyles.formSection}>
         <div className={dialerAuthStyles.titleBlock}>
           <h1 className={dialerAuthStyles.title}>Forgot Password</h1>
@@ -24,17 +57,18 @@ const DialerAuthForgotPasswordForm = () => {
         <TextInput
           id="dialer-auth-forgot-email"
           label="Email address"
-          value={email}
-          setValue={setEmail}
+          value={formik.values.email}
+          setValue={(val) => formik.setFieldValue("email", val)}
           placeholder="john.doe@email.com"
+          error={formik.touched.email ? formik.errors.email : undefined}
           startIcon={<Mail className={dialerAuthStyles.inputIcon} aria-hidden="true" />}
           labelClassName={dialerAuthStyles.inputLabel}
           className={dialerAuthStyles.inputField}
         />
       </div>
 
-      <Button type="submit" size="xl" className={dialerAuthStyles.button}>
-        Send Code
+      <Button type="submit" size="xl" className={dialerAuthStyles.button} disabled={isPending}>
+        {isPending ? "Sending..." : "Send Code"}
       </Button>
     </form>
   );

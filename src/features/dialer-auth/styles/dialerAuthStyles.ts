@@ -19,7 +19,6 @@ export const dialerAuthStyles = {
     "flex",
     "min-h-screen",
     "flex-col",
-    "justify-between",
     "gap-12",
     "px-10",
     "pb-0",
@@ -28,28 +27,18 @@ export const dialerAuthStyles = {
     "xl:pt-14"
   ),
   brandRow: cn("flex", "items-center", "gap-3"),
-  brandBadge: cn(
-    "flex",
-    "size-8",
-    "items-center",
-    "justify-center",
-    "rounded-full",
-    "bg-brand-accent",
-    "text-primary"
-  ),
-  brandText: cn("text-[2rem]", "font-semibold", "leading-none", "text-primary-foreground"),
-  heroCopy: cn("flex", "max-w-xl", "flex-col", "gap-5"),
-  heroTitle: cn(
-    "text-[3.25rem]",
+  brandText: cn(
+    "text-[2rem]",
     "font-semibold",
-    "leading-[1.06]",
-    "tracking-[-0.03em]",
-    "text-brand-accent"
+    "leading-none",
+    "text-primary-foreground"
   ),
+  heroImage: cn("absolute", "-bottom-0 -right-0"),
+  heroCopy: cn("flex", "max-w-xl", "flex-col", "gap-5"),
+  heroTitle: cn("text-[36px]", "font-semibold", "text-brand-accent"),
   heroSubtitle: cn(
     "max-w-lg",
-    "text-xl",
-    "leading-9",
+    "text-base",
     "text-[color:var(--text-inverse-muted)]"
   ),
   heroPreviewWrap: cn("flex", "items-end", "justify-center"),
@@ -95,8 +84,18 @@ export const dialerAuthStyles = {
     "text-primary"
   ),
   heroSidebarNav: cn("flex", "flex-col", "gap-5"),
-  heroSidebarItem: cn("flex", "flex-col", "items-center", "gap-1.5", "text-primary-foreground"),
-  heroSidebarItemLabel: cn("text-[0.6rem]", "font-medium", "text-[color:var(--text-inverse-muted)]"),
+  heroSidebarItem: cn(
+    "flex",
+    "flex-col",
+    "items-center",
+    "gap-1.5",
+    "text-primary-foreground"
+  ),
+  heroSidebarItemLabel: cn(
+    "text-[0.6rem]",
+    "font-medium",
+    "text-[color:var(--text-inverse-muted)]"
+  ),
   heroMain: cn("grid", "grid-rows-[auto_1fr]", "bg-card"),
   heroToolbar: cn(
     "flex",
@@ -119,7 +118,10 @@ export const dialerAuthStyles = {
   ),
   heroToolbarMeta: cn("flex", "flex-col", "gap-0.5"),
   heroToolbarName: cn("text-sm", "font-semibold", "text-primary-foreground"),
-  heroToolbarPhone: cn("text-[0.69rem]", "text-[color:var(--text-inverse-muted)]"),
+  heroToolbarPhone: cn(
+    "text-[0.69rem]",
+    "text-[color:var(--text-inverse-muted)]"
+  ),
   heroToolbarActions: cn("flex", "items-center", "gap-2"),
   heroToolbarAction: cn(
     "flex",
@@ -146,13 +148,29 @@ export const dialerAuthStyles = {
     "shadow-[0_1px_2px_var(--dialer-auth-input-shadow)]"
   ),
   heroCardPad: cn("p-4"),
-  heroSectionTitle: cn("text-[0.62rem]", "font-semibold", "tracking-[0.1em]", "text-text-primary"),
+  heroSectionTitle: cn(
+    "text-[0.62rem]",
+    "font-semibold",
+    "tracking-[0.1em]",
+    "text-text-primary"
+  ),
   heroInfoGrid: cn("mt-4", "grid", "grid-cols-3", "gap-x-5", "gap-y-4"),
   heroInfoBlock: cn("flex", "flex-col", "gap-1"),
   heroLabel: cn("text-[0.62rem]", "leading-4", "text-text-secondary"),
-  heroValue: cn("text-[0.7rem]", "font-medium", "leading-4", "text-text-primary"),
+  heroValue: cn(
+    "text-[0.7rem]",
+    "font-medium",
+    "leading-4",
+    "text-text-primary"
+  ),
   heroStack: cn("grid", "gap-4"),
-  heroTable: cn("mt-4", "overflow-hidden", "rounded-xl", "border", "border-border"),
+  heroTable: cn(
+    "mt-4",
+    "overflow-hidden",
+    "rounded-xl",
+    "border",
+    "border-border"
+  ),
   heroTableHead: cn(
     "grid",
     "grid-cols-3",
@@ -223,20 +241,15 @@ export const dialerAuthStyles = {
   formRoot: cn("flex", "w-full", "max-w-[23.75rem]", "flex-col", "gap-10"),
   formSection: cn("flex", "flex-col", "gap-8"),
   titleBlock: cn("flex", "flex-col", "gap-2"),
-  title: cn("text-[2.125rem]", "font-semibold", "leading-[1.1]", "tracking-[-0.03em]", "text-text-primary"),
+  title: cn(
+    "text-[2.125rem]",
+    "font-semibold",
+    "leading-[1.1]",
+    "tracking-[-0.03em]",
+    "text-text-primary"
+  ),
   subtitle: cn("text-lg", "leading-7", "text-text-secondary"),
   fieldStack: cn("flex", "flex-col", "gap-4"),
-  button: cn("h-11", "w-full", "rounded-lg", "text-[0.95rem]", "font-semibold"),
-  inputIcon: cn("size-5", "text-panel-muted"),
-  inputLabel: cn("text-[0.95rem]", "font-medium", "leading-6", "text-text-primary"),
-  inputField: cn(
-    "h-11",
-    "rounded-lg",
-    "border-border",
-    "bg-[var(--dialer-auth-surface)]",
-    "shadow-[0_1px_2px_var(--dialer-auth-input-shadow)]",
-    "placeholder:text-text-secondary"
-  ),
   backLink: cn(
     "inline-flex",
     "items-center",
@@ -249,7 +262,13 @@ export const dialerAuthStyles = {
   ),
   backIcon: cn("size-4"),
   helperRow: cn("flex", "justify-end"),
-  helperLink: cn("text-sm", "font-medium", "text-secondary", "underline", "underline-offset-2"),
+  helperLink: cn(
+    "text-sm",
+    "font-medium",
+    "text-secondary",
+    "underline",
+    "underline-offset-2"
+  ),
   otpIntro: cn("text-lg", "leading-7", "text-text-secondary"),
   otpStrong: cn("font-semibold", "text-primary"),
   otpGrid: cn("grid", "grid-cols-6", "gap-3"),
@@ -277,5 +296,10 @@ export const dialerAuthStyles = {
     "text-primary"
   ),
   otpFooter: cn("text-center", "text-lg", "leading-7", "text-text-secondary"),
-  otpFooterLink: cn("font-medium", "text-secondary", "underline", "underline-offset-2")
+  otpFooterLink: cn(
+    "font-medium",
+    "text-secondary",
+    "underline",
+    "underline-offset-2"
+  )
 };

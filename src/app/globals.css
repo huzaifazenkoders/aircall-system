@@ -54,6 +54,8 @@
   --color-input:var(--input);
   --gradient:var(--gradient);
   --color-brand-accent:var(--brand-accent);
+  --color-brand-900: var(--brand-900);
+  --color-brand-50: var(--brand-50);
   --color-status-active-bg: var(--status-active-bg);
   --color-status-active-fg: var(--status-active-fg);
   --color-status-waiting-bg: var(--status-waiting-bg);
@@ -133,6 +135,8 @@
   --input:#FFFFFF;
   --gradient:linear-gradient(180deg, #073031 0%, #183D3E 100%);
   --brand-accent:#2FBF9B;
+  --brand-900: #164B49;
+  --brand-50: #F1FCFB;
   --status-active-bg: #D1FAE5;
   --status-active-fg: #0F766E;
   --status-waiting-bg: #FFF7ED;

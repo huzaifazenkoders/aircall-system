@@ -47,7 +47,7 @@ export function proxy(request: NextRequest) {
   // Allow static assets to pass through
   const staticFilePattern =
     /\.(png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|eot|json|xml|txt|map)$/i;
-  if (staticFilePattern.test(pathname)) {
+  if (staticFilePattern.test(pathname) || pathname.startsWith("/_next/")) {
     return NextResponse.next();
   }
 

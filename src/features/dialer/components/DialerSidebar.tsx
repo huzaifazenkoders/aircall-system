@@ -7,11 +7,13 @@ import {
   HistoryIcon,
   HomeIcon,
   PhoneCallIcon,
-  PhoneForwardedIcon,
+  PhoneForwardedIcon
 } from "lucide-react";
+import Logo from "@/../public/assets/dialer-auth/logo.svg";
 
 import { cn } from "@/lib/utils";
 import { dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import Image from "next/image";
 
 const navItems = [
   { href: "#", label: "Home", icon: HomeIcon, key: "home" },
@@ -19,15 +21,15 @@ const navItems = [
     href: "/dialer/callback-schedules",
     label: "Callbacks",
     icon: PhoneForwardedIcon,
-    key: "callbacks",
+    key: "callbacks"
   },
   { href: "#", label: "My Lists", icon: PhoneCallIcon, key: "lists" },
   {
     href: "/dialer/call-history",
     label: "History",
     icon: HistoryIcon,
-    key: "history",
-  },
+    key: "history"
+  }
 ] as const;
 
 const DialerSidebar = () => {
@@ -36,23 +38,31 @@ const DialerSidebar = () => {
   return (
     <aside className={dialerShellStyles.sidebar}>
       <div className={dialerShellStyles.logoWrap}>
-        <HexagonIcon className="size-8 fill-brand-accent text-brand-accent" />
+        <Image src={Logo} alt="" width={38} height={34} />
       </div>
 
       <nav className={dialerShellStyles.nav}>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            (item.key === "callbacks" && pathname.startsWith("/dialer/callback-schedules")) ||
-            (item.key === "history" && pathname.startsWith("/dialer/call-history"));
+            (item.key === "callbacks" &&
+              pathname.startsWith("/dialer/callback-schedules")) ||
+            (item.key === "history" &&
+              pathname.startsWith("/dialer/call-history"));
 
           return (
             <Link
               key={item.key}
               href={item.href}
-              className={cn(dialerShellStyles.navItem, isActive && dialerShellStyles.navItemActive)}
+              className={cn(
+                dialerShellStyles.navItem,
+                isActive && dialerShellStyles.navItemActive
+              )}
             >
-              <Icon className="size-7 lg:size-8" strokeWidth={2} />
+              <Icon
+                className="size-6 text-white"
+                strokeWidth={isActive ? 2.5 : 1.5}
+              />
               <span className={dialerShellStyles.navLabel}>{item.label}</span>
             </Link>
           );
@@ -63,4 +73,3 @@ const DialerSidebar = () => {
 };
 
 export default DialerSidebar;
-

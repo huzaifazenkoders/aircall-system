@@ -57,7 +57,8 @@ const AppTopbar = () => {
 
   const name = data?.data?.first_name + " " + data?.data?.last_name;
   return (
-    <header className="flex items-center justify-end border-b border-border px-1 pb-5">
+    <header className="flex items-center justify-end border-b gap-2 border-border px-1 pb-5">
+      {data.data.role === "dialer" ? "" : null}
       <DropdownMenu>
         <DropdownMenuTrigger
           render={

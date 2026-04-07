@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 import DialerSidebar from "@/features/dialer/components/DialerSidebar";
-import DialerTopbar from "@/features/dialer/components/DialerTopbar";
 import { dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import AppTopbar from "@/components/custom/app-shell/AppTopbar";
 
 const DialerShell = ({ children }: { children: ReactNode }) => {
   return (
@@ -10,7 +10,7 @@ const DialerShell = ({ children }: { children: ReactNode }) => {
       <div className={dialerShellStyles.frame}>
         <DialerSidebar />
         <div className={dialerShellStyles.content}>
-          <DialerTopbar />
+          <AppTopbar />
           <main className={dialerShellStyles.page}>{children}</main>
         </div>
       </div>
@@ -19,4 +19,3 @@ const DialerShell = ({ children }: { children: ReactNode }) => {
 };
 
 export default DialerShell;
-

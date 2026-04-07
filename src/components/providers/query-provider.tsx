@@ -33,6 +33,7 @@ export default function QueryProvider({ children }: Props) {
               secondary: ""
             },
             style: {
+              color: "var(--primary)",
               background: "#e8f8f5"
             }
           },
