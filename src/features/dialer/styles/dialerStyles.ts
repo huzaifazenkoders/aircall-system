@@ -107,6 +107,55 @@ export const callHistoryStyles = {
   )
 };
 
+export const myListStyles = {
+  layout: cn("mt-8 flex gap-6 items-start"),
+  sidebar: cn(
+    "w-96 shrink-0 bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
+  ),
+  sidebarHeader: cn("px-4 py-4 border-b border-zinc-200 flex items-center gap-2 w-full"),
+  sidebarTitleContainer: cn(
+    "px-4 py-4 border-b border-zinc-200 flex items-center justify-between gap-2 w-full"
+  ),
+  sidebarTitle: cn("text-lg font-medium text-gray-800 leading-5"),
+  sidebarSearch: cn("px-4 pt-4"),
+  sidebarList: cn("px-4 pb-4 pt-4 flex flex-col gap-4"),
+  listCard: cn(
+    "px-4 py-5 rounded-lg outline outline-1 outline-offset-[-1px] flex flex-col gap-5"
+  ),
+  listCardActive: cn("bg-Brand-50 outline-Brand-300"),
+  listCardInactive: cn("bg-white outline-border"),
+  listCardHeader: cn("flex justify-between items-start"),
+  listCardName: cn("text-base font-semibold text-text-primary leading-5"),
+  listCardToggleWrap: cn("flex items-center gap-2"),
+  listCardToggleLabel: cn(
+    "text-xs font-semibold text-gray-500 uppercase leading-5"
+  ),
+  listCardDivider: cn("border-t border-border"),
+  listCardMeta: cn("flex justify-between items-center flex-wrap"),
+  listCardMetaItem: cn("flex items-center gap-1.5"),
+  listCardMetaLabel: cn("text-sm font-medium text-gray-400 leading-5"),
+  listCardMetaValue: cn("text-sm text-gray-800 leading-5"),
+  tablePanel: cn(
+    "flex-1 bg-white rounded-[20px] shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
+  ),
+  toolbar: cn("p-4 border-b border-zinc-200 flex items-center gap-4"),
+  toolbarRight: cn("flex flex-1 items-center justify-end gap-4"),
+  tableHead: cn("p-4 text-sm font-medium text-gray-500 leading-4"),
+  cell: cn("px-3 py-3.5 text-sm text-gray-800 leading-5"),
+  row: cn("cursor-pointer border-zinc-200 hover:bg-[#FBFCFD] h-16"),
+  arrowCell: cn("w-16 py-3.5 pr-4"),
+  arrowButton: cn(
+    "size-8 grid place-items-center rounded-lg outline outline-1 outline-offset-[-1px] outline-gray-800/20 bg-white"
+  ),
+  pagination: cn(
+    "py-2 px-4 inline-flex items-center justify-end w-full gap-6 text-gray-500"
+  ),
+  emptyWrap: cn("flex min-h-[42rem] flex-1 items-center justify-center px-6"),
+  emptyInner: cn("flex max-w-lg flex-col items-center text-center gap-3"),
+  emptyTitle: cn("text-2xl font-medium text-gray-800 leading-7"),
+  emptyDescription: cn("text-base font-medium text-gray-500 leading-6")
+};
+
 export const callbackStyles = {
   card: cn(
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"

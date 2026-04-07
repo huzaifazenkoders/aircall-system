@@ -23,7 +23,7 @@ const navItems = [
     icon: PhoneForwardedIcon,
     key: "callbacks"
   },
-  { href: "#", label: "My Lists", icon: PhoneCallIcon, key: "lists" },
+  { href: "/dialer/my-list", label: "My Lists", icon: PhoneCallIcon, key: "lists" },
   {
     href: "/dialer/call-history",
     label: "History",

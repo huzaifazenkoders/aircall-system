@@ -493,3 +493,92 @@ export const callbackScheduleRows: CallbackScheduleRecord[] = [
 
 export const callbackStatusOptions = ["All Status", "Cooldown", "Callback"] as const;
 
+
+export type LeadStatus =
+  | "Pending"
+  | "Cooldown"
+  | "Completed"
+  | "Scheduled"
+  | "Invalid"
+  | "Ban Contact";
+
+export type MyListLead = {
+  id: string;
+  name: string;
+  phone: string;
+  leadStatus: LeadStatus;
+  assignedRep: string | null;
+  lastDisposition: string | null;
+  lastDispositionDate: string | null;
+  attempt: number;
+};
+
+export type MyListItem = {
+  id: string;
+  name: string;
+  active: boolean;
+  priority: number;
+  totalLeads: number;
+  assignedDiallers: number;
+  leads: MyListLead[];
+};
+
+export const myLists: MyListItem[] = [
+  {
+    id: "ml-001",
+    name: "Masterclass Follow-Up",
+    active: true,
+    priority: 1,
+    totalLeads: 67,
+    assignedDiallers: 4,
+    leads: [
+      { id: "l-001", name: "Sarah Mitchell", phone: "+61 412 778 992", leadStatus: "Pending", assignedRep: null, lastDisposition: null, lastDispositionDate: null, attempt: 0 },
+      { id: "l-002", name: "Liam Johnson", phone: "+61 423 665 210", leadStatus: "Cooldown", assignedRep: "Olivia Smith", lastDisposition: "No Answer", lastDispositionDate: "02/21/2026", attempt: 2 },
+      { id: "l-003", name: "Emma Williams", phone: "+61 411 334 887", leadStatus: "Completed", assignedRep: "Daniel Harris", lastDisposition: "Connected", lastDispositionDate: "02/21/2026", attempt: 1 },
+      { id: "l-004", name: "Noah Brown", phone: "+61 433 556 199", leadStatus: "Scheduled", assignedRep: "Michael Tan", lastDisposition: "Callback", lastDispositionDate: "02/21/2026", attempt: 1 },
+      { id: "l-005", name: "Olivia Taylor", phone: "+61 455 999 113", leadStatus: "Invalid", assignedRep: "Ryan Cooper", lastDisposition: "Wrong Number", lastDispositionDate: "02/21/2026", attempt: 1 },
+      { id: "l-006", name: "James Wilson", phone: "+61 498 772 119", leadStatus: "Completed", assignedRep: "Emma Clarke", lastDisposition: "Not Interested", lastDispositionDate: "02/21/2026", attempt: 1 },
+      { id: "l-007", name: "Mia Davis", phone: "+61 422 118 443", leadStatus: "Cooldown", assignedRep: "Lucas Ford", lastDisposition: "Voicemail Left", lastDispositionDate: "02/21/2026", attempt: 3 },
+      { id: "l-008", name: "Charlotte Anderson", phone: "+61 489 445 221", leadStatus: "Ban Contact", assignedRep: "Daniel Harris", lastDisposition: "Ban Contact", lastDispositionDate: "02/21/2026", attempt: 1 },
+      { id: "l-009", name: "Noah Brown", phone: "+61 433 556 199", leadStatus: "Scheduled", assignedRep: "Michael Tan", lastDisposition: "Callback", lastDispositionDate: "02/21/2026", attempt: 1 },
+    ],
+  },
+  {
+    id: "ml-002",
+    name: "Gold Cost Event",
+    active: false,
+    priority: 3,
+    totalLeads: 87,
+    assignedDiallers: 6,
+    leads: [],
+  },
+  {
+    id: "ml-003",
+    name: "Webinar Sydney",
+    active: false,
+    priority: 5,
+    totalLeads: 80,
+    assignedDiallers: 8,
+    leads: [],
+  },
+  {
+    id: "ml-004",
+    name: "Live Event Brisbane",
+    active: false,
+    priority: 6,
+    totalLeads: 50,
+    assignedDiallers: 8,
+    leads: [],
+  },
+  {
+    id: "ml-005",
+    name: "Your IDV List",
+    active: false,
+    priority: 9,
+    totalLeads: 44,
+    assignedDiallers: 2,
+    leads: [],
+  },
+];
+
+export const leadStatusOptions = ["All Status", "Pending", "Cooldown", "Completed", "Scheduled", "Invalid", "Ban Contact"] as const;
