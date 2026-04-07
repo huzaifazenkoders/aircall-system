@@ -5,7 +5,7 @@ export interface AuthUser {
   full_name: string | null;
   first_name: string;
   last_name: string;
-  role: "admin";
+  role: "admin" | "dialer";
   has_reset_password: boolean;
   phone_number: string | null;
   status: "active";

@@ -11,7 +11,7 @@ import {
   callLogListOptions,
   callLogStatusOptions,
   callLogsData,
-  type CallLog,
+  type CallLog
 } from "@/features/call-logs/data/callLogsData";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 
@@ -20,7 +20,9 @@ const CallLogsView = () => {
   const [selectedList, setSelectedList] = React.useState("All Lists");
   const [selectedStatus, setSelectedStatus] = React.useState("All Status");
   const [selectedDateRange, setSelectedDateRange] = React.useState("all");
-  const [selectedCallLog, setSelectedCallLog] = React.useState<CallLog | null>(null);
+  const [selectedCallLog, setSelectedCallLog] = React.useState<CallLog | null>(
+    null
+  );
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const filteredRows = React.useMemo(() => {
@@ -34,7 +36,8 @@ const CallLogsView = () => {
           .toLowerCase()
           .includes(query);
 
-      const matchesList = selectedList === "All Lists" || row.list === selectedList;
+      const matchesList =
+        selectedList === "All Lists" || row.list === selectedList;
       const matchesStatus =
         selectedStatus === "All Status" || row.disposition === selectedStatus;
       const matchesDateRange =

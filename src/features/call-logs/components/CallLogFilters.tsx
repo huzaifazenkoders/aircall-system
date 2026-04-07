@@ -8,10 +8,11 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
+import TextInput from "@/components/ui/text-input";
 
 type CallLogFiltersProps = {
   searchValue: string;
@@ -38,21 +39,18 @@ const CallLogFilters = ({
   statusOptions,
   selectedDateRange,
   onDateRangeChange,
-  dateRangeOptions,
+  dateRangeOptions
 }: CallLogFiltersProps) => {
   return (
     <div className={callLogsStyles.toolbar}>
-      <label className={callLogsStyles.searchField}>
-        <SearchIcon className="size-7 text-[#667085]" aria-hidden="true" />
-        <input
-          type="text"
-          className={callLogsStyles.searchInput}
-          placeholder="Search by name, phone number, or lead ID"
-          value={searchValue}
-          onChange={(event) => onSearchChange(event.target.value)}
-        />
-      </label>
-
+      <TextInput
+        setValue={() => {}}
+        startIcon={
+          <SearchIcon className="size-5 text-[#667085]" aria-hidden="true" />
+        }
+        placeholder="Search by name, phone number, or lead ID"
+        className="max-w-[500px]"
+      />
       <div className={callLogsStyles.filterRow}>
         <Select value={selectedList} onValueChange={onListChange}>
           <SelectTrigger className={callLogsStyles.filterTrigger}>
@@ -90,7 +88,10 @@ const CallLogFilters = ({
 
         <Select value={selectedDateRange} onValueChange={onDateRangeChange}>
           <SelectTrigger
-            className={cn(callLogsStyles.filterTrigger, callLogsStyles.dateTrigger)}
+            className={cn(
+              callLogsStyles.filterTrigger,
+              callLogsStyles.dateTrigger
+            )}
           >
             <SelectValue />
             <CalendarDaysIcon className="ml-3 size-5 text-text-primary" />
