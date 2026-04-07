@@ -19,23 +19,34 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { type CallLog } from "@/features/call-logs/data/callLogsData";
+import { type CallLog } from "@/features/call-logs/types/callLogTypes";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 
-const dispositionVariantMap = {
-  Connected: "connected",
-  Callback: "callback",
-  "No Answer": "no-answer",
-  "Not Interested": "not-interested",
-  "Wrong Number": "wrong-number"
-} as const;
+const callStatusVariantMap: Record<string, string> = {
+  completed: "connected",
+  failed: "not-interested",
+  no_answer: "no-answer",
+};
+
+const callStatusLabelMap: Record<string, string> = {
+  completed: "Completed",
+  failed: "Failed",
+  no_answer: "No Answer",
+};
 
 type CallLogsTableProps = {
   rows: CallLog[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
   onRowSelect: (callLog: CallLog) => void;
 };
 
-const CallLogsTable = ({ rows, onRowSelect }: CallLogsTableProps) => {
+const CallLogsTable = ({ rows, page, limit, total, totalPages, onPageChange, onRowSelect }: CallLogsTableProps) => {
+  const from = total === 0 ? 0 : (page - 1) * limit + 1;
+  const to = Math.min(page * limit, total);
   return (
     <>
       <Table>
@@ -67,15 +78,15 @@ const CallLogsTable = ({ rows, onRowSelect }: CallLogsTableProps) => {
               onClick={() => onRowSelect(row)}
             >
               <TableCell className={callLogsStyles.cell}>
-                {row.leadName}
+                {row.lead ? `${row.lead.first_name} ${row.lead.last_name}` : row.lead_id}
               </TableCell>
-              <TableCell className={callLogsStyles.cell}>{row.phone}</TableCell>
+              <TableCell className={callLogsStyles.cell}>{row.lead?.phone ?? "—"}</TableCell>
               <TableCell className={callLogsStyles.cell}>
-                {row.representative}
+                {row.assigned_to ? `${row.assigned_to.first_name} ${row.assigned_to.last_name}` : "—"}
               </TableCell>
-              <TableCell className={callLogsStyles.cell}>{row.list}</TableCell>
+              <TableCell className={callLogsStyles.cell}>{row.list?.name ?? "—"}</TableCell>
               <TableCell className={callLogsStyles.cell}>
-                {row.callTime}
+                {new Date(row.created_at).toLocaleString()}
               </TableCell>
               <TableCell
                 className={cn(
@@ -84,10 +95,10 @@ const CallLogsTable = ({ rows, onRowSelect }: CallLogsTableProps) => {
                 )}
               >
                 <Badge
-                  variant={dispositionVariantMap[row.disposition]}
+                  variant={callStatusVariantMap[row.call_status] as never}
                   className={callLogsStyles.dispositionBadge}
                 >
-                  {row.disposition}
+                  {callStatusLabelMap[row.call_status]}
                 </Badge>
               </TableCell>
               <TableCell className={cn(callLogsStyles.cell, "py-4 pr-4")}>
@@ -121,12 +132,14 @@ const CallLogsTable = ({ rows, onRowSelect }: CallLogsTableProps) => {
         </div>
 
         <div className="flex items-center gap-10">
-          <span className={callLogsStyles.paginationText}>1-5 of 13</span>
+          <span className={callLogsStyles.paginationText}>{from}-{to} of {total}</span>
           <div className={callLogsStyles.paginationActions}>
             <Button
               variant="ghost"
               size="icon"
               className={callLogsStyles.paginationButton}
+              disabled={page <= 1}
+              onClick={() => onPageChange(page - 1)}
             >
               <ChevronLeftIcon className="size-4" />
             </Button>
@@ -134,6 +147,8 @@ const CallLogsTable = ({ rows, onRowSelect }: CallLogsTableProps) => {
               variant="ghost"
               size="icon"
               className={callLogsStyles.paginationButton}
+              disabled={page >= totalPages}
+              onClick={() => onPageChange(page + 1)}
             >
               <ChevronRightIcon className="size-4" />
             </Button>

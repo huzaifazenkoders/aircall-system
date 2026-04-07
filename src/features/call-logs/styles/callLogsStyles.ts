@@ -42,12 +42,8 @@ export const callLogsStyles = {
   ),
   emptyWrap: cn("flex min-h-[720px] flex-1 items-center justify-center px-6"),
   emptyInner: cn("flex max-w-[580px] flex-col items-center text-center"),
-  emptyTitle: cn(
-    "mt-8 text-[42px] font-medium tracking-tight text-text-primary"
-  ),
-  emptyDescription: cn(
-    "mt-5 max-w-[540px] text-[28px] leading-[1.45] text-[#667794]"
-  ),
+  emptyTitle: cn("mt-8 text-2xl font-medium tracking-tight text-text-primary"),
+  emptyDescription: cn("mt-1 max-w-[540px] text-base text-text-secondary"),
   dialogHeader: cn("items-start px-6 pt-8 pb-4"),
   dialogTitle: cn("text-2xl font-medium text-gray-800"),
   section: cn("border-t border-zinc-200 px-6 py-6 first:border-t-0"),

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PlayIcon } from "lucide-react";
+import { Loader2Icon, PlayIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,36 +10,38 @@ import {
   DialogContent,
   DialogHeader,
   DialogIconClose,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { type CallLog } from "@/features/call-logs/data/callLogsData";
+import { type CallLog } from "@/features/call-logs/types/callLogTypes";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 import Image from "next/image";
 import PhoneList from "@/../public/assets/call-logs/PhoneList.svg";
 
-const dispositionVariantMap = {
-  Connected: "connected",
-  Callback: "callback",
-  "No Answer": "no-answer",
-  "Not Interested": "not-interested",
-  "Wrong Number": "wrong-number"
-} as const;
+const callStatusVariantMap: Record<string, string> = {
+  completed: "connected",
+  failed: "not-interested",
+  no_answer: "no-answer",
+};
+
+const callStatusLabelMap: Record<string, string> = {
+  completed: "Completed",
+  failed: "Failed",
+  no_answer: "No Answer",
+};
 
 type CallLogDetailsDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   callLog: CallLog | null;
+  isLoading?: boolean;
 };
 
 const CallLogDetailsDialog = ({
   open,
   onOpenChange,
-  callLog
+  callLog,
+  isLoading,
 }: CallLogDetailsDialogProps) => {
-  if (!callLog) {
-    return null;
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -55,112 +57,102 @@ const CallLogDetailsDialog = ({
         </DialogHeader>
 
         <DialogBody className="flex min-h-0 flex-1 flex-col p-0">
-          <section className={callLogsStyles.section}>
-            <h3 className={callLogsStyles.sectionTitle}>Lead Information</h3>
-            <div className={callLogsStyles.detailsGrid}>
-              <div className="inline-flex gap-0">
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Name</p>
-                  <p className={callLogsStyles.detailValue}>
-                    {callLog.leadName}
-                  </p>
-                </div>
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Email</p>
-                  <p className={callLogsStyles.detailValue}>{callLog.email}</p>
-                </div>
-              </div>
-              <div className="inline-flex gap-0">
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Phone</p>
-                  <p className={callLogsStyles.detailValue}>{callLog.phone}</p>
-                </div>
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Timezone</p>
-                  <p className={callLogsStyles.detailValue}>
-                    {callLog.timezone}
-                  </p>
-                </div>
-              </div>
-              <div className="inline-flex gap-0">
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Event</p>
-                  <p className={callLogsStyles.detailValue}>{callLog.event}</p>
-                </div>
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>View in Keap</p>
-                  <a href="#" className={callLogsStyles.keapLink}>
-                    {callLog.keapUrlLabel}
-                  </a>
-                </div>
-              </div>
+          {isLoading || !callLog ? (
+            <div className="flex flex-1 items-center justify-center">
+              <Loader2Icon className="size-8 animate-spin text-panel-muted" />
             </div>
-          </section>
-
-          <section className={callLogsStyles.section}>
-            <h3 className={callLogsStyles.sectionTitle}>Call Summary</h3>
-            <div className={callLogsStyles.summaryGrid}>
-              <div className="inline-flex gap-0">
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Representative</p>
-                  <div className={callLogsStyles.representative}>
-                    <span className={callLogsStyles.avatar} />
-                    <span className={callLogsStyles.detailValue}>
-                      {callLog.representative}
-                    </span>
+          ) : (
+            <>
+              <section className={callLogsStyles.section}>
+                <h3 className={callLogsStyles.sectionTitle}>Lead Information</h3>
+                <div className={callLogsStyles.detailsGrid}>
+                  <div className="inline-flex gap-0">
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Name</p>
+                      <p className={callLogsStyles.detailValue}>
+                        {callLog.lead
+                          ? `${callLog.lead.first_name} ${callLog.lead.last_name}`
+                          : callLog.lead_id}
+                      </p>
+                    </div>
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Email</p>
+                      <p className={callLogsStyles.detailValue}>{callLog.lead?.email ?? "—"}</p>
+                    </div>
+                  </div>
+                  <div className="inline-flex gap-0">
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Phone</p>
+                      <p className={callLogsStyles.detailValue}>{callLog.lead?.phone ?? "—"}</p>
+                    </div>
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Timezone</p>
+                      <p className={callLogsStyles.detailValue}>{callLog.lead?.timezone ?? "—"}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Disposition</p>
-                  <Badge
-                    variant={dispositionVariantMap[callLog.disposition]}
-                    className="rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
-                  >
-                    {callLog.disposition}
-                  </Badge>
-                </div>
-              </div>
-              <div className="inline-flex gap-0">
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
-                  <p className={callLogsStyles.detailLabel}>Call Time</p>
-                  <p className={callLogsStyles.detailValue}>
-                    {callLog.callTime}
-                  </p>
-                </div>
-                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-1">
-                  <p className={callLogsStyles.detailLabel}>Next Action</p>
-                  <Badge
-                    variant="cooldown"
-                    className="rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
-                  >
-                    {callLog.nextAction}
-                  </Badge>
-                </div>
-              </div>
-            </div>
+              </section>
 
-            <div className={callLogsStyles.noteWrap}>
-              <p className={callLogsStyles.detailLabel}>Note</p>
-              <p className={callLogsStyles.noteValue}>{callLog.note}</p>
-            </div>
-          </section>
+              <section className={callLogsStyles.section}>
+                <h3 className={callLogsStyles.sectionTitle}>Call Summary</h3>
+                <div className={callLogsStyles.summaryGrid}>
+                  <div className="inline-flex gap-0">
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Representative</p>
+                      <div className={callLogsStyles.representative}>
+                        <span className={callLogsStyles.avatar} />
+                        <span className={callLogsStyles.detailValue}>
+                          {callLog.assigned_to
+                            ? `${callLog.assigned_to.first_name} ${callLog.assigned_to.last_name}`
+                            : "—"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Status</p>
+                      <Badge
+                        variant={callStatusVariantMap[callLog.call_status] as never}
+                        className="rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
+                      >
+                        {callStatusLabelMap[callLog.call_status]}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="inline-flex gap-0">
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Call Time</p>
+                      <p className={callLogsStyles.detailValue}>
+                        {new Date(callLog.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                      <p className={callLogsStyles.detailLabel}>Attempt #</p>
+                      <p className={callLogsStyles.detailValue}>{callLog.attempt_number}</p>
+                    </div>
+                  </div>
+                </div>
 
-          <div className={callLogsStyles.recordingBar}>
-            <div className={callLogsStyles.recordingMeta}>
-              <div className={callLogsStyles.recordingIconWrap}>
-                <Image src={PhoneList} alt="" height={39} width={39} />
+                <div className={callLogsStyles.noteWrap}>
+                  <p className={callLogsStyles.detailLabel}>Note</p>
+                  <p className={callLogsStyles.noteValue}>{callLog.notes || "—"}</p>
+                </div>
+              </section>
+
+              <div className={callLogsStyles.recordingBar}>
+                <div className={callLogsStyles.recordingMeta}>
+                  <div className={callLogsStyles.recordingIconWrap}>
+                    <Image src={PhoneList} alt="" height={39} width={39} />
+                  </div>
+                  <div className="flex flex-col">
+                    <p className={callLogsStyles.recordingLabel}>Call Recording</p>
+                  </div>
+                </div>
+                <button type="button" className={callLogsStyles.playButton}>
+                  <PlayIcon className="size-6" />
+                </button>
               </div>
-              <div className="flex flex-col">
-                <p className={callLogsStyles.recordingLabel}>Call Recording</p>
-                <p className={callLogsStyles.recordingTime}>
-                  {callLog.recordingDuration}
-                </p>
-              </div>
-            </div>
-            <button type="button" className={callLogsStyles.playButton}>
-              <PlayIcon className="size-6" />
-            </button>
-          </div>
+            </>
+          )}
         </DialogBody>
       </DialogContent>
     </Dialog>
