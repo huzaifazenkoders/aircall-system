@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import NoImage from "@/../public/assets/dialer/no-assigned-lead.png";
 
 import { Button } from "@/components/ui/button";
 import { assignedLeadStyles as s } from "@/features/assigned-leads/styles/assignedLeadStyles";
@@ -10,7 +10,7 @@ const AssignedLeadEmptyState = () => {
   return (
     <div className={s.emptyWrap}>
       <Image
-        src="/assets/aircall/assigned-lead-empty.png"
+        src={NoImage}
         alt="No calls assigned"
         width={340}
         height={240}
@@ -27,4 +27,3 @@ const AssignedLeadEmptyState = () => {
 };
 
 export default AssignedLeadEmptyState;
-

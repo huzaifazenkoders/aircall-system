@@ -28,17 +28,12 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { GroupStatus } from "@/features/groups/data/groupsData";
 import { Group } from "@/features/groups/types/groupTypes";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import TextInput from "@/components/ui/text-input";
 import DateSelector from "@/components/custom/date-selector.component";
 
-const statusOptions: ("All Status" | GroupStatus)[] = [
-  "All Status",
-  "Active",
-  "Inactive"
-];
+const statusOptions: string[] = ["All Status", "Active", "Inactive"];
 
 const GroupsTable = ({
   groups,
@@ -52,9 +47,9 @@ const GroupsTable = ({
 }: {
   groups: Group[];
   searchValue: string;
-  statusFilter: "All Status" | GroupStatus;
+  statusFilter: string;
   onSearchChange: (value: string) => void;
-  onStatusChange: (value: "All Status" | GroupStatus) => void;
+  onStatusChange: (value: string) => void;
   onViewDetails: (groupId: string) => void;
   onAssignList: (groupId: string) => void;
   onAddMember: (groupId: string) => void;

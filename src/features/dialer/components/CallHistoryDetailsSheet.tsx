@@ -1,6 +1,7 @@
 "use client";
 
-import { CirclePlayIcon, ExternalLinkIcon, PhoneCallIcon } from "lucide-react";
+import { PlayIcon } from "lucide-react";
+import Image from "next/image";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,8 +12,9 @@ import {
   DialogIconClose,
   DialogTitle,
 } from "@/components/ui/dialog";
+import PhoneList from "@/../public/assets/call-logs/PhoneList.svg";
+import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 import { type CallHistoryRecord } from "@/features/dialer/data/dialerData";
-import { callHistoryStyles } from "@/features/dialer/styles/dialerStyles";
 
 const dispositionVariantMap = {
   Connected: "connected",
@@ -37,101 +39,122 @@ const CallHistoryDetailsSheet = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent position="right" overlayClassName="bg-overlay-strong" className="flex h-full flex-col">
-        <DialogHeader className={callHistoryStyles.sheetHeader}>
-          <DialogTitle className={callHistoryStyles.sheetTitle}>Call Details</DialogTitle>
+      <DialogContent
+        position="right"
+        overlayClassName="bg-overlay-strong"
+        className="flex h-full flex-col"
+      >
+        <DialogHeader className={callLogsStyles.dialogHeader}>
+          <DialogTitle className={callLogsStyles.dialogTitle}>
+            Call Details
+          </DialogTitle>
           <DialogIconClose />
         </DialogHeader>
 
         <DialogBody className="flex min-h-0 flex-1 flex-col p-0">
-          <section className={callHistoryStyles.sheetSection}>
-            <h3 className={callHistoryStyles.sheetSectionTitle}>LEAD INFORMATION</h3>
-            <div className={callHistoryStyles.detailGrid}>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Name</div>
-                <div className={callHistoryStyles.detailValue}>{record.leadName}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Email</div>
-                <div className={callHistoryStyles.detailValue}>{record.email}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Phone</div>
-                <div className={callHistoryStyles.detailValue}>{record.phone}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Timezone</div>
-                <div className={callHistoryStyles.detailValue}>{record.timezone}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Event</div>
-                <div className={callHistoryStyles.detailValue}>{record.event}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>View in Keap</div>
-                <a href="#" className={callHistoryStyles.link}>
-                  Open Contact in Keap
-                  <ExternalLinkIcon className="size-5" />
-                </a>
-              </div>
-            </div>
-          </section>
-
-          <section className={callHistoryStyles.sheetSection}>
-            <h3 className={callHistoryStyles.sheetSectionTitle}>CALL SUMMARY</h3>
-            <div className={callHistoryStyles.detailGrid}>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Representative</div>
-                <div className={callHistoryStyles.representative}>
-                  <span className={callHistoryStyles.representativeAvatar}>{record.representativeAvatar}</span>
-                  <span>{record.representative}</span>
+          <section className={callLogsStyles.section}>
+            <h3 className={callLogsStyles.sectionTitle}>Lead Information</h3>
+            <div className={callLogsStyles.detailsGrid}>
+              <div className="inline-flex gap-0">
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Name</p>
+                  <p className={callLogsStyles.detailValue}>{record.leadName}</p>
+                </div>
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Email</p>
+                  <p className={callLogsStyles.detailValue}>{record.email}</p>
                 </div>
               </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Disposition</div>
-                <Badge variant={dispositionVariantMap[record.disposition]} className="mt-1.5 h-8 rounded-[0.75rem] px-4 text-base font-medium">
-                  {record.disposition}
-                </Badge>
+              <div className="inline-flex gap-0">
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Phone</p>
+                  <p className={callLogsStyles.detailValue}>{record.phone}</p>
+                </div>
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Timezone</p>
+                  <p className={callLogsStyles.detailValue}>{record.timezone}</p>
+                </div>
               </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Call Time</div>
-                <div className={callHistoryStyles.detailValue}>{record.callTime}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Next Action</div>
-                <Badge variant="cooldown" className="mt-1.5 h-8 rounded-[0.75rem] px-4 text-base font-medium">
-                  {record.nextAction}
-                </Badge>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Duration</div>
-                <div className={callHistoryStyles.detailValue}>{record.recordingDuration}</div>
-              </div>
-              <div>
-                <div className={callHistoryStyles.detailLabel}>Personal Note</div>
-                <div className={callHistoryStyles.detailValue}>{record.personalNote}</div>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <div className={callHistoryStyles.detailLabel}>Keap Note</div>
-              <div className={callHistoryStyles.noteText}>{record.keepNote}</div>
             </div>
           </section>
 
-          <div className={callHistoryStyles.recordingBar}>
-            <div className={callHistoryStyles.recordingMeta}>
-              <div className={callHistoryStyles.recordingIconWrap}>
-                <PhoneCallIcon className="size-7 stroke-[1.8]" />
+          <section className={callLogsStyles.section}>
+            <h3 className={callLogsStyles.sectionTitle}>Call Summary</h3>
+            <div className={callLogsStyles.summaryGrid}>
+              <div className="inline-flex gap-0">
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Representative</p>
+                  <div className={callLogsStyles.representative}>
+                    <span className={callLogsStyles.avatar}>
+                      {record.representativeAvatar}
+                    </span>
+                    <span className={callLogsStyles.detailValue}>
+                      {record.representative}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Status</p>
+                  <Badge
+                    variant={dispositionVariantMap[record.disposition]}
+                    className="rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
+                  >
+                    {record.disposition}
+                  </Badge>
+                </div>
               </div>
-              <div>
-                <div className={callHistoryStyles.recordingLabel}>Call Recording</div>
-                <div className={callHistoryStyles.recordingTime}>{record.recordingDuration}</div>
+              <div className="inline-flex gap-0">
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Call Time</p>
+                  <p className={callLogsStyles.detailValue}>{record.callTime}</p>
+                </div>
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Duration</p>
+                  <p className={callLogsStyles.detailValue}>
+                    {record.recordingDuration}
+                  </p>
+                </div>
+              </div>
+              <div className="inline-flex gap-0">
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Event</p>
+                  <p className={callLogsStyles.detailValue}>{record.event}</p>
+                </div>
+                <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <p className={callLogsStyles.detailLabel}>Next Action</p>
+                  <p className={callLogsStyles.detailValue}>{record.nextAction}</p>
+                </div>
               </div>
             </div>
 
-            <button type="button" className={callHistoryStyles.playButton}>
-              <CirclePlayIcon className="size-7 stroke-[1.8]" />
+            <div className={callLogsStyles.noteWrap}>
+              <p className={callLogsStyles.detailLabel}>Personal Note</p>
+              <p className={callLogsStyles.noteValue}>
+                {record.personalNote || "—"}
+              </p>
+            </div>
+
+            <div className={callLogsStyles.noteWrap}>
+              <p className={callLogsStyles.detailLabel}>Keap Note</p>
+              <p className={callLogsStyles.noteValue}>{record.keepNote || "—"}</p>
+            </div>
+          </section>
+
+          <div className={callLogsStyles.recordingBar}>
+            <div className={callLogsStyles.recordingMeta}>
+              <div className={callLogsStyles.recordingIconWrap}>
+                <Image src={PhoneList} alt="" height={39} width={39} />
+              </div>
+              <div className="flex flex-col">
+                <p className={callLogsStyles.recordingLabel}>Call Recording</p>
+                <p className={callLogsStyles.recordingTime}>
+                  {record.recordingDuration}
+                </p>
+              </div>
+            </div>
+
+            <button type="button" className={callLogsStyles.playButton}>
+              <PlayIcon className="size-6" />
             </button>
           </div>
         </DialogBody>
@@ -141,4 +164,3 @@ const CallHistoryDetailsSheet = ({
 };
 
 export default CallHistoryDetailsSheet;
-

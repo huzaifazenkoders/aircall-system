@@ -11,9 +11,9 @@ export const dialerShellStyles = {
   logoWrap: cn("inline-flex items-center gap-2"),
   nav: cn("self-stretch flex flex-col items-start gap-4"),
   navItem: cn(
-    "self-stretch py-2 rounded-lg flex flex-col justify-center items-center gap-1.5 overflow-hidden transition-colors hover:bg-Brand-900/60"
+    "self-stretch py-2 rounded-lg flex flex-col justify-center items-center gap-1.5 overflow-hidden transition-colors hover:bg-brand-900/60"
   ),
-  navItemActive: cn("bg-Brand-900"),
+  navItemActive: cn("bg-brand-900"),
   navLabel: cn("text-xs font-normal leading-5 text-white"),
   content: cn("flex min-w-0 flex-col"),
   topbar: cn(
@@ -32,45 +32,40 @@ export const dialerShellStyles = {
 
 export const callHistoryStyles = {
   statsCard: cn(
-    "mt-8 grid overflow-hidden rounded-[1.875rem] border border-border bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)] md:grid-cols-2 xl:grid-cols-5"
+    "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex items-center p-6 gap-4"
   ),
-  statItem: cn(
-    "flex min-h-36 flex-col justify-center gap-2 px-8 py-6 xl:border-r xl:border-border last:border-r-0"
-  ),
-  statLabel: cn("text-[1rem] text-[#6B7A99] lg:text-[1.125rem]"),
-  statValue: cn(
-    "text-[3.25rem] font-medium leading-none tracking-tight text-[#127A79]"
-  ),
+  statItem: cn("flex-1 inline-flex flex-col justify-center items-start gap-2"),
+  statLabel: cn("text-base text-gray-500 leading-6"),
+  statValue: cn("text-4xl font-medium text-Brand-700 leading-10"),
+  statDivider: cn("w-px self-stretch border border-zinc-200"),
   tableCard: cn(
-    "mt-10 overflow-hidden rounded-[1.875rem] border border-border bg-white shadow-[0_18px_40px_rgba(15,23,42,0.06)]"
+    "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "grid gap-4 border-b border-border px-5 py-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:px-7"
+    "border-b border-zinc-200 px-6 py-4 inline-flex items-center w-full"
   ),
   searchField: cn(
-    "flex h-11 items-center gap-3 rounded-[0.875rem] border border-border bg-white px-4 shadow-xs sm:max-w-xl"
+    "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-11 px-3 py-1.5"
   ),
   searchInput: cn(
-    "w-full border-none bg-transparent text-lg text-text-primary outline-none placeholder:text-[#6B7A99]"
+    "w-full border-none bg-transparent text-base text-gray-500 outline-none placeholder:text-gray-500 tracking-tight leading-6"
   ),
   filterTrigger: cn(
-    "h-11 min-w-36 rounded-[0.875rem] border-border bg-white px-4 text-lg text-text-primary shadow-xs"
+    "bg-input h-11 rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-11 px-3 py-2 text-sm text-gray-800 leading-5"
   ),
-  tableHead: cn("px-5 py-4 text-[1rem] font-medium text-[#6B7A99] lg:px-6"),
-  cell: cn("px-5 py-5 text-lg text-text-primary lg:px-6"),
-  row: cn("cursor-pointer border-border hover:bg-[#FBFCFD]"),
-  statusBadge: cn("h-8 rounded-[0.75rem] px-4 text-base font-medium"),
-  arrowCell: cn("w-14 py-5 pr-5"),
+  tableHead: cn("p-4 text-sm font-medium text-gray-500 leading-4"),
+  cell: cn("px-4 py-3.5 text-sm text-gray-800 leading-5"),
+  row: cn("cursor-pointer border-zinc-200 hover:bg-[#FBFCFD] h-16"),
+  statusBadge: cn(
+    "rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
+  ),
+  arrowCell: cn("w-20 py-3.5"),
   arrowButton: cn(
-    "grid size-10 place-items-center rounded-full text-[#6B7A99] transition-colors hover:bg-muted hover:text-text-primary"
+    "grid size-6 place-items-center text-gray-500 transition-colors hover:bg-muted"
   ),
-  pagination: cn(
-    "flex flex-col gap-3 border-t border-border px-5 py-4 text-[#6B7A99] sm:flex-row sm:items-center sm:justify-end lg:px-6"
-  ),
-  paginationText: cn("text-base"),
-  paginationButton: cn(
-    "grid size-9 place-items-center rounded-full text-[#6B7A99] transition-colors hover:bg-muted hover:text-text-primary"
-  ),
+  pagination: cn("py-2 inline-flex w-full items-center justify-end gap-6"),
+  paginationText: cn("text-xs text-gray-500 leading-5"),
+  paginationButton: cn("p-2 rounded-lg text-gray-500 hover:bg-muted"),
   emptyWrap: cn("flex min-h-[42rem] flex-1 items-center justify-center px-6"),
   emptyInner: cn("flex max-w-2xl flex-col items-center text-center"),
   emptyTitle: cn("mt-8 text-2xl font-medium text-text-primary lg:text-[3rem]"),
@@ -121,7 +116,7 @@ export const callbackStyles = {
   ),
   toolbarRight: cn("flex flex-1 items-center justify-end gap-4"),
   searchField: cn(
-    "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-zinc-200 min-h-9 px-3 py-1.5"
+    "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-9 px-3 py-1.5"
   ),
   searchInput: cn(
     "w-full border-none bg-transparent text-base text-gray-500 outline-none placeholder:text-gray-500 tracking-tight leading-6"

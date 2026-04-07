@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 import { type CallHistoryRecord } from "@/features/dialer/data/dialerData";
 import { callHistoryStyles } from "@/features/dialer/styles/dialerStyles";
 
@@ -35,26 +34,26 @@ const CallHistoryTable = ({
     <>
       <Table>
         <TableHeader>
-          <TableRow className="border-border hover:bg-transparent">
+          <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
             <TableHead className={callHistoryStyles.tableHead}>Lead Name</TableHead>
             <TableHead className={callHistoryStyles.tableHead}>Phone</TableHead>
             <TableHead className={callHistoryStyles.tableHead}>List</TableHead>
-            <TableHead className={callHistoryStyles.tableHead}>Duration</TableHead>
+            <TableHead className="w-40 p-4 text-sm font-medium text-gray-500 leading-4">Duration</TableHead>
             <TableHead className={callHistoryStyles.tableHead}>Call Time</TableHead>
-            <TableHead className={callHistoryStyles.tableHead}>Disposition</TableHead>
-            <TableHead className={callHistoryStyles.tableHead} />
+            <TableHead className="pl-2 pr-4 py-4 text-sm font-medium text-gray-500 leading-4">Disposition</TableHead>
+            <TableHead className="w-20 pl-9 pr-4 py-4 text-sm font-medium text-gray-500 leading-4 opacity-0">Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id} className={callHistoryStyles.row} onClick={() => onSelect(row)}>
-              <TableCell className={callHistoryStyles.cell}>{row.leadName}</TableCell>
-              <TableCell className={callHistoryStyles.cell}>{row.phone}</TableCell>
+              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.leadName}</TableCell>
+              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.phone}</TableCell>
               <TableCell className={callHistoryStyles.cell}>{row.list}</TableCell>
-              <TableCell className={callHistoryStyles.cell}>{row.duration}</TableCell>
+              <TableCell className="w-40 px-4 py-3.5 text-sm text-gray-800 leading-5">{row.duration}</TableCell>
               <TableCell className={callHistoryStyles.cell}>{row.callTime}</TableCell>
-              <TableCell className={cn(callHistoryStyles.cell, "whitespace-nowrap")}>
+              <TableCell className="flex-1 pl-2 pr-4 py-3.5">
                 <Badge variant={dispositionVariantMap[row.disposition]} className={callHistoryStyles.statusBadge}>
                   {row.disposition}
                 </Badge>
@@ -69,7 +68,7 @@ const CallHistoryTable = ({
                     onSelect(row);
                   }}
                 >
-                  <ArrowRightIcon className="size-7" />
+                  <ArrowRightIcon className="size-4" />
                 </Button>
               </TableCell>
             </TableRow>
@@ -80,22 +79,19 @@ const CallHistoryTable = ({
       <div className={callHistoryStyles.pagination}>
         <div className="flex items-center gap-2">
           <span className={callHistoryStyles.paginationText}>Rows per page:</span>
-          <button type="button" className="flex items-center gap-2 text-base text-text-primary">
+          <button type="button" className="flex items-center gap-2 text-xs text-gray-800 leading-5">
             10
-            <ChevronDownIcon className="size-4 text-[#6B7A99]" />
+            <ChevronDownIcon className="size-4 text-gray-500" />
           </button>
         </div>
-
-        <div className="flex items-center gap-8">
-          <span className={callHistoryStyles.paginationText}>1-5 of 13</span>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
-              <ChevronLeftIcon className="size-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
-              <ChevronRightIcon className="size-5" />
-            </Button>
-          </div>
+        <span className="text-xs text-gray-800 leading-5">1-5 of 13</span>
+        <div className="flex items-start">
+          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
+            <ChevronLeftIcon className="size-6" />
+          </Button>
+          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
+            <ChevronRightIcon className="size-6" />
+          </Button>
         </div>
       </div>
     </>

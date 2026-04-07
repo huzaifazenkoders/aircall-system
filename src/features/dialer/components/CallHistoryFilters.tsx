@@ -7,9 +7,10 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { callHistoryStyles } from "@/features/dialer/styles/dialerStyles";
+import TextInput from "@/components/ui/text-input";
 
 type CallHistoryFiltersProps = {
   searchValue: string;
@@ -22,22 +23,19 @@ const CallHistoryFilters = ({
   searchValue,
   onSearchChange,
   statusValue,
-  onStatusChange,
+  onStatusChange
 }: CallHistoryFiltersProps) => {
   return (
     <div className={callHistoryStyles.toolbar}>
-      <label className={callHistoryStyles.searchField}>
-        <SearchIcon className="size-6 text-[#6B7A99]" />
-        <input
-          type="text"
-          value={searchValue}
-          onChange={(event) => onSearchChange(event.target.value)}
-          className={callHistoryStyles.searchInput}
-          placeholder="Search by name, phone number"
-        />
-      </label>
+      <TextInput
+        value={searchValue}
+        setValue={onSearchChange}
+        placeholder="Search by name, phone number"
+        className="md:w-[500px]"
+        startIcon={<SearchIcon className="size-5 text-text-secondary" />}
+      />
 
-      <div className="flex flex-wrap items-center justify-end gap-3">
+      <div className="flex flex-1 items-center justify-end gap-4">
         <Select
           value={statusValue}
           onValueChange={(value) => onStatusChange(value ?? "All Status")}
@@ -45,9 +43,23 @@ const CallHistoryFilters = ({
           <SelectTrigger className={callHistoryStyles.filterTrigger}>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent align="end" className="rounded-[1rem] border border-border bg-white p-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
-            {["All Status", "No Answer", "Connected", "Callback", "Not Interested", "Wrong Number"].map((option) => (
-              <SelectItem key={option} value={option} className="rounded-xl px-4 py-3 text-base text-text-primary">
+          <SelectContent
+            align="end"
+            className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]"
+          >
+            {[
+              "All Status",
+              "No Answer",
+              "Connected",
+              "Callback",
+              "Not Interested",
+              "Wrong Number"
+            ].map((option) => (
+              <SelectItem
+                key={option}
+                value={option}
+                className="rounded-none px-3 py-2 text-sm text-text-primary"
+              >
                 {option}
               </SelectItem>
             ))}

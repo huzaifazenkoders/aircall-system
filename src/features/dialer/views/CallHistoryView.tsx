@@ -1,21 +1,33 @@
 "use client";
 
 import React from "react";
-import { CalendarDaysIcon } from "lucide-react";
+import { CalendarDaysIcon, CalendarIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import CallHistoryDetailsSheet from "@/features/dialer/components/CallHistoryDetailsSheet";
 import CallHistoryEmptyState from "@/features/dialer/components/CallHistoryEmptyState";
 import CallHistoryFilters from "@/features/dialer/components/CallHistoryFilters";
 import CallHistoryStats from "@/features/dialer/components/CallHistoryStats";
 import CallHistoryTable from "@/features/dialer/components/CallHistoryTable";
-import { callHistoryRows, type CallHistoryRecord } from "@/features/dialer/data/dialerData";
-import { callHistoryStyles, dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import {
+  callHistoryRows,
+  type CallHistoryRecord
+} from "@/features/dialer/data/dialerData";
+import {
+  callHistoryStyles,
+  dialerShellStyles
+} from "@/features/dialer/styles/dialerStyles";
+import DateSelector from "@/components/custom/date-selector.component";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const CallHistoryView = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const [statusValue, setStatusValue] = React.useState("All Status");
-  const [selectedRecord, setSelectedRecord] = React.useState<CallHistoryRecord | null>(null);
+  const [selectedRecord, setSelectedRecord] =
+    React.useState<CallHistoryRecord | null>(null);
   const [sheetOpen, setSheetOpen] = React.useState(false);
 
   const filteredRows = React.useMemo(() => {
@@ -39,10 +51,20 @@ const CallHistoryView = () => {
     <>
       <div className={dialerShellStyles.titleRow}>
         <h1 className={dialerShellStyles.title}>Call History</h1>
-        <Button variant="outline" className="h-12 rounded-[0.875rem] px-5 text-lg text-text-primary shadow-xs">
-          Today
-          <CalendarDaysIcon className="size-5" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button variant="outline-transparent">
+                <span>Date</span>
+                <CalendarIcon
+                  className="ml-2 size-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </Button>
+            }
+          />
+          <DateSelector />
+        </DropdownMenu>
       </div>
 
       <CallHistoryStats />
@@ -78,4 +100,3 @@ const CallHistoryView = () => {
 };
 
 export default CallHistoryView;
-

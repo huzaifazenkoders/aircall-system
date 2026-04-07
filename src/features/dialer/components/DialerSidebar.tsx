@@ -16,7 +16,7 @@ import { dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
 import Image from "next/image";
 
 const navItems = [
-  { href: "#", label: "Home", icon: HomeIcon, key: "home" },
+  { href: "/dialer/assigned-lead", label: "Home", icon: HomeIcon, key: "home" },
   {
     href: "/dialer/callback-schedules",
     label: "Callbacks",
@@ -44,11 +44,7 @@ const DialerSidebar = () => {
       <nav className={dialerShellStyles.nav}>
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive =
-            (item.key === "callbacks" &&
-              pathname.startsWith("/dialer/callback-schedules")) ||
-            (item.key === "history" &&
-              pathname.startsWith("/dialer/call-history"));
+          const isActive = pathname.startsWith(item.href);
 
           return (
             <Link
@@ -59,10 +55,7 @@ const DialerSidebar = () => {
                 isActive && dialerShellStyles.navItemActive
               )}
             >
-              <Icon
-                className="size-6 text-white"
-                strokeWidth={isActive ? 2.5 : 1.5}
-              />
+              <Icon className="size-6 text-white" strokeWidth={1.5} />
               <span className={dialerShellStyles.navLabel}>{item.label}</span>
             </Link>
           );
