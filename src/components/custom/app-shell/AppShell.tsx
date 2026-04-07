@@ -12,14 +12,7 @@ const AppShell = ({
   className
 }: {
   children: React.ReactNode;
-  activeKey?:
-    | "dashboard"
-    | "list"
-    | "users"
-    | "groups"
-    | "workflows"
-    | "logs"
-    | "settings";
+  activeKey?: "list" | "users" | "groups" | "workflows" | "logs" | "settings";
   className?: string;
 }) => {
   return (

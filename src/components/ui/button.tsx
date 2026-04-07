@@ -61,7 +61,8 @@ function Button({
       onMouseDown={(e) => {
         handleRippleAnimation(
           e,
-          variant && ["outline-transparent", "ghost"].includes(variant)
+          variant &&
+            ["outline", "outline-transparent", "ghost"].includes(variant)
             ? "bg-black/30"
             : undefined
         );

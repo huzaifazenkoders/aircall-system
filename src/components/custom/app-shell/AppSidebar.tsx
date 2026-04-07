@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboardIcon,
   ListIcon,
   UsersIcon,
   UsersRoundIcon,
@@ -17,12 +15,6 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    href: "#",
-    icon: LayoutDashboardIcon
-  },
   { key: "list", label: "List Management", href: "/list", icon: ListIcon },
   { key: "users", label: "Users", href: "/users", icon: UsersIcon },
   { key: "groups", label: "Groups", href: "/groups", icon: UsersRoundIcon },

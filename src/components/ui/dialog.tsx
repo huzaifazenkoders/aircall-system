@@ -33,11 +33,10 @@ function DialogContent({
   overlayClassName,
   position = "center",
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Popup> &
-  {
-    position?: "center" | "right";
-    overlayClassName?: string;
-  }) {
+}: React.ComponentProps<typeof DialogPrimitive.Popup> & {
+  position?: "center" | "right";
+  overlayClassName?: string;
+}) {
   return (
     <DialogPortal>
       <DialogOverlay className={overlayClassName} />
@@ -146,7 +145,7 @@ function DialogIconClose({
     <DialogClose
       data-slot="dialog-icon-close"
       className={cn(
-        "inline-flex size-10 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
+        "inline-flex shrink-0 size-10 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50",
         className
       )}
       {...props}
@@ -167,5 +166,5 @@ export {
   DialogDescription,
   DialogBody,
   DialogFooter,
-  DialogIconClose,
+  DialogIconClose
 };

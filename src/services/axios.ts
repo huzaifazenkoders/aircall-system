@@ -4,8 +4,7 @@ import { getCookie } from "cookies-next/client";
 
 // ----------------|| Base Url ||-------------------
 
-export const BASE_URL = "http://localhost:5000/api/";
-// export const BASE_URL = "https://fleet-anteater-cleanly.ngrok-free.app/api/";
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 // -------------|| Axios Declaration ||-------------
 
