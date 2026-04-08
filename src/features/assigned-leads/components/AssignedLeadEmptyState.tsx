@@ -6,7 +6,7 @@ import NoImage from "@/../public/assets/dialer/no-assigned-lead.png";
 import { Button } from "@/components/ui/button";
 import { assignedLeadStyles as s } from "@/features/assigned-leads/styles/assignedLeadStyles";
 
-const AssignedLeadEmptyState = () => {
+const AssignedLeadEmptyState = ({ onRefresh }: { onRefresh?: () => void }) => {
   return (
     <div className={s.emptyWrap}>
       <Image
@@ -21,7 +21,7 @@ const AssignedLeadEmptyState = () => {
         You are currently not assigned to any active calls. When a lead becomes
         available, it will automatically appear here.
       </p>
-      <Button className={s.emptyButton}>Refresh Queue</Button>
+      <Button className={s.emptyButton} onClick={onRefresh}>Refresh Queue</Button>
     </div>
   );
 };

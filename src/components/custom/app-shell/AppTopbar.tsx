@@ -10,9 +10,16 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useMe } from "@/features/users/services/userService";
+import { useMe, useToggleAvailability } from "@/features/users/services/userService";
 import { deleteCookie } from "cookies-next/client";
 import { useRouter } from "next/navigation";
+import { myListStyles } from "@/features/dialer/styles/dialerStyles";
+import Toggle from "@/components/ui/toggle";
+import ConfirmDialog from "@/components/ui/confirm-dialog";
+import { handleMutationError } from "@/utils/handleMutationError";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { authKeys } from "@/features/auth/query-keys";
 
 const UserAvatar = () => {
   return (
@@ -50,50 +57,97 @@ const UserAvatar = () => {
 const AppTopbar = () => {
   const { data, isPending, isError } = useMe();
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+
+  const { mutate: toggleAvailability, isPending: toggling } = useToggleAvailability();
 
   if (isPending || isError) {
     return null;
   }
 
   const name = data?.data?.first_name + " " + data?.data?.last_name;
+  const isUnavailable = data?.data?.is_unavailable ?? false;
+
+  const handleToggle = () => {
+    toggleAvailability(undefined, {
+      onSuccess: () => {
+        toast.success(isUnavailable ? "You are now available" : "You are now unavailable");
+        queryClient.invalidateQueries({ queryKey: authKeys.me });
+        setConfirmDialogOpen(false);
+      },
+      onError: handleMutationError
+    });
+  };
+
   return (
-    <header className="flex items-center justify-end border-b gap-2 border-border px-1 pb-5">
-      {data.data.role === "dialer" ? "" : null}
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
+    <>
+      <header className="flex items-center justify-end border-b gap-2 border-border px-1 pb-5">
+        {data.data.role === "sales_person" ? (
+          <div className="flex items-center gap-2 ml-auto">
+            <span className={myListStyles.listCardToggleLabel}>
+              {isUnavailable ? "Unavailable" : "Available"}
+            </span>
             <button
               type="button"
-              className={cn(
-                "flex items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-colors hover:bg-muted"
-              )}
+              aria-label="Toggle availability"
+              disabled={toggling}
+              onClick={() => setConfirmDialogOpen(true)}
             >
-              <UserAvatar />
-              <div className="leading-tight">
-                <div className="text-[14px] text-[#94A3B8]">Hello</div>
-                <div className="text-[14px] font-semibold text-text-primary">
-                  {name}
-                </div>
-              </div>
+              <Toggle active={!isUnavailable} />
             </button>
-          }
-        />
+          </div>
+        ) : null}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <button
+                type="button"
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2 py-1.5 text-left transition-colors hover:bg-muted"
+                )}
+              >
+                <UserAvatar />
+                <div className="leading-tight">
+                  <div className="text-[14px] text-[#94A3B8]">Hello</div>
+                  <div className="text-[14px] font-semibold text-text-primary">
+                    {name}
+                  </div>
+                </div>
+              </button>
+            }
+          />
 
-        <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => {
-              deleteCookie("token");
-              router.push("/auth/sign-in");
-              router.refresh();
-            }}
-          >
-            <LogOutIcon className="size-4" aria-hidden="true" />
-            Logout
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </header>
+          <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => {
+                deleteCookie("token");
+                router.push("/auth/sign-in");
+                router.refresh();
+              }}
+            >
+              <LogOutIcon className="size-4" aria-hidden="true" />
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        title={isUnavailable ? "Set as Available?" : "Set as Unavailable?"}
+        description={
+          isUnavailable
+            ? "You will start receiving calls from your assigned lists."
+            : "You will stop receiving calls until you set yourself as available again."
+        }
+        confirmLabel={isUnavailable ? "Set Available" : "Set Unavailable"}
+        onConfirm={handleToggle}
+      />
+    </>
   );
 };
 

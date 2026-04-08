@@ -27,7 +27,8 @@ const CallbackSchedulesFilters = ({
   return (
     <div className={callbackStyles.toolbar}>
       <TextInput
-        setValue={() => {}}
+        value={searchValue}
+        setValue={onSearchChange}
         startIcon={<SearchIcon className="size-5 text-gray-500 mr-2" />}
         placeholder="Search by name, phone number"
         className="w-[500px]"

@@ -1,39 +1,38 @@
 "use client";
 
 import React from "react";
+import { Loader2Icon } from "lucide-react";
 
 import CallbackScheduleDetailsDialog from "@/features/dialer/components/CallbackScheduleDetailsDialog";
 import CallbackSchedulesEmptyState from "@/features/dialer/components/CallbackSchedulesEmptyState";
 import CallbackSchedulesFilters from "@/features/dialer/components/CallbackSchedulesFilters";
 import CallbackSchedulesTable from "@/features/dialer/components/CallbackSchedulesTable";
-import {
-  callbackScheduleRows,
-  type CallbackScheduleRecord,
-} from "@/features/dialer/data/dialerData";
 import { callbackStyles, dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import { useGetScheduledCooldown } from "@/features/dialer/services/leadActivityService";
+import { LeadActivityStatus } from "@/features/dialer/types/leadActivityTypes";
+
+const LIMIT = 10;
+
+const statusMap: Record<string, LeadActivityStatus | undefined> = {
+  "All Status": undefined,
+  Scheduled: "scheduled",
+  Cooldown: "cooldown",
+};
 
 const CallbackSchedulesView = () => {
-  const [searchValue, setSearchValue] = React.useState("");
+  const [page, setPage] = React.useState(1);
   const [statusValue, setStatusValue] = React.useState("All Status");
-  const [selectedRecord, setSelectedRecord] = React.useState<CallbackScheduleRecord | null>(null);
+  const [selectedActivityId, setSelectedActivityId] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
-  const filteredRows = React.useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+  const { data, isPending, isError } = useGetScheduledCooldown({
+    page,
+    limit: LIMIT,
+    status: statusMap[statusValue],
+  });
 
-    return callbackScheduleRows.filter((row) => {
-      const matchesSearch =
-        !query ||
-        [row.leadName, row.phone, row.list, row.scheduledTime]
-          .join(" ")
-          .toLowerCase()
-          .includes(query);
-      const matchesStatus =
-        statusValue === "All Status" || row.currentStatus === statusValue;
-
-      return matchesSearch && matchesStatus;
-    });
-  }, [searchValue, statusValue]);
+  const rows = data?.data?.data ?? [];
+  const meta = data?.data?.meta;
 
   return (
     <>
@@ -44,33 +43,43 @@ const CallbackSchedulesView = () => {
 
       <section className={callbackStyles.card}>
         <CallbackSchedulesFilters
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
+          searchValue=""
+          onSearchChange={() => {}}
           statusValue={statusValue}
-          onStatusChange={setStatusValue}
+          onStatusChange={(val) => { setStatusValue(val); setPage(1); }}
         />
 
-        {filteredRows.length > 0 ? (
+        {isPending ? (
+          <div className="flex min-h-[400px] items-center justify-center">
+            <Loader2Icon className="size-8 animate-spin text-gray-400" />
+          </div>
+        ) : isError || rows.length === 0 ? (
+          <CallbackSchedulesEmptyState />
+        ) : (
           <CallbackSchedulesTable
-            rows={filteredRows}
+            rows={rows}
+            page={page}
+            total={meta?.total ?? 0}
+            totalPages={meta?.totalPages ?? 1}
+            onPageChange={setPage}
             onSelect={(row) => {
-              setSelectedRecord(row);
+              setSelectedActivityId(row.id);
               setDialogOpen(true);
             }}
           />
-        ) : (
-          <CallbackSchedulesEmptyState />
         )}
       </section>
 
       <CallbackScheduleDetailsDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        record={selectedRecord}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) setSelectedActivityId("");
+        }}
+        activityId={selectedActivityId}
       />
     </>
   );
 };
 
 export default CallbackSchedulesView;
-

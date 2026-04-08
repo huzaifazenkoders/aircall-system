@@ -11,22 +11,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type CallbackScheduleRecord } from "@/features/dialer/data/dialerData";
 import { callbackStyles } from "@/features/dialer/styles/dialerStyles";
+import { LeadActivity } from "@/features/dialer/types/leadActivityTypes";
+
+const LIMIT = 10;
 
 const CallbackSchedulesTable = ({
   rows,
+  page,
+  total,
+  totalPages,
+  onPageChange,
   onSelect,
 }: {
-  rows: CallbackScheduleRecord[];
-  onSelect: (row: CallbackScheduleRecord) => void;
+  rows: LeadActivity[];
+  page: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onSelect: (row: LeadActivity) => void;
 }) => {
+  const from = total === 0 ? 0 : (page - 1) * LIMIT + 1;
+  const to = Math.min(page * LIMIT, total);
+
   return (
     <>
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
-            <TableHead className={callbackStyles.tableHead}>Lead Owner</TableHead>
+            <TableHead className={callbackStyles.tableHead}>Lead Name</TableHead>
             <TableHead className={callbackStyles.tableHead}>Phone</TableHead>
             <TableHead className={callbackStyles.tableHead}>List</TableHead>
             <TableHead className={callbackStyles.tableHead}>Scheduled Time</TableHead>
@@ -37,19 +50,22 @@ const CallbackSchedulesTable = ({
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id} className={callbackStyles.row} onClick={() => onSelect(row)}>
-              <TableCell className="flex-1 self-stretch pl-4 text-sm text-gray-800 leading-5">{row.leadName}</TableCell>
-              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.phone}</TableCell>
-              <TableCell className={callbackStyles.cell}>{row.list}</TableCell>
-              <TableCell className={callbackStyles.cell}>{row.scheduledTime}</TableCell>
+              <TableCell className="flex-1 self-stretch pl-4 text-sm text-gray-800 leading-5">
+                {row.lead ? `${row.lead.first_name} ${row.lead.last_name}` : row.lead_id}
+              </TableCell>
+              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">
+                {row.lead?.phone ?? "—"}
+              </TableCell>
+              <TableCell className={callbackStyles.cell}>{row.list?.name ?? "—"}</TableCell>
+              <TableCell className={callbackStyles.cell}>
+                {row.scheduled_at ? new Date(row.scheduled_at).toLocaleString() : "—"}
+              </TableCell>
               <TableCell className={callbackStyles.arrowCell}>
                 <Button
                   variant="ghost"
                   size="icon"
                   className={callbackStyles.arrowButton}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelect(row);
-                  }}
+                  onClick={(e) => { e.stopPropagation(); onSelect(row); }}
                 >
                   <ArrowRightIcon className="size-4" />
                 </Button>
@@ -62,17 +78,29 @@ const CallbackSchedulesTable = ({
       <div className={callbackStyles.pagination}>
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500 leading-5">Rows per page:</span>
-          <button type="button" className="flex items-center gap-2 text-xs text-gray-800 leading-5">
-            10
+          <span className="flex items-center gap-2 text-xs text-gray-800 leading-5">
+            {LIMIT}
             <ChevronDownIcon className="size-4 text-gray-500" />
-          </button>
+          </span>
         </div>
-        <span className="text-xs text-gray-800 leading-5">1-5 of 13</span>
+        <span className="text-xs text-gray-800 leading-5">{from}-{to} of {total}</span>
         <div className="flex items-start">
-          <Button variant="ghost" size="icon" className="p-2 rounded-lg">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-2 rounded-lg"
+            disabled={page <= 1}
+            onClick={() => onPageChange(page - 1)}
+          >
             <ChevronLeftIcon className="size-6 text-gray-500" />
           </Button>
-          <Button variant="ghost" size="icon" className="p-2 rounded-lg">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="p-2 rounded-lg"
+            disabled={page >= totalPages}
+            onClick={() => onPageChange(page + 1)}
+          >
             <ChevronRightIcon className="size-6 text-gray-500" />
           </Button>
         </div>
@@ -82,4 +110,3 @@ const CallbackSchedulesTable = ({
 };
 
 export default CallbackSchedulesTable;
-

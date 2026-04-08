@@ -318,3 +318,69 @@ export const useAssignList = () =>
       return res.data as AssignListRes;
     }
   });
+
+// ─── Get My Lists (Infinite) ──────────────────────────────────────────────────
+
+interface GetMyListsReq extends PaginationReq {
+  search?: string;
+}
+
+export interface MyList {
+  id: string;
+  name: string;
+  priority: number;
+  total_leads: number;
+  assigned_diallers: number;
+  is_active: boolean;
+}
+
+interface GetMyListsRes {
+  data: {
+    data: MyList[];
+    meta: IPagination;
+  };
+  message: string;
+}
+
+export function useGetMyLists({ limit, search }: GetMyListsReq) {
+  return useInfiniteQuery({
+    queryKey: listKeys.myLists({ limit, search }),
+    queryFn: async ({ pageParam }) => {
+      const res = await axiosInstance.get("/lists/my-lists", {
+        params: { page: pageParam, limit, search }
+      });
+      return res.data as GetMyListsRes;
+    },
+    getNextPageParam,
+    initialPageParam: 1
+  });
+}
+
+// ─── Activate / Deactivate My List ────────────────────────────────────────────
+
+interface ToggleMyListReq {
+  payload: {
+    list_id: string;
+  };
+}
+
+interface ToggleMyListRes {
+  data: MyList;
+  message: string;
+}
+
+export const useActivateMyList = () =>
+  useMutation({
+    mutationFn: async ({ payload }: ToggleMyListReq) => {
+      const res = await axiosInstance.patch("/lists/my-lists/activate", payload);
+      return res.data as ToggleMyListRes;
+    }
+  });
+
+export const useDeactivateMyList = () =>
+  useMutation({
+    mutationFn: async ({ payload }: ToggleMyListReq) => {
+      const res = await axiosInstance.patch("/lists/my-lists/inactivate", payload);
+      return res.data as ToggleMyListRes;
+    }
+  });

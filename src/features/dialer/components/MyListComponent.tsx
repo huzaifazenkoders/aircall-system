@@ -1,13 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  SearchIcon
-} from "lucide-react";
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { cn } from "@/lib/utils";
 import TextInput from "@/components/ui/text-input";
@@ -30,13 +25,21 @@ import { Button } from "@/components/ui/button";
 import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
-import {
-  myLists,
-  leadStatusOptions,
-  type MyListItem,
-  type LeadStatus
-} from "@/features/dialer/data/dialerData";
+import { leadStatusOptions, type LeadStatus } from "@/features/dialer/data/dialerData";
 import { myListStyles } from "@/features/dialer/styles/dialerStyles";
+import Toggle from "@/components/ui/toggle";
+import {
+  useGetMyLists,
+  useActivateMyList,
+  useDeactivateMyList,
+  type MyList
+} from "@/features/list/services/listService";
+import { useGetLeads } from "@/features/list/services/listService";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { useQueryClient } from "@tanstack/react-query";
+import { listKeys } from "@/features/list/query-keys";
+import toast from "react-hot-toast";
 
 const leadStatusStyle: Record<LeadStatus, string> = {
   Pending: "bg-amber-50 text-amber-500",
@@ -47,57 +50,121 @@ const leadStatusStyle: Record<LeadStatus, string> = {
   "Ban Contact": "bg-gray-100 text-gray-500"
 };
 
-const Toggle = ({ active }: { active: boolean }) => (
-  <div className="flex items-center">
-    <div
-      className={cn(
-        "w-10 h-4 rounded-[120px]",
-        active ? "bg-Brand-300" : "bg-gray-100"
-      )}
-    />
-    <div
-      className={cn(
-        "size-6 rounded-full shadow-[0px_1.2px_6px_0px_rgba(0,0,0,0.08)] -ml-3",
-        active ? "bg-Brand-700" : "bg-gray-400"
-      )}
-    />
-  </div>
-);
+const LIMIT = 20;
+const LEADS_LIMIT = 10;
 
 const MyListComponent = () => {
+  const queryClient = useQueryClient();
+
   const [focusMode, setFocusMode] = React.useState(false);
   const [focusModeDialogOpen, setFocusModeDialogOpen] = React.useState(false);
   const [resumeAllDialogOpen, setResumeAllDialogOpen] = React.useState(false);
   const [activateListDialog, setActivateListDialog] = React.useState<{
     open: boolean;
-    list: MyListItem | null;
+    list: MyList | null;
   }>({ open: false, list: null });
 
   const [listSearch, setListSearch] = React.useState("");
-  const [selectedList, setSelectedList] = React.useState<MyListItem>(
-    myLists[0]
-  );
+  const [selectedList, setSelectedList] = React.useState<MyList | null>(null);
   const [leadSearch, setLeadSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("All Status");
+  const [leadsPage, setLeadsPage] = React.useState(1);
 
-  const filteredLists = React.useMemo(
-    () =>
-      myLists.filter((l) =>
-        l.name.toLowerCase().includes(listSearch.toLowerCase())
-      ),
-    [listSearch]
-  );
+  // ── My Lists (infinite scroll) ──────────────────────────────────────────────
+  const {
+    data: myListsData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useGetMyLists({ limit: LIMIT, search: listSearch });
 
-  const filteredLeads = React.useMemo(() => {
-    const q = leadSearch.trim().toLowerCase();
-    return selectedList.leads.filter((lead) => {
-      const matchesSearch =
-        !q || [lead.name, lead.phone].join(" ").toLowerCase().includes(q);
-      const matchesStatus =
-        statusFilter === "All Status" || lead.leadStatus === statusFilter;
-      return matchesSearch && matchesStatus;
-    });
-  }, [selectedList, leadSearch, statusFilter]);
+  const myLists = transformInfiniteData(myListsData, "data");
+
+  // Auto-select first list
+  React.useEffect(() => {
+    if (!selectedList && myLists.length > 0) {
+      setSelectedList(myLists[0]);
+    }
+  }, [myLists, selectedList]);
+
+  // ── Leads ───────────────────────────────────────────────────────────────────
+  const { data: leadsData, isPending: leadsLoading } = useGetLeads({
+    page: leadsPage,
+    limit: LEADS_LIMIT,
+    list_id: selectedList?.id ?? "",
+    search: leadSearch,
+    status: statusFilter !== "All Status" ? (statusFilter.toLowerCase() as never) : undefined
+  });
+
+  const leads = leadsData?.data?.data ?? [];
+  const leadsMeta = leadsData?.data?.meta;
+
+  // ── Mutations ───────────────────────────────────────────────────────────────
+  const { mutate: activateMyList, isPending: activating } = useActivateMyList();
+  const { mutate: deactivateMyList, isPending: deactivating } = useDeactivateMyList();
+
+  const invalidateMyLists = () =>
+    queryClient.invalidateQueries({ queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch }) });
+
+  const handleToggleList = (list: MyList) => {
+    if (list.is_active) {
+      deactivateMyList(
+        { payload: { list_id: list.id } },
+        {
+          onSuccess: () => {
+            toast.success("List deactivated");
+            invalidateMyLists();
+          },
+          onError: handleMutationError
+        }
+      );
+    } else {
+      setActivateListDialog({ open: true, list });
+    }
+  };
+
+  const handleActivateConfirm = () => {
+    if (!activateListDialog.list) return;
+    activateMyList(
+      { payload: { list_id: activateListDialog.list.id } },
+      {
+        onSuccess: () => {
+          toast.success("List activated");
+          invalidateMyLists();
+          setActivateListDialog({ open: false, list: null });
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
+  const handleFocusMode = () => {
+    activateMyList(
+      { payload: { list_id: "all" } },
+      {
+        onSuccess: () => {
+          setFocusMode(true);
+          invalidateMyLists();
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
+  const handleResumeAll = () => {
+    deactivateMyList(
+      { payload: { list_id: "all" } },
+      {
+        onSuccess: () => {
+          setFocusMode(false);
+          invalidateMyLists();
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
+  const togglePending = activating || deactivating;
 
   return (
     <>
@@ -113,6 +180,7 @@ const MyListComponent = () => {
               <button
                 type="button"
                 aria-label="Toggle focus mode"
+                disabled={togglePending}
                 onClick={() =>
                   focusMode
                     ? setResumeAllDialogOpen(true)
@@ -134,67 +202,73 @@ const MyListComponent = () => {
             />
           </div>
 
-          <div className={myListStyles.sidebarList}>
-            {filteredLists.map((list) => (
-              <div
-                key={list.id}
-                className={cn(
-                  myListStyles.listCard,
-                  list.active
-                    ? myListStyles.listCardActive
-                    : myListStyles.listCardInactive,
-                  selectedList.id === list.id && "ring-2 ring-Brand-500"
-                )}
-                onClick={() => setSelectedList(list)}
-              >
-                <div className={myListStyles.listCardHeader}>
-                  <span className={myListStyles.listCardName}>{list.name}</span>
-                  <div className={myListStyles.listCardToggleWrap}>
-                    <span className={myListStyles.listCardToggleLabel}>
-                      {list.active ? "Active" : "Inactive"}
-                    </span>
-                    <button
-                      type="button"
-                      aria-label={`Toggle ${list.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (!list.active)
-                          setActivateListDialog({ open: true, list });
-                      }}
-                    >
-                      <Toggle active={list.active} />
-                    </button>
+          <div id="my-lists-scroll" className={cn(myListStyles.sidebarList, "overflow-y-auto max-h-[calc(100vh-16rem)]")}>
+            <InfiniteScroll
+              dataLength={myLists.length}
+              next={fetchNextPage}
+              hasMore={!!hasNextPage}
+              loader={
+                <div className="flex justify-center py-2">
+                  <Loader2Icon className="size-5 animate-spin text-gray-400" />
+                </div>
+              }
+              scrollableTarget="my-lists-scroll"
+              className="flex flex-col gap-4"
+            >
+              {myLists.map((list) => (
+                <div
+                  key={list.id}
+                  className={cn(
+                    myListStyles.listCard,
+                    list.is_active
+                      ? myListStyles.listCardActive
+                      : myListStyles.listCardInactive,
+                    selectedList?.id === list.id && "ring-2 ring-Brand-500"
+                  )}
+                  onClick={() => setSelectedList(list)}
+                >
+                  <div className={myListStyles.listCardHeader}>
+                    <span className={myListStyles.listCardName}>{list.name}</span>
+                    <div className={myListStyles.listCardToggleWrap}>
+                      <span className={myListStyles.listCardToggleLabel}>
+                        {list.is_active ? "Active" : "Inactive"}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Toggle ${list.name}`}
+                        disabled={togglePending}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleList(list);
+                        }}
+                      >
+                        <Toggle active={list.is_active} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className={myListStyles.listCardDivider} />
+                  <div className={myListStyles.listCardMeta}>
+                    <div className={myListStyles.listCardMetaItem}>
+                      <span className={myListStyles.listCardMetaLabel}>Priority:</span>
+                      <span className={myListStyles.listCardMetaValue}>{list.priority}</span>
+                    </div>
+                    <div className={myListStyles.listCardMetaItem}>
+                      <span className={myListStyles.listCardMetaLabel}>Total Lead:</span>
+                      <span className={myListStyles.listCardMetaValue}>{list.total_leads}</span>
+                    </div>
+                    <div className={myListStyles.listCardMetaItem}>
+                      <span className={myListStyles.listCardMetaLabel}>Assigned Diallers</span>
+                      <span className={myListStyles.listCardMetaValue}>{list.assigned_diallers}</span>
+                    </div>
                   </div>
                 </div>
-                <div className={myListStyles.listCardDivider} />
-                <div className={myListStyles.listCardMeta}>
-                  <div className={myListStyles.listCardMetaItem}>
-                    <span className={myListStyles.listCardMetaLabel}>
-                      Priority:
-                    </span>
-                    <span className={myListStyles.listCardMetaValue}>
-                      {list.priority}
-                    </span>
-                  </div>
-                  <div className={myListStyles.listCardMetaItem}>
-                    <span className={myListStyles.listCardMetaLabel}>
-                      Total Lead:
-                    </span>
-                    <span className={myListStyles.listCardMetaValue}>
-                      {list.totalLeads}
-                    </span>
-                  </div>
-                  <div className={myListStyles.listCardMetaItem}>
-                    <span className={myListStyles.listCardMetaLabel}>
-                      Assigned Diallers
-                    </span>
-                    <span className={myListStyles.listCardMetaValue}>
-                      {list.assignedDiallers}
-                    </span>
-                  </div>
+              ))}
+              {isFetchingNextPage && (
+                <div className="flex justify-center py-2">
+                  <Loader2Icon className="size-5 animate-spin text-gray-400" />
                 </div>
-              </div>
-            ))}
+              )}
+            </InfiniteScroll>
           </div>
         </div>
 
@@ -202,7 +276,7 @@ const MyListComponent = () => {
         <div className={myListStyles.tablePanel}>
           <div className={myListStyles.toolbar}>
             <TextInput
-              setValue={setLeadSearch}
+              setValue={(v) => { setLeadSearch(v); setLeadsPage(1); }}
               value={leadSearch}
               startIcon={<SearchIcon className="size-5 text-gray-500" />}
               placeholder="Search..."
@@ -211,7 +285,7 @@ const MyListComponent = () => {
             <div className={myListStyles.toolbarRight}>
               <Select
                 value={statusFilter}
-                onValueChange={(v) => setStatusFilter(v ?? "All Status")}
+                onValueChange={(v) => { setStatusFilter(v ?? "All Status"); setLeadsPage(1); }}
               >
                 <SelectTrigger className="h-9 text-sm text-gray-800 border-zinc-200">
                   <SelectValue />
@@ -234,91 +308,93 @@ const MyListComponent = () => {
             </div>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
-                <TableHead className={myListStyles.tableHead}>Name</TableHead>
-                <TableHead className={myListStyles.tableHead}>
-                  Lead Status
-                </TableHead>
-                <TableHead className={myListStyles.tableHead}>
-                  Assigned Rep
-                </TableHead>
-                <TableHead className={myListStyles.tableHead}>
-                  Last Disposition
-                </TableHead>
-                <TableHead className={myListStyles.tableHead}>
-                  Attempt
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredLeads.map((lead) => (
-                <TableRow key={lead.id} className={myListStyles.row}>
-                  <TableCell className="pl-4 py-3.5">
-                    <div className="text-sm font-medium text-gray-800 leading-5">
-                      {lead.name}
-                    </div>
-                    <div className="text-sm text-gray-500 leading-5">
-                      {lead.phone}
-                    </div>
-                  </TableCell>
-                  <TableCell className={myListStyles.cell}>
-                    <span
-                      className={cn(
-                        "px-2 py-1 rounded-lg text-xs font-medium leading-4 tracking-tight",
-                        leadStatusStyle[lead.leadStatus]
-                      )}
-                    >
-                      {lead.leadStatus}
-                    </span>
-                  </TableCell>
-                  <TableCell className={myListStyles.cell}>
-                    {lead.assignedRep ?? "-"}
-                  </TableCell>
-                  <TableCell className={myListStyles.cell}>
-                    {lead.lastDisposition ? (
-                      <>
-                        <div className="text-sm font-medium text-gray-800 leading-5">
-                          {lead.lastDisposition}
-                        </div>
-                        <div className="text-sm text-gray-500 leading-5">
-                          {lead.lastDispositionDate}
-                        </div>
-                      </>
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
-                  <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
-                    {lead.attempt}
-                  </TableCell>
+          {leadsLoading ? (
+            <div className="flex flex-1 items-center justify-center py-20">
+              <Loader2Icon className="size-8 animate-spin text-gray-400" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
+                  <TableHead className={myListStyles.tableHead}>Name</TableHead>
+                  <TableHead className={myListStyles.tableHead}>Lead Status</TableHead>
+                  <TableHead className={myListStyles.tableHead}>Assigned Rep</TableHead>
+                  <TableHead className={myListStyles.tableHead}>Last Disposition</TableHead>
+                  <TableHead className={myListStyles.tableHead}>Attempt</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {leads.map((lead) => (
+                  <TableRow key={lead.id} className={myListStyles.row}>
+                    <TableCell className="pl-4 py-3.5">
+                      <div className="text-sm font-medium text-gray-800 leading-5">
+                        {lead.first_name} {lead.last_name}
+                      </div>
+                      <div className="text-sm text-gray-500 leading-5">{lead.phone}</div>
+                    </TableCell>
+                    <TableCell className={myListStyles.cell}>
+                      {lead.activity_status ? (
+                        <span
+                          className={cn(
+                            "px-2 py-1 rounded-lg text-xs font-medium leading-4 tracking-tight",
+                            leadStatusStyle[lead.activity_status as LeadStatus]
+                          )}
+                        >
+                          {lead.activity_status}
+                        </span>
+                      ) : "-"}
+                    </TableCell>
+                    <TableCell className={myListStyles.cell}>
+                      {lead.assigned_rep
+                        ? `${lead.assigned_rep.first_name ?? ""} ${lead.assigned_rep.last_name ?? ""}`.trim() || "-"
+                        : "-"}
+                    </TableCell>
+                    <TableCell className={myListStyles.cell}>
+                      {lead.last_disposition ? (
+                        <div className="text-sm font-medium text-gray-800 leading-5">
+                          {lead.last_disposition}
+                        </div>
+                      ) : "-"}
+                    </TableCell>
+                    <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
+                      {lead.attempts ?? lead.attempt ?? 0}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
 
           <div className={myListStyles.pagination}>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 leading-5">
-                Rows per page:
-              </span>
-              <button
-                type="button"
-                className="flex items-center gap-2 text-xs text-gray-800 leading-5"
-              >
-                10
+              <span className="text-xs text-gray-500 leading-5">Rows per page:</span>
+              <span className="flex items-center gap-2 text-xs text-gray-800 leading-5">
+                {LEADS_LIMIT}
                 <ChevronDownIcon className="size-4 text-gray-500" />
-              </button>
+              </span>
             </div>
-            <span className="text-xs text-gray-800 leading-5">
-              1-{filteredLeads.length} of {selectedList.leads.length}
-            </span>
+            {leadsMeta && (
+              <span className="text-xs text-gray-800 leading-5">
+                {(leadsPage - 1) * LEADS_LIMIT + 1}-{Math.min(leadsPage * LEADS_LIMIT, leadsMeta.total)} of {leadsMeta.total}
+              </span>
+            )}
             <div className="flex items-start">
-              <Button variant="ghost" size="icon" className="p-2 rounded-lg">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="p-2 rounded-lg"
+                disabled={leadsPage <= 1}
+                onClick={() => setLeadsPage((p) => p - 1)}
+              >
                 <ChevronLeftIcon className="size-6 text-gray-500" />
               </Button>
-              <Button variant="ghost" size="icon" className="p-2 rounded-lg">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="p-2 rounded-lg"
+                disabled={!leadsMeta?.hasNextPage}
+                onClick={() => setLeadsPage((p) => p + 1)}
+              >
                 <ChevronRightIcon className="size-6 text-gray-500" />
               </Button>
             </div>
@@ -329,22 +405,20 @@ const MyListComponent = () => {
       <FocusModeDialog
         open={focusModeDialogOpen}
         onOpenChange={setFocusModeDialogOpen}
-        onConfirm={() => setFocusMode(true)}
+        onConfirm={handleFocusMode}
       />
 
       <ResumeAllListsDialog
         open={resumeAllDialogOpen}
         onOpenChange={setResumeAllDialogOpen}
-        onConfirm={() => setFocusMode(false)}
+        onConfirm={handleResumeAll}
       />
 
       <ActivateListDialog
         open={activateListDialog.open}
-        onOpenChange={(open) =>
-          setActivateListDialog((prev) => ({ ...prev, open }))
-        }
+        onOpenChange={(open) => setActivateListDialog((prev) => ({ ...prev, open }))}
         listName={activateListDialog.list?.name ?? ""}
-        onConfirm={() => {}}
+        onConfirm={handleActivateConfirm}
       />
     </>
   );

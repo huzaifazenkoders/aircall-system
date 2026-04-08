@@ -191,3 +191,18 @@ export const useAddListsToUser = () =>
       return res.data as AddListsToUserRes;
     }
   });
+
+// ─── Toggle Availability ────────────────────────────────────────────────────────────
+
+interface ToggleAvailabilityRes {
+  data: Me;
+  message: string;
+}
+
+export const useToggleAvailability = () =>
+  useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.patch("/users/toggle-availability");
+      return res.data as ToggleAvailabilityRes;
+    }
+  });

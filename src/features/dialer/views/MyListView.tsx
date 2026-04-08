@@ -2,11 +2,13 @@
 
 import MyListComponent from "@/features/dialer/components/MyListComponent";
 import MyListEmptyComponent from "@/features/dialer/components/MyListEmptyComponent";
-import { myLists } from "@/features/dialer/data/dialerData";
 import { dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import { useGetMyLists } from "@/features/list/services/listService";
+import { Loader2Icon } from "lucide-react";
 
 const MyListView = () => {
-  const hasLists = myLists.length > 0;
+  const { data, isPending } = useGetMyLists({ limit: 1 });
+  const hasLists = (data?.pages?.[0]?.data?.meta?.total ?? 0) > 0;
 
   return (
     <>
@@ -15,7 +17,15 @@ const MyListView = () => {
         <div className="opacity-0 w-36 h-11" />
       </div>
 
-      {hasLists ? <MyListComponent /> : <MyListEmptyComponent />}
+      {isPending ? (
+        <div className="flex flex-1 items-center justify-center py-20">
+          <Loader2Icon className="size-8 animate-spin text-gray-400" />
+        </div>
+      ) : hasLists ? (
+        <MyListComponent />
+      ) : (
+        <MyListEmptyComponent />
+      )}
     </>
   );
 };

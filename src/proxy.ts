@@ -3,6 +3,10 @@ import type { NextRequest } from "next/server";
 import type { AuthUser } from "@/features/auth/types/authTypes";
 
 type UserRole = AuthUser["role"];
+type TokenPayload = {
+  role?: UserRole;
+  exp?: number;
+};
 
 const ADMIN_HOME_PATH = "/list";
 const ADMIN_AUTH_PREFIX = "/auth";
@@ -10,7 +14,7 @@ const DIALER_HOME_PATH = "/dialer/callback-schedules";
 const DIALER_AUTH_PREFIX = "/dialer-auth";
 const DIALER_APP_PREFIX = "/dialer";
 
-function getRoleFromToken(token?: string): UserRole | null {
+function getTokenPayload(token?: string): TokenPayload | null {
   if (!token) return null;
 
   const [, payload] = token.split(".");
@@ -23,9 +27,9 @@ function getRoleFromToken(token?: string): UserRole | null {
       "="
     );
     const decodedPayload = atob(paddedPayload);
-    const parsedPayload = JSON.parse(decodedPayload) as { role?: UserRole };
+    const parsedPayload = JSON.parse(decodedPayload) as TokenPayload;
 
-    return parsedPayload.role ?? null;
+    return parsedPayload;
   } catch {
     return null;
   }
@@ -35,10 +39,20 @@ function redirect(request: NextRequest, pathname: string) {
   return NextResponse.redirect(new URL(pathname, request.url));
 }
 
+function clearTokenAndRedirect(request: NextRequest, pathname: string) {
+  const response = redirect(request, pathname);
+  response.cookies.delete("token");
+  return response;
+}
+
 // This function can be marked `async` if using `await` inside
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
-  const role = getRoleFromToken(token);
+  const tokenPayload = getTokenPayload(token);
+  const role = tokenPayload?.role ?? null;
+  const isTokenExpired =
+    typeof tokenPayload?.exp === "number" &&
+    tokenPayload.exp <= Math.floor(Date.now() / 1000);
   const pathname = request.nextUrl.pathname;
   const isAdminAuthRoute = pathname.startsWith(ADMIN_AUTH_PREFIX);
   const isDialerAuthRoute = pathname.startsWith(DIALER_AUTH_PREFIX);
@@ -49,6 +63,10 @@ export function proxy(request: NextRequest) {
     /\.(png|jpg|jpeg|gif|svg|webp|ico|css|js|woff|woff2|ttf|eot|json|xml|txt|map)$/i;
   if (staticFilePattern.test(pathname) || pathname.startsWith("/_next/")) {
     return NextResponse.next();
+  }
+
+  if (token && isTokenExpired) {
+    return clearTokenAndRedirect(request, `${ADMIN_AUTH_PREFIX}/sign-in`);
   }
 
   if (!token) {
@@ -70,18 +88,18 @@ export function proxy(request: NextRequest) {
   if (pathname === "/") {
     return redirect(
       request,
-      role === "dialer" ? DIALER_HOME_PATH : ADMIN_HOME_PATH
+      role === "sales_person" ? DIALER_HOME_PATH : ADMIN_HOME_PATH
     );
   }
 
   if (isAdminAuthRoute || isDialerAuthRoute) {
     return redirect(
       request,
-      role === "dialer" ? DIALER_HOME_PATH : ADMIN_HOME_PATH
+      role === "sales_person" ? DIALER_HOME_PATH : ADMIN_HOME_PATH
     );
   }
 
-  if (role === "dialer" && !isDialerAppRoute) {
+  if (role === "sales_person" && !isDialerAppRoute) {
     return redirect(request, DIALER_HOME_PATH);
   }
 

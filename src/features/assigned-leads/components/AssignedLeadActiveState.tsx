@@ -12,160 +12,238 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { assignedLeadStyles as s } from "@/features/assigned-leads/styles/assignedLeadStyles";
-import AssignedLeadCallBar from "@/features/assigned-leads/components/AssignedLeadCallBar";
 import {
   AssignedLeadInfo,
   AssignedLeadSectionTitle
 } from "@/features/assigned-leads/components/AssignedLeadInfo";
 import AssignedLeadTimelineItem from "@/features/assigned-leads/components/AssignedLeadTimelineItem";
 import { useAircall } from "@/features/aircall/hooks/useAirCall";
+import CallOutcomeDialog from "@/features/assigned-leads/components/CallOutcomeDialog";
+import { CurrentLead } from "@/features/assigned-leads/types/assignedLeadTypes";
+import { useCreateCallLog } from "@/features/assigned-leads/services/assignedLeadService";
+import { assignedLeadKeys } from "@/features/assigned-leads/query-keys";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
-const AssignedLeadActiveState = () => {
-  useAircall({
+const DISPOSITION_ID_MAP: Record<string, string> = {
+  "No Answer": "no_answer",
+  "Connected / Positive": "connected",
+  "Not Interested": "not_interested",
+  "Callback Scheduled": "callback_scheduled",
+  "Voicemail Left": "voicemail_left",
+  "Wrong Number": "wrong_number",
+  "Do Not Call": "do_not_call",
+  "Ban Contact": "ban_contact",
+};
+
+const CALL_STATUS_MAP: Record<string, "completed" | "failed" | "no_answer"> = {
+  "No Answer": "no_answer",
+  "Connected / Positive": "completed",
+  "Not Interested": "completed",
+  "Callback Scheduled": "completed",
+  "Voicemail Left": "no_answer",
+  "Wrong Number": "failed",
+  "Do Not Call": "failed",
+  "Ban Contact": "failed",
+};
+
+const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
+  const queryClient = useQueryClient();
+  const [callOutcomeOpen, setCallOutcomeOpen] = React.useState(false);
+
+  const { mutate: createCallLog, isPending } = useCreateCallLog();
+
+  const { dial, isReady } = useAircall({
     containerId: "#phone-container",
     onCallEnded: () => {
-      console.log("Call completed!");
-
-      // YOUR FUTURE LOGIC
-    }
+      setCallOutcomeOpen(true);
+    },
   });
+
+  // Dial as soon as aircall is ready
+  React.useEffect(() => {
+    if (isReady && lead.lead.phone) {
+      dial(lead.lead.phone);
+    }
+  }, [isReady]);
+
+  const handleOutcomeSubmit = ({
+    disposition,
+    personalNote,
+  }: {
+    disposition: string;
+    callbackDate: Date | null;
+    callbackTime: string;
+    personalNote: string;
+    keapNoteTemplate: string;
+    keapTag: string;
+  }) => {
+    createCallLog(
+      {
+        payload: {
+          lead_id: lead.lead_id,
+          list_id: lead.list_id,
+          disposition_id: DISPOSITION_ID_MAP[disposition] ?? disposition,
+          notes: personalNote.trim(),
+          attempt_number: lead.attempt_number,
+          call_status: CALL_STATUS_MAP[disposition] ?? "completed",
+        },
+      },
+      {
+        onSuccess: () => {
+          setCallOutcomeOpen(false);
+          toast.success("Call Logged Successfully", {
+            // react-hot-toast supports a description via the icon/style options;
+            // we pass it as a two-line message using \n
+            id: "call-logged",
+          });
+          // Show description as a follow-up info toast
+          toast("The call outcome has been recorded. A new contact will be assigned automatically.", {
+            id: "call-logged-desc",
+            icon: "ℹ️",
+          });
+          queryClient.invalidateQueries({ queryKey: assignedLeadKeys.currentLead });
+        },
+        onError: handleMutationError,
+      }
+    );
+  };
+
+  const leadName = `${lead.lead.first_name} ${lead.lead.last_name}`;
+
   return (
-    <div className={s.page}>
-      <div className={s.shell}>
-        <div className={s.mainColumn}>
-          {/* <AssignedLeadCallBar /> */}
+    <>
+      <div className={s.page}>
+        <div className={s.shell}>
+          <div className={s.mainColumn}>
+            <section className={s.card}>
+              <header className={s.cardHeader}>
+                <h1 className={s.cardTitle}>Lead Information</h1>
+                {lead.lead.keap_contact_url ? (
+                  <a
+                    href={lead.lead.keap_contact_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={s.cardLink}
+                  >
+                    <ExternalLinkIcon className="size-4" aria-hidden="true" />
+                    Click to Open Contact in Keap
+                  </a>
+                ) : (
+                  <button type="button" className={s.cardLink} disabled>
+                    <ExternalLinkIcon className="size-4" aria-hidden="true" />
+                    Click to Open Contact in Keap
+                  </button>
+                )}
+              </header>
 
-          <section className={s.card}>
-            <header className={s.cardHeader}>
-              <h1 className={s.cardTitle}>Lead Information</h1>
-              <button type="button" className={s.cardLink}>
-                <ExternalLinkIcon className="size-4" aria-hidden="true" />
-                Click to Open Contact in Keap
-              </button>
-            </header>
-
-            <div className={s.contentGrid}>
-              <div className="min-w-0">
-                <AssignedLeadSectionTitle>
-                  BASIC INFORMATION
-                </AssignedLeadSectionTitle>
-                <div className={s.infoGrid3}>
-                  <AssignedLeadInfo label="Email" value="sarah@gmail.com" />
-                  <AssignedLeadInfo label="Phone" value="+61 412 778 992" />
-                  <AssignedLeadInfo
-                    label="Send Timezone"
-                    value="Australia/Sydney"
-                  />
-
-                  <AssignedLeadInfo
-                    label="Event Name"
-                    value="Sydney Masterclass"
-                  />
-                  <AssignedLeadInfo label="Event Date" value="March 15, 2025" />
-                  <AssignedLeadInfo label="Location" value="Yes" />
-
-                  <AssignedLeadInfo label="Referral" value="Yes" />
-                  <AssignedLeadInfo
-                    label="Referred By"
-                    value="Michael Stevens"
-                  />
-                </div>
-
-                <div className={s.divider} />
-
-                <AssignedLeadSectionTitle>LEAD STATUS</AssignedLeadSectionTitle>
-                <div className={s.infoGrid2}>
-                  <div>
-                    <div className={s.infoLabel}>Current Status</div>
-                    <div className={s.statusBadge}>Cooldown</div>
+              <div className={s.contentGrid}>
+                <div className="min-w-0">
+                  <AssignedLeadSectionTitle>BASIC INFORMATION</AssignedLeadSectionTitle>
+                  <div className={s.infoGrid3}>
+                    <AssignedLeadInfo label="Email" value={lead.lead.email} />
+                    <AssignedLeadInfo label="Phone" value={lead.lead.phone} />
+                    <AssignedLeadInfo label="Send Timezone" value={lead.lead.timezone} />
+                    <AssignedLeadInfo label="Event Name" value={lead.lead.event_name} />
+                    <AssignedLeadInfo label="Event Date" value={lead.lead.event_date} />
+                    <AssignedLeadInfo label="Location" value={lead.lead.event_location} />
+                    <AssignedLeadInfo label="Referral" value={lead.lead.is_referral ? "Yes" : "No"} />
+                    <AssignedLeadInfo label="Referred By" value={lead.lead.referred_by || "—"} />
                   </div>
-                  <AssignedLeadInfo
-                    label="Assigned Representation"
-                    value="James Carter"
-                  />
-                  <AssignedLeadInfo label="Timezone" value="Australia/Sydney" />
-                  <AssignedLeadInfo label="Call Type" value="Cold Lead" />
-                </div>
 
-                <div className={s.purchaseCard}>
-                  <div className={s.purchaseHeader}>
-                    <div className={s.purchaseTitle}>Purchase History</div>
-                    <div className={s.purchaseTotal}>
-                      TOTAL PURCHASE
-                      <span className={s.purchaseTotalAmount}>$ 2,300</span>
+                  <div className={s.divider} />
+
+                  <AssignedLeadSectionTitle>LEAD STATUS</AssignedLeadSectionTitle>
+                  <div className={s.infoGrid2}>
+                    <div>
+                      <div className={s.infoLabel}>Current Status</div>
+                      <div className={s.statusBadge}>{lead.status}</div>
                     </div>
+                    <AssignedLeadInfo
+                      label="Assigned Representation"
+                      value={
+                        lead.assigned_rep
+                          ? `${lead.assigned_rep.first_name} ${lead.assigned_rep.last_name}`
+                          : "—"
+                      }
+                    />
+                    <AssignedLeadInfo label="Timezone" value={lead.lead.timezone} />
+                    <AssignedLeadInfo label="Call Type" value={lead.list.call_type} />
                   </div>
 
-                  <div className="w-full overflow-x-auto bg-card">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="min-w-52">Product</TableHead>
-                          <TableHead className="w-40">Amount</TableHead>
-                          <TableHead className="w-44">Purchase Date</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {Array.from({ length: 7 }).map((_, i) => (
-                          <TableRow key={i} className="h-14">
-                            <TableCell className="font-medium text-foreground">
-                              VIP Ticket
-                            </TableCell>
-                            <TableCell className="font-semibold text-foreground">
-                              $997
-                            </TableCell>
-                            <TableCell className="text-foreground">
-                              06/12/26
-                            </TableCell>
+                  <div className={s.purchaseCard}>
+                    <div className={s.purchaseHeader}>
+                      <div className={s.purchaseTitle}>Purchase History</div>
+                      <div className={s.purchaseTotal}>
+                        TOTAL PURCHASE
+                        <span className={s.purchaseTotalAmount}>
+                          {lead.total_purchase ?? "—"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="w-full overflow-x-auto bg-card">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="min-w-52">Product</TableHead>
+                            <TableHead className="w-40">Amount</TableHead>
+                            <TableHead className="w-44">Purchase Date</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {(lead.purchases ?? []).map((p) => (
+                            <TableRow key={p.id} className="h-14">
+                              <TableCell className="font-medium text-foreground">{p.product}</TableCell>
+                              <TableCell className="font-semibold text-foreground">{p.amount}</TableCell>
+                              <TableCell className="text-foreground">{p.purchase_date}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="min-w-0">
-                <AssignedLeadSectionTitle>
-                  CALL HISTORY TIMELINE
-                </AssignedLeadSectionTitle>
-                <div className={s.timelineWrap}>
-                  <div className={s.timelineList}>
-                    <div className={s.timelineLine} aria-hidden="true" />
-                    <div className={s.timelineItems}>
-                      <AssignedLeadTimelineItem
-                        title="No Answer"
-                        subtitle="Olivia Smith on Feb 20, 2025 at 10:12 AM"
-                      />
-                      <AssignedLeadTimelineItem
-                        title="No Answer"
-                        subtitle="Olivia Smith on Feb 20, 2025 at 10:12 AM"
-                      />
-                      <AssignedLeadTimelineItem
-                        title="No Answer"
-                        subtitle="Olivia Smith on Feb 20, 2025 at 10:12 AM"
-                      />
-                      <AssignedLeadTimelineItem
-                        title="Voice Mail"
-                        subtitle="Olivia Smith on Feb 20, 2025 at 10:12 AM"
-                      />
+                <div className="min-w-0">
+                  <AssignedLeadSectionTitle>CALL HISTORY TIMELINE</AssignedLeadSectionTitle>
+                  <div className={s.timelineWrap}>
+                    <div className={s.timelineList}>
+                      <div className={s.timelineLine} aria-hidden="true" />
+                      <div className={s.timelineItems}>
+                        {(lead.timeline ?? []).map((item) => (
+                          <AssignedLeadTimelineItem
+                            key={item.id}
+                            title={item.title}
+                            subtitle={item.subtitle}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-        </div>
+            </section>
+          </div>
 
-        <aside className={s.sideColumn}>
-          <section className={s.dialerPanel} aria-label="Aircall dialer">
-            <div className={s.dialerFrame}>
-              <div id="phone-container" />
-            </div>
-          </section>
-        </aside>
+          <aside className={s.sideColumn}>
+            <section className={s.dialerPanel} aria-label="Aircall dialer">
+              <div className={s.dialerFrame}>
+                <div id="phone-container" />
+              </div>
+            </section>
+          </aside>
+        </div>
       </div>
-    </div>
+
+      <CallOutcomeDialog
+        open={callOutcomeOpen}
+        onOpenChange={setCallOutcomeOpen}
+        isPending={isPending}
+        onSubmit={handleOutcomeSubmit}
+      />
+    </>
   );
 };
 
