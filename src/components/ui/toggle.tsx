@@ -1,17 +1,16 @@
 import { cn } from "@/lib/utils";
 
 const Toggle = ({ active }: { active: boolean }) => (
-  <div className="flex items-center">
-    <div
+  <div
+    className={cn(
+      "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out",
+      active ? "bg-Brand-700" : "bg-gray-300"
+    )}
+  >
+    <span
       className={cn(
-        "w-10 h-4 rounded-[120px]",
-        active ? "bg-Brand-300" : "bg-gray-100"
-      )}
-    />
-    <div
-      className={cn(
-        "size-6 rounded-full shadow-[0px_1.2px_6px_0px_rgba(0,0,0,0.08)] -ml-3",
-        active ? "bg-Brand-700" : "bg-gray-400"
+        "pointer-events-none inline-block size-5 rounded-full bg-white shadow-[0px_1px_4px_rgba(0,0,0,0.15)] transition-transform duration-200 ease-in-out",
+        active ? "translate-x-5" : "translate-x-0"
       )}
     />
   </div>

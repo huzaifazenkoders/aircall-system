@@ -26,17 +26,8 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import DateSelector from "@/components/custom/date-selector.component";
-
-const DISPOSITIONS = [
-  "No Answer",
-  "Connected / Positive",
-  "Not Interested",
-  "Callback Scheduled",
-  "Voicemail Left",
-  "Wrong Number",
-  "Do Not Call",
-  "Ban Contact"
-] as const;
+import { useGetWorkflowDispositions } from "@/features/assigned-leads/services/assignedLeadService";
+import { Loader2Icon } from "lucide-react";
 
 const KEAP_NOTE_TEMPLATES = [
   "Follow-up template",
@@ -55,6 +46,7 @@ type CallOutcomeDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   isPending?: boolean;
+  workflowId: string;
   onSubmit?: (data: {
     disposition: string;
     callbackDate: Date | null;
@@ -69,6 +61,7 @@ const CallOutcomeDialog = ({
   open,
   onOpenChange,
   isPending,
+  workflowId,
   onSubmit
 }: CallOutcomeDialogProps) => {
   const [disposition, setDisposition] = React.useState<string | null>(null);
@@ -79,6 +72,12 @@ const CallOutcomeDialog = ({
     null
   );
   const [keapTag, setKeapTag] = React.useState<string | null>(null);
+
+  const { data: dispositionsData, isPending: isLoadingDispositions } =
+    useGetWorkflowDispositions(workflowId);
+  const dispositions = dispositionsData?.data ?? [];
+
+  console.log("dispositions", dispositions);
 
   const isCallback = disposition === "Callback Scheduled";
 
@@ -120,15 +119,21 @@ const CallOutcomeDialog = ({
                 <SelectValue placeholder="Select disposition" />
               </SelectTrigger>
               <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
-                {DISPOSITIONS.map((d) => (
-                  <SelectItem
-                    key={d}
-                    value={d}
-                    className="px-3 py-2 text-sm text-text-primary"
-                  >
-                    {d}
-                  </SelectItem>
-                ))}
+                {isLoadingDispositions ? (
+                  <div className="flex items-center justify-center py-4">
+                    <Loader2Icon className="size-4 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  dispositions.map((d) => (
+                    <SelectItem
+                      key={d.id}
+                      value={d.name}
+                      className="px-3 py-2 text-sm text-text-primary"
+                    >
+                      {d.name}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
             {isCallback && (

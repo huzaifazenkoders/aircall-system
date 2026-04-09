@@ -26,457 +26,6 @@ interface BaseSelectorProps {
   triggerClassName?: string;
 }
 
-interface CalendarPanelProps {
-  rangeStart?: Date | null;
-  rangeEnd?: Date | null;
-  onSelectDate: (date: Date) => void;
-  disabledDates?: Date[];
-  minDate?: Date;
-  maxDate?: Date;
-  initialViewDate?: Date | null;
-}
-
-const MainBackground = "bg-primary/10";
-const SecondaryBackground = "bg-background-secondary";
-const BackgroundColor = "bg-background";
-
-const TextColorMain = "text-text-primary";
-const TextColorSecondary = "text-text-secondary";
-const TextColorDisabled = "text-gray-400";
-
-const MainBorder = "border-border-primary";
-
-const selectorTriggerClassName = cn(
-  "bg-background-secondary px-3 py-2 pr-10 relative",
-  "text-base",
-  "rounded-lg whitespace-nowrap cursor-pointer",
-  "flex items-center justify-between gap-2",
-  "h-11 border border-border-primary"
-);
-
-const selectorContentClassName = cn(
-  "w-fit rounded-lg border p-4 shadow-md",
-  BackgroundColor,
-  MainBorder
-);
-
-const SelectorButton = React.forwardRef<
-  HTMLButtonElement,
-  {
-    onClick?: VoidFunction;
-    children?: React.ReactNode;
-    className?: string;
-    disabled?: boolean;
-  }
->(({ onClick, children, className, disabled }, ref) => (
-  <button
-    ref={ref}
-    type="button"
-    onClick={() => !disabled && onClick?.()}
-    disabled={disabled}
-    className={cn(
-      "flex h-9 min-w-9 items-center justify-center rounded-md p-3 text-sm whitespace-nowrap",
-      "cursor-pointer",
-      !disabled && `hover:${SecondaryBackground} hover:${TextColorMain}`,
-      disabled && "cursor-not-allowed",
-      className
-    )}
-  >
-    {children}
-  </button>
-));
-
-SelectorButton.displayName = "SelectorButton";
-
-const checkIfDateDisabled = (
-  date: Date,
-  disabledDates?: Date[],
-  minDate?: Date,
-  maxDate?: Date
-) => {
-  if (
-    disabledDates?.some((disabledDate) =>
-      moment(date).isSame(disabledDate, "day")
-    )
-  ) {
-    return true;
-  }
-
-  if (minDate && moment(date).isBefore(moment(minDate), "day")) {
-    return true;
-  }
-
-  if (maxDate && moment(date).isAfter(moment(maxDate), "day")) {
-    return true;
-  }
-
-  return false;
-};
-
-const getDateCellClasses = ({
-  date,
-  viewDate,
-  rangeStart,
-  rangeEnd,
-  disabledDates,
-  minDate,
-  maxDate
-}: {
-  date: Date;
-  viewDate: Date;
-  rangeStart?: Date | null;
-  rangeEnd?: Date | null;
-  disabledDates?: Date[];
-  minDate?: Date;
-  maxDate?: Date;
-}) => {
-  const dateDisabled = checkIfDateDisabled(
-    date,
-    disabledDates,
-    minDate,
-    maxDate
-  );
-  const isCurrentMonth = moment(date).isSame(viewDate, "month");
-  const today = moment(date).isSame(moment(), "day");
-  const isRangeStart = rangeStart
-    ? moment(date).isSame(rangeStart, "day")
-    : false;
-  const isRangeEnd = rangeEnd ? moment(date).isSame(rangeEnd, "day") : false;
-  const inRange =
-    rangeStart &&
-    rangeEnd &&
-    moment(date).isBetween(rangeStart, rangeEnd, "day", "[]");
-
-  if (dateDisabled) {
-    return cn("text-sm font-medium rounded-full", TextColorDisabled);
-  }
-
-  if (isRangeStart || isRangeEnd) {
-    return cn(
-      "text-sm font-medium rounded-full font-bold text-safed",
-      MainBackground,
-      `hover:${MainBackground}`
-    );
-  }
-
-  if (inRange) {
-    return cn(
-      "text-sm font-medium rounded-full bg-primary/12 text-primary",
-      "hover:bg-primary/12"
-    );
-  }
-
-  if (today) {
-    return cn(
-      "text-sm font-medium rounded-full font-bold",
-      SecondaryBackground,
-      TextColorMain
-    );
-  }
-
-  return cn(
-    "text-sm font-medium rounded-full",
-    isCurrentMonth ? TextColorMain : TextColorSecondary
-  );
-};
-
-const DateGrid = ({
-  viewDate,
-  rangeStart,
-  rangeEnd,
-  onSelectDate,
-  disabledDates,
-  minDate,
-  maxDate
-}: CalendarPanelProps & { viewDate: Date }) => {
-  const start = moment(viewDate).startOf("month").startOf("week");
-  const end = moment(viewDate).endOf("month").endOf("week");
-
-  const days: Date[] = [];
-  const current = moment(start);
-
-  while (current.isSameOrBefore(end)) {
-    days.push(current.toDate());
-    current.add(1, "day");
-  }
-
-  return (
-    <div className="grid grid-cols-7 gap-1">
-      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((dayLabel) => (
-        <div
-          key={dayLabel}
-          className={cn("text-center text-sm font-medium", TextColorSecondary)}
-        >
-          {dayLabel}
-        </div>
-      ))}
-
-      {days.map((day) => {
-        const dateDisabled = checkIfDateDisabled(
-          day,
-          disabledDates,
-          minDate,
-          maxDate
-        );
-
-        return (
-          <SelectorButton
-            key={day.toISOString()}
-            disabled={dateDisabled}
-            onClick={() => onSelectDate(day)}
-            className={getDateCellClasses({
-              date: day,
-              viewDate,
-              rangeStart,
-              rangeEnd,
-              disabledDates,
-              minDate,
-              maxDate
-            })}
-          >
-            {moment(day).date()}
-          </SelectorButton>
-        );
-      })}
-    </div>
-  );
-};
-
-const MonthGrid = ({
-  viewDate,
-  onMonthSelect
-}: {
-  viewDate: Date;
-  onMonthSelect: (month: number) => void;
-}) => {
-  const months = Array.from({ length: 12 }, (_, index) => ({
-    index,
-    label: moment(viewDate).month(index).format("MMM"),
-    isCurrentMonth: moment().isSame(moment(viewDate).month(index), "month")
-  }));
-
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {months.map((month) => (
-        <SelectorButton
-          key={month.index}
-          onClick={() => onMonthSelect(month.index)}
-          className={cn(
-            "font-medium",
-            month.isCurrentMonth && `font-bold ${SecondaryBackground}`
-          )}
-        >
-          {month.label}
-        </SelectorButton>
-      ))}
-    </div>
-  );
-};
-
-const YearGrid = ({
-  viewDate,
-  onYearSelect
-}: {
-  viewDate: Date;
-  onYearSelect: (year: number) => void;
-}) => {
-  const startYear = Math.floor(moment(viewDate).year() / 10) * 10 - 1;
-  const years = Array.from({ length: 12 }, (_, index) => startYear + index);
-
-  return (
-    <div className="grid grid-cols-3 gap-2">
-      {years.map((year) => (
-        <SelectorButton
-          key={year}
-          onClick={() => onYearSelect(year)}
-          className={cn(
-            "font-medium",
-            year === moment().year() && `font-bold ${SecondaryBackground}`
-          )}
-        >
-          {year}
-        </SelectorButton>
-      ))}
-    </div>
-  );
-};
-
-const CalendarPanel = ({
-  rangeStart,
-  rangeEnd,
-  onSelectDate,
-  disabledDates,
-  minDate,
-  maxDate,
-  initialViewDate
-}: CalendarPanelProps) => {
-  const [currentView, setCurrentView] = React.useState<ViewType>("date");
-  const [viewDate, setViewDate] = React.useState<Date>(
-    initialViewDate ?? rangeStart ?? new Date()
-  );
-
-  const goNext = () => {
-    if (currentView === "date") {
-      setViewDate(moment(viewDate).add(1, "month").toDate());
-      return;
-    }
-
-    if (currentView === "month") {
-      setViewDate(moment(viewDate).add(1, "year").toDate());
-      return;
-    }
-
-    setViewDate(moment(viewDate).add(10, "year").toDate());
-  };
-
-  const goPrev = () => {
-    if (currentView === "date") {
-      setViewDate(moment(viewDate).subtract(1, "month").toDate());
-      return;
-    }
-
-    if (currentView === "month") {
-      setViewDate(moment(viewDate).subtract(1, "year").toDate());
-      return;
-    }
-
-    setViewDate(moment(viewDate).subtract(10, "year").toDate());
-  };
-
-  return (
-    <div>
-      <div className="mb-5 flex items-center justify-between">
-        <button
-          type="button"
-          className={cn(
-            TextColorMain,
-            "cursor-pointer font-semibold hover:underline"
-          )}
-          onClick={() => {
-            if (currentView === "date") setCurrentView("month");
-            else if (currentView === "month") setCurrentView("year");
-          }}
-        >
-          {currentView === "date" && moment(viewDate).format("MMMM YYYY")}
-          {currentView === "month" && moment(viewDate).format("YYYY")}
-          {currentView === "year" &&
-            `${moment(viewDate).year() - 4} - ${moment(viewDate).year() + 5}`}
-        </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className={cn(TextColorMain, "cursor-pointer")}
-            onClick={goPrev}
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            type="button"
-            className={cn(TextColorMain, "cursor-pointer")}
-            onClick={goNext}
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
-      </div>
-
-      {currentView === "year" && (
-        <YearGrid
-          viewDate={viewDate}
-          onYearSelect={(year) => {
-            setViewDate(moment(viewDate).year(year).toDate());
-            setCurrentView("month");
-          }}
-        />
-      )}
-
-      {currentView === "month" && (
-        <MonthGrid
-          viewDate={viewDate}
-          onMonthSelect={(month) => {
-            setViewDate(moment(viewDate).month(month).toDate());
-            setCurrentView("date");
-          }}
-        />
-      )}
-
-      {currentView === "date" && (
-        <DateGrid
-          viewDate={viewDate}
-          rangeStart={rangeStart}
-          rangeEnd={rangeEnd}
-          onSelectDate={onSelectDate}
-          disabledDates={disabledDates}
-          minDate={minDate}
-          maxDate={maxDate}
-        />
-      )}
-    </div>
-  );
-};
-
-const formatDateRangeLabel = (
-  value?: DateRangeValue,
-  placeholder = "Select Date Range"
-) => {
-  if (!value?.startDate && !value?.endDate) return placeholder;
-  if (value?.startDate && !value?.endDate) {
-    return `${moment(value.startDate).format("DD MMM YYYY")} - ...`;
-  }
-  if (!value?.startDate || !value?.endDate) return placeholder;
-
-  return `${moment(value.startDate).format("DD MMM YYYY")} - ${moment(
-    value.endDate
-  ).format("DD MMM YYYY")}`;
-};
-
-const formatSingleDateLabel = (
-  date: Date | null | undefined,
-  placeholder: string
-) => (date ? moment(date).format("DD MMM YYYY") : placeholder);
-
-const SelectorContent = ({
-  children,
-  className
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <DropdownMenuContent
-    translate="no"
-    sideOffset={8}
-    className={cn(selectorContentClassName, className)}
-  >
-    {children}
-  </DropdownMenuContent>
-);
-
-const SelectorRoot = ({
-  hideTrigger,
-  open,
-  onOpenChange,
-  triggerClassName,
-  triggerLabel,
-  children
-}: BaseSelectorProps & {
-  triggerLabel: string;
-  children: React.ReactNode;
-}) => (
-  <DropdownMenu open={open} onOpenChange={onOpenChange}>
-    {hideTrigger ? null : (
-      <DropdownMenuTrigger
-        translate="no"
-        className={cn(selectorTriggerClassName, triggerClassName)}
-      >
-        {triggerLabel}
-        <Calendar className="size-5 absolute right-3" />
-      </DropdownMenuTrigger>
-    )}
-    {children}
-  </DropdownMenu>
-);
-
 interface Props extends BaseSelectorProps {
   value?: DateRangeValue;
   setValue?: (value: DateRangeValue) => void;
@@ -485,18 +34,237 @@ interface Props extends BaseSelectorProps {
   maxDate?: Date;
 }
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const isDisabled = (date: Date, disabledDates?: Date[], minDate?: Date, maxDate?: Date) => {
+  if (disabledDates?.some((d) => moment(date).isSame(d, "day"))) return true;
+  if (minDate && moment(date).isBefore(minDate, "day")) return true;
+  if (maxDate && moment(date).isAfter(maxDate, "day")) return true;
+  return false;
+};
+
+const formatLabel = (value?: DateRangeValue, placeholder = "Select Date Range") => {
+  if (!value?.startDate && !value?.endDate) return placeholder;
+  if (value.startDate && !value.endDate)
+    return `${moment(value.startDate).format("DD MMM YYYY")} - ...`;
+  if (!value.startDate || !value.endDate) return placeholder;
+  return `${moment(value.startDate).format("DD MMM YYYY")} – ${moment(value.endDate).format("DD MMM YYYY")}`;
+};
+
+// ─── Day Cell ─────────────────────────────────────────────────────────────────
+
+const DAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+const MonthGrid = ({
+  viewDate,
+  rangeStart,
+  rangeEnd,
+  hoverDate,
+  onSelectDate,
+  onHoverDate,
+  disabledDates,
+  minDate,
+  maxDate
+}: {
+  viewDate: Date;
+  rangeStart: Date | null;
+  rangeEnd: Date | null;
+  hoverDate: Date | null;
+  onSelectDate: (date: Date) => void;
+  onHoverDate: (date: Date | null) => void;
+  disabledDates?: Date[];
+  minDate?: Date;
+  maxDate?: Date;
+}) => {
+  const start = moment(viewDate).startOf("month").startOf("week");
+  const end = moment(viewDate).endOf("month").endOf("week");
+
+  const days: Date[] = [];
+  const cur = moment(start);
+  while (cur.isSameOrBefore(end)) {
+    days.push(cur.toDate());
+    cur.add(1, "day");
+  }
+
+  // Effective end for preview: use hoverDate if no endDate yet
+  const effectiveEnd = rangeEnd ?? (rangeStart && hoverDate && moment(hoverDate).isSameOrAfter(rangeStart, "day") ? hoverDate : null);
+
+  return (
+    <div className="grid grid-cols-7">
+      {DAY_LABELS.map((d) => (
+        <div key={d} className="flex h-9 items-center justify-center text-xs font-medium text-text-secondary">
+          {d}
+        </div>
+      ))}
+
+      {days.map((day) => {
+        const isCurrentMonth = moment(day).isSame(viewDate, "month");
+        const disabled = !isCurrentMonth || isDisabled(day, disabledDates, minDate, maxDate);
+        const isToday = moment(day).isSame(moment(), "day");
+        const isStart = rangeStart ? moment(day).isSame(rangeStart, "day") : false;
+        const isEnd = rangeEnd ? moment(day).isSame(rangeEnd, "day") : false;
+        const isHoverEnd = !rangeEnd && hoverDate ? moment(day).isSame(hoverDate, "day") : false;
+
+        const inConfirmedRange =
+          rangeStart && rangeEnd
+            ? moment(day).isBetween(rangeStart, rangeEnd, "day", "()")
+            : false;
+
+        const inPreviewRange =
+          !rangeEnd && rangeStart && effectiveEnd
+            ? moment(day).isBetween(rangeStart, effectiveEnd, "day", "()")
+            : false;
+
+        const isSelected = isStart || isEnd;
+        const isPreviewEdge = isHoverEnd && !rangeEnd;
+
+        // Square edge classes
+        const squareBase = "relative flex h-9 w-full items-center justify-center text-sm font-medium transition-colors";
+
+        let bgClass = "";
+        let textClass = isCurrentMonth ? "text-text-primary" : "text-transparent select-none pointer-events-none";
+        let innerClass = "z-10 flex h-8 w-8 items-center justify-center rounded-sm";
+
+        if (disabled) {
+          textClass = "text-gray-300 cursor-not-allowed";
+        } else if (isSelected || isPreviewEdge) {
+          bgClass = inConfirmedRange || inPreviewRange ? "bg-primary/10" : "";
+          innerClass = cn(innerClass, "bg-primary text-white font-semibold");
+          textClass = "";
+        } else if (inConfirmedRange) {
+          bgClass = "bg-primary/10";
+          textClass = "text-primary font-medium";
+        } else if (inPreviewRange) {
+          bgClass = "bg-primary/5";
+          textClass = "text-primary/70";
+        } else if (isToday) {
+          innerClass = cn(innerClass, "bg-background-secondary font-bold text-text-primary");
+          textClass = "";
+        }
+
+        // Round only the outer edges of the range
+        const isRangeLeftEdge = isStart || (inConfirmedRange && moment(day).day() === 0);
+        const isRangeRightEdge = isEnd || (inConfirmedRange && moment(day).day() === 6);
+        const isPreviewLeftEdge = isStart || (inPreviewRange && moment(day).day() === 0);
+        const isPreviewRightEdge = isPreviewEdge || (inPreviewRange && moment(day).day() === 6);
+
+        const rangeBgRounded = cn(
+          bgClass && "w-full",
+          bgClass,
+          (isRangeLeftEdge || isPreviewLeftEdge) && bgClass && "rounded-l-sm",
+          (isRangeRightEdge || isPreviewRightEdge) && bgClass && "rounded-r-sm"
+        );
+
+        return (
+          <div
+            key={day.toISOString()}
+            className={cn(squareBase, rangeBgRounded)}
+            onMouseEnter={() => !disabled && onHoverDate(day)}
+            onMouseLeave={() => onHoverDate(null)}
+          >
+            <button
+              type="button"
+              disabled={disabled}
+              onClick={() => onSelectDate(day)}
+              className={cn(
+                innerClass,
+                textClass,
+                !disabled && !isSelected && !isPreviewEdge && "hover:bg-background-secondary hover:text-text-primary",
+                disabled && "cursor-not-allowed"
+              )}
+            >
+              {moment(day).date()}
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ─── Month/Year Pickers ───────────────────────────────────────────────────────
+
+const MonthPicker = ({
+  viewDate,
+  onSelect
+}: {
+  viewDate: Date;
+  onSelect: (month: number) => void;
+}) => (
+  <div className="grid grid-cols-3 gap-2">
+    {Array.from({ length: 12 }, (_, i) => {
+      const isCurrent = moment().isSame(moment(viewDate).month(i), "month");
+      return (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onSelect(i)}
+          className={cn(
+            "rounded-md px-2 py-2 text-sm font-medium text-text-primary hover:bg-background-secondary",
+            isCurrent && "bg-background-secondary font-bold"
+          )}
+        >
+          {moment(viewDate).month(i).format("MMM")}
+        </button>
+      );
+    })}
+  </div>
+);
+
+const YearPicker = ({
+  viewDate,
+  onSelect
+}: {
+  viewDate: Date;
+  onSelect: (year: number) => void;
+}) => {
+  const startYear = Math.floor(moment(viewDate).year() / 10) * 10 - 1;
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {Array.from({ length: 12 }, (_, i) => {
+        const year = startYear + i;
+        const isCurrent = moment().year() === year;
+        return (
+          <button
+            key={year}
+            type="button"
+            onClick={() => onSelect(year)}
+            className={cn(
+              "rounded-md px-2 py-2 text-sm font-medium text-text-primary hover:bg-background-secondary",
+              isCurrent && "bg-background-secondary font-bold"
+            )}
+          >
+            {year}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 const DateRangeSelector = ({
   value,
   setValue,
   disabledDates,
   minDate,
   maxDate,
-  ...rest
+  hideTrigger,
+  open,
+  onOpenChange,
+  triggerClassName
 }: Props) => {
   const [range, setRange] = React.useState<DateRangeValue>({
     startDate: value?.startDate ?? null,
     endDate: value?.endDate ?? null
   });
+  const [hoverDate, setHoverDate] = React.useState<Date | null>(null);
+  // Single shared viewDate — left panel shows this month, right shows next
+  const [viewDate, setViewDate] = React.useState<Date>(
+    value?.startDate ?? new Date()
+  );
+  const [view, setView] = React.useState<ViewType>("date");
 
   React.useEffect(() => {
     setRange({
@@ -505,77 +273,174 @@ const DateRangeSelector = ({
     });
   }, [value?.startDate, value?.endDate]);
 
-  const handleSelectStartDate = (date: Date) => {
-    const nextRange: DateRangeValue =
-      range.endDate && moment(date).isAfter(range.endDate, "day")
-        ? { startDate: date, endDate: null }
-        : { startDate: date, endDate: range.endDate };
+  const leftMonth = viewDate;
+  const rightMonth = moment(viewDate).add(1, "month").toDate();
 
-    setRange(nextRange);
-    setValue?.(nextRange);
-  };
-
-  const handleSelectEndDate = (date: Date) => {
-    let nextRange: DateRangeValue;
-
-    if (!range.startDate || moment(date).isBefore(range.startDate, "day")) {
-      nextRange = { startDate: date, endDate: null };
-    } else {
-      nextRange = { startDate: range.startDate, endDate: date };
+  const handleSelectDate = (date: Date) => {
+    // If no start, or both already set, start fresh
+    if (!range.startDate || (range.startDate && range.endDate)) {
+      const next = { startDate: date, endDate: null };
+      setRange(next);
+      setValue?.(next);
+      return;
     }
 
-    setRange(nextRange);
-    setValue?.(nextRange);
-
-    if (nextRange.startDate && nextRange.endDate) {
-      rest.onOpenChange?.(false);
+    // Start is set, no end — pick end (or swap if before start)
+    if (moment(date).isBefore(range.startDate, "day")) {
+      const next = { startDate: date, endDate: null };
+      setRange(next);
+      setValue?.(next);
+      return;
     }
+
+    const next = { startDate: range.startDate, endDate: date };
+    setRange(next);
+    setValue?.(next);
+    setHoverDate(null);
+    onOpenChange?.(false);
   };
+
+  const goNext = () => {
+    if (view === "date") setViewDate(moment(viewDate).add(1, "month").toDate());
+    else if (view === "month") setViewDate(moment(viewDate).add(1, "year").toDate());
+    else setViewDate(moment(viewDate).add(10, "year").toDate());
+  };
+
+  const goPrev = () => {
+    if (view === "date") setViewDate(moment(viewDate).subtract(1, "month").toDate());
+    else if (view === "month") setViewDate(moment(viewDate).subtract(1, "year").toDate());
+    else setViewDate(moment(viewDate).subtract(10, "year").toDate());
+  };
+
+  const headerLabel =
+    view === "date"
+      ? `${moment(leftMonth).format("MMM YYYY")} – ${moment(rightMonth).format("MMM YYYY")}`
+      : view === "month"
+      ? moment(viewDate).format("YYYY")
+      : `${Math.floor(moment(viewDate).year() / 10) * 10 - 1} – ${Math.floor(moment(viewDate).year() / 10) * 10 + 10}`;
+
+  const triggerLabel = formatLabel(range);
+  const hasDates = !!(range.startDate || range.endDate);
 
   return (
-    <SelectorRoot
-      {...rest}
-      triggerLabel={formatDateRangeLabel(range)}
-      triggerClassName={
-        range.startDate || range.endDate
-          ? "text-text-primary"
-          : "text-text-secondary"
-      }
-    >
-      <SelectorContent>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="min-w-[310px]">
-            <div className="mb-4 text-sm font-medium text-text-primary">
-              {formatSingleDateLabel(range.startDate, "Start Date")}
-            </div>
-            <CalendarPanel
-              rangeStart={range.startDate}
-              rangeEnd={range.endDate}
-              onSelectDate={handleSelectStartDate}
-              disabledDates={disabledDates}
-              minDate={minDate}
-              maxDate={range.endDate ?? maxDate}
-              initialViewDate={range.startDate}
-            />
-          </div>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+      {!hideTrigger && (
+        <DropdownMenuTrigger
+          className={cn(
+            "bg-background-secondary px-3 py-2 pr-10 relative",
+            "text-base rounded-lg whitespace-nowrap cursor-pointer",
+            "flex items-center justify-between gap-2",
+            "h-11 border border-border-primary",
+            hasDates ? "text-text-primary" : "text-text-secondary",
+            triggerClassName
+          )}
+        >
+          {triggerLabel}
+          <Calendar className="size-5 absolute right-3" />
+        </DropdownMenuTrigger>
+      )}
 
-          <div className="min-w-[310px] border-t border-border-primary pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-4">
-            <div className="mb-4 text-sm font-medium text-text-primary">
-              {formatSingleDateLabel(range.endDate, "End Date")}
-            </div>
-            <CalendarPanel
-              rangeStart={range.startDate}
-              rangeEnd={range.endDate}
-              onSelectDate={handleSelectEndDate}
-              disabledDates={disabledDates}
-              minDate={range.startDate ?? minDate}
-              maxDate={maxDate}
-              initialViewDate={range.endDate ?? range.startDate}
-            />
+      <DropdownMenuContent
+        translate="no"
+        sideOffset={8}
+        className="w-fit rounded-lg border border-border-primary bg-background p-4 shadow-md"
+      >
+        {/* Header */}
+        <div className="mb-4 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => {
+              if (view === "date") setView("month");
+              else if (view === "month") setView("year");
+            }}
+            className="cursor-pointer font-semibold text-text-primary hover:underline text-sm"
+          >
+            {headerLabel}
+          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={goPrev} className="cursor-pointer text-text-primary">
+              <ChevronLeft size={18} />
+            </button>
+            <button type="button" onClick={goNext} className="cursor-pointer text-text-primary">
+              <ChevronRight size={18} />
+            </button>
           </div>
         </div>
-      </SelectorContent>
-    </SelectorRoot>
+
+        {view === "year" && (
+          <YearPicker
+            viewDate={viewDate}
+            onSelect={(year) => {
+              setViewDate(moment(viewDate).year(year).toDate());
+              setView("month");
+            }}
+          />
+        )}
+
+        {view === "month" && (
+          <MonthPicker
+            viewDate={viewDate}
+            onSelect={(month) => {
+              setViewDate(moment(viewDate).month(month).toDate());
+              setView("date");
+            }}
+          />
+        )}
+
+        {view === "date" && (
+          <div className="flex gap-6">
+            {/* Left — current month */}
+            <div className="w-[280px]">
+              <div className="mb-2 text-center text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                {moment(leftMonth).format("MMMM YYYY")}
+              </div>
+              <MonthGrid
+                viewDate={leftMonth}
+                rangeStart={range.startDate}
+                rangeEnd={range.endDate}
+                hoverDate={hoverDate}
+                onSelectDate={handleSelectDate}
+                onHoverDate={setHoverDate}
+                disabledDates={disabledDates}
+                minDate={minDate}
+                maxDate={maxDate}
+              />
+            </div>
+
+            <div className="w-px bg-border-primary" />
+
+            {/* Right — next month */}
+            <div className="w-[280px]">
+              <div className="mb-2 text-center text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                {moment(rightMonth).format("MMMM YYYY")}
+              </div>
+              <MonthGrid
+                viewDate={rightMonth}
+                rangeStart={range.startDate}
+                rangeEnd={range.endDate}
+                hoverDate={hoverDate}
+                onSelectDate={handleSelectDate}
+                onHoverDate={setHoverDate}
+                disabledDates={disabledDates}
+                minDate={minDate}
+                maxDate={maxDate}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Footer hint */}
+        {view === "date" && (
+          <div className="mt-3 text-xs text-text-secondary">
+            {!range.startDate
+              ? "Click to select start date"
+              : !range.endDate
+              ? "Click to select end date"
+              : `${moment(range.startDate).format("DD MMM YYYY")} – ${moment(range.endDate).format("DD MMM YYYY")}`}
+          </div>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

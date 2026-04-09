@@ -1,7 +1,13 @@
 "use client";
 
 import React from "react";
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, SearchIcon } from "lucide-react";
+import {
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  Loader2Icon,
+  SearchIcon
+} from "lucide-react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { cn } from "@/lib/utils";
@@ -25,7 +31,10 @@ import { Button } from "@/components/ui/button";
 import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
-import { leadStatusOptions, type LeadStatus } from "@/features/dialer/data/dialerData";
+import {
+  leadStatusOptions,
+  type LeadStatus
+} from "@/features/dialer/data/dialerData";
 import { myListStyles } from "@/features/dialer/styles/dialerStyles";
 import Toggle from "@/components/ui/toggle";
 import {
@@ -93,7 +102,10 @@ const MyListComponent = () => {
     limit: LEADS_LIMIT,
     list_id: selectedList?.id ?? "",
     search: leadSearch,
-    status: statusFilter !== "All Status" ? (statusFilter.toLowerCase() as never) : undefined
+    status:
+      statusFilter !== "All Status"
+        ? (statusFilter.toLowerCase() as never)
+        : undefined
   });
 
   const leads = leadsData?.data?.data ?? [];
@@ -101,10 +113,13 @@ const MyListComponent = () => {
 
   // ── Mutations ───────────────────────────────────────────────────────────────
   const { mutate: activateMyList, isPending: activating } = useActivateMyList();
-  const { mutate: deactivateMyList, isPending: deactivating } = useDeactivateMyList();
+  const { mutate: deactivateMyList, isPending: deactivating } =
+    useDeactivateMyList();
 
   const invalidateMyLists = () =>
-    queryClient.invalidateQueries({ queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch }) });
+    queryClient.invalidateQueries({
+      queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch })
+    });
 
   const handleToggleList = (list: MyList) => {
     if (list.is_active) {
@@ -175,7 +190,7 @@ const MyListComponent = () => {
             <span className={myListStyles.sidebarTitle}>Assigned Lists</span>
             <div className="flex items-center gap-2 ml-auto">
               <span className={myListStyles.listCardToggleLabel}>
-                {focusMode ? "Focus Mode" : "All On"}
+                {focusMode ? "All On" : "Focus Mode"}
               </span>
               <button
                 type="button"
@@ -202,7 +217,13 @@ const MyListComponent = () => {
             />
           </div>
 
-          <div id="my-lists-scroll" className={cn(myListStyles.sidebarList, "overflow-y-auto max-h-[calc(100vh-16rem)]")}>
+          <div
+            id="my-lists-scroll"
+            className={cn(
+              myListStyles.sidebarList,
+              "overflow-y-auto max-h-[calc(100vh-16rem)]"
+            )}
+          >
             <InfiniteScroll
               dataLength={myLists.length}
               next={fetchNextPage}
@@ -223,12 +244,14 @@ const MyListComponent = () => {
                     list.is_active
                       ? myListStyles.listCardActive
                       : myListStyles.listCardInactive,
-                    selectedList?.id === list.id && "ring-2 ring-Brand-500"
+                    selectedList?.id === list.id && "border-3 border-primary"
                   )}
                   onClick={() => setSelectedList(list)}
                 >
                   <div className={myListStyles.listCardHeader}>
-                    <span className={myListStyles.listCardName}>{list.name}</span>
+                    <span className={myListStyles.listCardName}>
+                      {list.name}
+                    </span>
                     <div className={myListStyles.listCardToggleWrap}>
                       <span className={myListStyles.listCardToggleLabel}>
                         {list.is_active ? "Active" : "Inactive"}
@@ -249,16 +272,28 @@ const MyListComponent = () => {
                   <div className={myListStyles.listCardDivider} />
                   <div className={myListStyles.listCardMeta}>
                     <div className={myListStyles.listCardMetaItem}>
-                      <span className={myListStyles.listCardMetaLabel}>Priority:</span>
-                      <span className={myListStyles.listCardMetaValue}>{list.priority}</span>
+                      <span className={myListStyles.listCardMetaLabel}>
+                        Priority:
+                      </span>
+                      <span className={myListStyles.listCardMetaValue}>
+                        {list.priority}
+                      </span>
                     </div>
                     <div className={myListStyles.listCardMetaItem}>
-                      <span className={myListStyles.listCardMetaLabel}>Total Lead:</span>
-                      <span className={myListStyles.listCardMetaValue}>{list.total_leads}</span>
+                      <span className={myListStyles.listCardMetaLabel}>
+                        Total Lead:
+                      </span>
+                      <span className={myListStyles.listCardMetaValue}>
+                        {list.total_leads}
+                      </span>
                     </div>
                     <div className={myListStyles.listCardMetaItem}>
-                      <span className={myListStyles.listCardMetaLabel}>Assigned Diallers</span>
-                      <span className={myListStyles.listCardMetaValue}>{list.assigned_diallers}</span>
+                      <span className={myListStyles.listCardMetaLabel}>
+                        Assigned Diallers
+                      </span>
+                      <span className={myListStyles.listCardMetaValue}>
+                        {list.assigned_diallers}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -276,7 +311,10 @@ const MyListComponent = () => {
         <div className={myListStyles.tablePanel}>
           <div className={myListStyles.toolbar}>
             <TextInput
-              setValue={(v) => { setLeadSearch(v); setLeadsPage(1); }}
+              setValue={(v) => {
+                setLeadSearch(v);
+                setLeadsPage(1);
+              }}
               value={leadSearch}
               startIcon={<SearchIcon className="size-5 text-gray-500" />}
               placeholder="Search..."
@@ -285,7 +323,10 @@ const MyListComponent = () => {
             <div className={myListStyles.toolbarRight}>
               <Select
                 value={statusFilter}
-                onValueChange={(v) => { setStatusFilter(v ?? "All Status"); setLeadsPage(1); }}
+                onValueChange={(v) => {
+                  setStatusFilter(v ?? "All Status");
+                  setLeadsPage(1);
+                }}
               >
                 <SelectTrigger className="h-9 text-sm text-gray-800 border-zinc-200">
                   <SelectValue />
@@ -317,10 +358,18 @@ const MyListComponent = () => {
               <TableHeader>
                 <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
                   <TableHead className={myListStyles.tableHead}>Name</TableHead>
-                  <TableHead className={myListStyles.tableHead}>Lead Status</TableHead>
-                  <TableHead className={myListStyles.tableHead}>Assigned Rep</TableHead>
-                  <TableHead className={myListStyles.tableHead}>Last Disposition</TableHead>
-                  <TableHead className={myListStyles.tableHead}>Attempt</TableHead>
+                  <TableHead className={myListStyles.tableHead}>
+                    Lead Status
+                  </TableHead>
+                  <TableHead className={myListStyles.tableHead}>
+                    Assigned Rep
+                  </TableHead>
+                  <TableHead className={myListStyles.tableHead}>
+                    Last Disposition
+                  </TableHead>
+                  <TableHead className={myListStyles.tableHead}>
+                    Attempt
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -330,7 +379,9 @@ const MyListComponent = () => {
                       <div className="text-sm font-medium text-gray-800 leading-5">
                         {lead.first_name} {lead.last_name}
                       </div>
-                      <div className="text-sm text-gray-500 leading-5">{lead.phone}</div>
+                      <div className="text-sm text-gray-500 leading-5">
+                        {lead.phone}
+                      </div>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
                       {lead.activity_status ? (
@@ -342,11 +393,14 @@ const MyListComponent = () => {
                         >
                           {lead.activity_status}
                         </span>
-                      ) : "-"}
+                      ) : (
+                        "-"
+                      )}
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
                       {lead.assigned_rep
-                        ? `${lead.assigned_rep.first_name ?? ""} ${lead.assigned_rep.last_name ?? ""}`.trim() || "-"
+                        ? `${lead.assigned_rep.first_name ?? ""} ${lead.assigned_rep.last_name ?? ""}`.trim() ||
+                          "-"
                         : "-"}
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
@@ -354,7 +408,9 @@ const MyListComponent = () => {
                         <div className="text-sm font-medium text-gray-800 leading-5">
                           {lead.last_disposition}
                         </div>
-                      ) : "-"}
+                      ) : (
+                        "-"
+                      )}
                     </TableCell>
                     <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
                       {lead.attempts ?? lead.attempt ?? 0}
@@ -367,7 +423,9 @@ const MyListComponent = () => {
 
           <div className={myListStyles.pagination}>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 leading-5">Rows per page:</span>
+              <span className="text-xs text-gray-500 leading-5">
+                Rows per page:
+              </span>
               <span className="flex items-center gap-2 text-xs text-gray-800 leading-5">
                 {LEADS_LIMIT}
                 <ChevronDownIcon className="size-4 text-gray-500" />
@@ -375,7 +433,9 @@ const MyListComponent = () => {
             </div>
             {leadsMeta && (
               <span className="text-xs text-gray-800 leading-5">
-                {(leadsPage - 1) * LEADS_LIMIT + 1}-{Math.min(leadsPage * LEADS_LIMIT, leadsMeta.total)} of {leadsMeta.total}
+                {(leadsPage - 1) * LEADS_LIMIT + 1}-
+                {Math.min(leadsPage * LEADS_LIMIT, leadsMeta.total)} of{" "}
+                {leadsMeta.total}
               </span>
             )}
             <div className="flex items-start">
@@ -416,7 +476,9 @@ const MyListComponent = () => {
 
       <ActivateListDialog
         open={activateListDialog.open}
-        onOpenChange={(open) => setActivateListDialog((prev) => ({ ...prev, open }))}
+        onOpenChange={(open) =>
+          setActivateListDialog((prev) => ({ ...prev, open }))
+        }
         listName={activateListDialog.list?.name ?? ""}
         onConfirm={handleActivateConfirm}
       />

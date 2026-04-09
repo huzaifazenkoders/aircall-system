@@ -50,15 +50,17 @@ export const assignedLeadStyles = {
   ),
 
   sectionTitle: cn("text-xs font-semibold tracking-wider text-foreground"),
-  infoGrid3: cn("mt-6 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-3"),
-  infoGrid2: cn("mt-6 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2"),
+  infoGrid3: cn(
+    "mt-6 grid grid-cols-1 gap-x-10 gap-y-6 lg:grid-cols-2 2xl:grid-cols-3"
+  ),
+  infoGrid2: cn("mt-6 grid grid-cols-1 gap-x-10 gap-y-6  2xl:grid-cols-2"),
   divider: cn("my-10 h-px bg-border"),
 
   infoLabel: cn("text-sm text-muted-foreground"),
   infoValue: cn("mt-2 text-sm font-medium text-foreground"),
 
   statusBadge: cn(
-    "mt-3 inline-flex rounded-lg bg-status-cooldown-bg px-4 py-1 text-xs font-medium text-status-cooldown-fg"
+    "mt-3 uppercase inline-flex rounded-lg bg-status-cooldown-bg px-4 py-1 text-xs font-medium text-status-cooldown-fg"
   ),
 
   purchaseCard: cn(

@@ -47,7 +47,7 @@ const DialerAuthLoginForm = () => {
             if (res.data.has_reset_password) {
               router.replace("/dialer/set-password");
             } else {
-              router.replace("/dialer/callback-schedules");
+              router.replace("/dialer/assigned-lead");
             }
           },
           onError: handleMutationError

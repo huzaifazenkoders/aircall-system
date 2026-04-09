@@ -24,6 +24,7 @@ export interface CurrentLead {
     id: string;
     name: string;
     call_type: string;
+    workflow_id: string;
   };
   assigned_rep?: {
     id: string;

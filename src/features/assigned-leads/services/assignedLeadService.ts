@@ -15,9 +15,35 @@ export function useGetCurrentLead() {
   return useQuery({
     queryKey: assignedLeadKeys.currentLead,
     queryFn: async () => {
-      const res = await axiosInstance.get("/lead-activities/fetch-current-lead");
+      const res = await axiosInstance.get(
+        "/lead-activities/fetch-current-lead"
+      );
       return res.data as GetCurrentLeadRes;
-    },
+    }
+  });
+}
+
+// ─── Fetch Workflow Dispositions ──────────────────────────────────────────────
+
+export interface WorkflowDisposition {
+  id: string;
+  name: string;
+}
+
+interface GetWorkflowDispositionsRes {
+  data: WorkflowDisposition[];
+  message: string;
+}
+
+export function useGetWorkflowDispositions(workflowId: string) {
+  return useQuery({
+    queryKey: ["workflow-dispositions", workflowId],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/workflow-dispositions", {
+        params: { workflow_id: workflowId }
+      });
+      return res.data as GetWorkflowDispositionsRes;
+    }
   });
 }
 
@@ -44,6 +70,6 @@ export function useCreateCallLog() {
     mutationFn: async ({ payload }: CreateCallLogReq) => {
       const res = await axiosInstance.post("/call-logs", payload);
       return res.data as CreateCallLogRes;
-    },
+    }
   });
 }

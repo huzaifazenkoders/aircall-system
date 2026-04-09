@@ -25,6 +25,7 @@ import { assignedLeadKeys } from "@/features/assigned-leads/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
 
 const DISPOSITION_ID_MAP: Record<string, string> = {
   "No Answer": "no_answer",
@@ -34,7 +35,7 @@ const DISPOSITION_ID_MAP: Record<string, string> = {
   "Voicemail Left": "voicemail_left",
   "Wrong Number": "wrong_number",
   "Do Not Call": "do_not_call",
-  "Ban Contact": "ban_contact",
+  "Ban Contact": "ban_contact"
 };
 
 const CALL_STATUS_MAP: Record<string, "completed" | "failed" | "no_answer"> = {
@@ -45,7 +46,7 @@ const CALL_STATUS_MAP: Record<string, "completed" | "failed" | "no_answer"> = {
   "Voicemail Left": "no_answer",
   "Wrong Number": "failed",
   "Do Not Call": "failed",
-  "Ban Contact": "failed",
+  "Ban Contact": "failed"
 };
 
 const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
@@ -54,11 +55,11 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
 
   const { mutate: createCallLog, isPending } = useCreateCallLog();
 
-  const { dial, isReady } = useAircall({
+  const { dial, isReady, triggerEvent } = useAircall({
     containerId: "#phone-container",
     onCallEnded: () => {
       setCallOutcomeOpen(true);
-    },
+    }
   });
 
   // Dial as soon as aircall is ready
@@ -70,7 +71,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
 
   const handleOutcomeSubmit = ({
     disposition,
-    personalNote,
+    personalNote
   }: {
     disposition: string;
     callbackDate: Date | null;
@@ -87,8 +88,8 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
           disposition_id: DISPOSITION_ID_MAP[disposition] ?? disposition,
           notes: personalNote.trim(),
           attempt_number: lead.attempt_number,
-          call_status: CALL_STATUS_MAP[disposition] ?? "completed",
-        },
+          call_status: CALL_STATUS_MAP[disposition] ?? "completed"
+        }
       },
       {
         onSuccess: () => {
@@ -96,16 +97,21 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
           toast.success("Call Logged Successfully", {
             // react-hot-toast supports a description via the icon/style options;
             // we pass it as a two-line message using \n
-            id: "call-logged",
+            id: "call-logged"
           });
           // Show description as a follow-up info toast
-          toast("The call outcome has been recorded. A new contact will be assigned automatically.", {
-            id: "call-logged-desc",
-            icon: "ℹ️",
+          toast(
+            "The call outcome has been recorded. A new contact will be assigned automatically.",
+            {
+              id: "call-logged-desc",
+              icon: "ℹ️"
+            }
+          );
+          queryClient.invalidateQueries({
+            queryKey: assignedLeadKeys.currentLead
           });
-          queryClient.invalidateQueries({ queryKey: assignedLeadKeys.currentLead });
         },
-        onError: handleMutationError,
+        onError: handleMutationError
       }
     );
   };
@@ -121,40 +127,67 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
               <header className={s.cardHeader}>
                 <h1 className={s.cardTitle}>Lead Information</h1>
                 {lead.lead.keap_contact_url ? (
-                  <a
-                    href={lead.lead.keap_contact_url}
-                    target="_blank"
+                  <Button
+                    // link={lead.lead.keap_contact_url}
+                    // target="_blank"
                     rel="noreferrer"
+                    variant={"ghost"}
                     className={s.cardLink}
                   >
                     <ExternalLinkIcon className="size-4" aria-hidden="true" />
                     Click to Open Contact in Keap
-                  </a>
+                  </Button>
                 ) : (
-                  <button type="button" className={s.cardLink} disabled>
+                  <Button
+                    variant={"ghost"}
+                    type="button"
+                    className={s.cardLink}
+                  >
                     <ExternalLinkIcon className="size-4" aria-hidden="true" />
                     Click to Open Contact in Keap
-                  </button>
+                  </Button>
                 )}
               </header>
 
               <div className={s.contentGrid}>
                 <div className="min-w-0">
-                  <AssignedLeadSectionTitle>BASIC INFORMATION</AssignedLeadSectionTitle>
+                  <AssignedLeadSectionTitle>
+                    BASIC INFORMATION
+                  </AssignedLeadSectionTitle>
                   <div className={s.infoGrid3}>
                     <AssignedLeadInfo label="Email" value={lead.lead.email} />
                     <AssignedLeadInfo label="Phone" value={lead.lead.phone} />
-                    <AssignedLeadInfo label="Send Timezone" value={lead.lead.timezone} />
-                    <AssignedLeadInfo label="Event Name" value={lead.lead.event_name} />
-                    <AssignedLeadInfo label="Event Date" value={lead.lead.event_date} />
-                    <AssignedLeadInfo label="Location" value={lead.lead.event_location} />
-                    <AssignedLeadInfo label="Referral" value={lead.lead.is_referral ? "Yes" : "No"} />
-                    <AssignedLeadInfo label="Referred By" value={lead.lead.referred_by || "—"} />
+                    <AssignedLeadInfo
+                      label="Send Timezone"
+                      value={lead.lead.timezone}
+                    />
+                    <AssignedLeadInfo
+                      label="Event Name"
+                      value={lead.lead.event_name}
+                    />
+                    <AssignedLeadInfo
+                      label="Event Date"
+                      value={lead.lead.event_date}
+                    />
+                    <AssignedLeadInfo
+                      label="Location"
+                      value={lead.lead.event_location}
+                    />
+                    <AssignedLeadInfo
+                      label="Referral"
+                      value={lead.lead.is_referral ? "Yes" : "No"}
+                    />
+                    <AssignedLeadInfo
+                      label="Referred By"
+                      value={lead.lead.referred_by || "—"}
+                    />
                   </div>
 
                   <div className={s.divider} />
 
-                  <AssignedLeadSectionTitle>LEAD STATUS</AssignedLeadSectionTitle>
+                  <AssignedLeadSectionTitle>
+                    LEAD STATUS
+                  </AssignedLeadSectionTitle>
                   <div className={s.infoGrid2}>
                     <div>
                       <div className={s.infoLabel}>Current Status</div>
@@ -168,61 +201,83 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
                           : "—"
                       }
                     />
-                    <AssignedLeadInfo label="Timezone" value={lead.lead.timezone} />
-                    <AssignedLeadInfo label="Call Type" value={lead.list.call_type} />
+                    <AssignedLeadInfo
+                      label="Timezone"
+                      value={lead.lead.timezone}
+                    />
+                    <AssignedLeadInfo
+                      label="Call Type"
+                      value={lead.list.call_type}
+                    />
                   </div>
 
-                  <div className={s.purchaseCard}>
-                    <div className={s.purchaseHeader}>
-                      <div className={s.purchaseTitle}>Purchase History</div>
-                      <div className={s.purchaseTotal}>
-                        TOTAL PURCHASE
-                        <span className={s.purchaseTotalAmount}>
-                          {lead.total_purchase ?? "—"}
-                        </span>
+                  {lead?.purchases?.length && (
+                    <div className={s.purchaseCard}>
+                      <div className={s.purchaseHeader}>
+                        <div className={s.purchaseTitle}>Purchase History</div>
+                        <div className={s.purchaseTotal}>
+                          TOTAL PURCHASE
+                          <span className={s.purchaseTotalAmount}>
+                            {lead.total_purchase ?? "—"}
+                          </span>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="w-full overflow-x-auto bg-card">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="min-w-52">Product</TableHead>
-                            <TableHead className="w-40">Amount</TableHead>
-                            <TableHead className="w-44">Purchase Date</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(lead.purchases ?? []).map((p) => (
-                            <TableRow key={p.id} className="h-14">
-                              <TableCell className="font-medium text-foreground">{p.product}</TableCell>
-                              <TableCell className="font-semibold text-foreground">{p.amount}</TableCell>
-                              <TableCell className="text-foreground">{p.purchase_date}</TableCell>
+                      <div className="w-full overflow-x-auto bg-card">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="min-w-52">
+                                Product
+                              </TableHead>
+                              <TableHead className="w-40">Amount</TableHead>
+                              <TableHead className="w-44">
+                                Purchase Date
+                              </TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                          </TableHeader>
+                          <TableBody>
+                            {(lead.purchases ?? []).map((p) => (
+                              <TableRow key={p.id} className="h-14">
+                                <TableCell className="font-medium text-foreground">
+                                  {p.product}
+                                </TableCell>
+                                <TableCell className="font-semibold text-foreground">
+                                  {p.amount}
+                                </TableCell>
+                                <TableCell className="text-foreground">
+                                  {p.purchase_date}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="min-w-0">
-                  <AssignedLeadSectionTitle>CALL HISTORY TIMELINE</AssignedLeadSectionTitle>
-                  <div className={s.timelineWrap}>
-                    <div className={s.timelineList}>
-                      <div className={s.timelineLine} aria-hidden="true" />
-                      <div className={s.timelineItems}>
-                        {(lead.timeline ?? []).map((item) => (
-                          <AssignedLeadTimelineItem
-                            key={item.id}
-                            title={item.title}
-                            subtitle={item.subtitle}
-                          />
-                        ))}
+                {lead.timeline?.length && (
+                  <div className="min-w-0">
+                    <AssignedLeadSectionTitle>
+                      CALL HISTORY TIMELINE
+                    </AssignedLeadSectionTitle>
+                    <div className={s.timelineWrap}>
+                      <div className={s.timelineList}>
+                        <div className={s.timelineLine} aria-hidden="true" />
+                        <div className={s.timelineItems}>
+                          {(lead.timeline ?? []).map((item) => (
+                            <AssignedLeadTimelineItem
+                              key={item.id}
+                              title={item.title}
+                              subtitle={item.subtitle}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </section>
           </div>
@@ -241,8 +296,41 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
         open={callOutcomeOpen}
         onOpenChange={setCallOutcomeOpen}
         isPending={isPending}
+        workflowId={lead.list.workflow_id}
         onSubmit={handleOutcomeSubmit}
       />
+
+      {process.env.NODE_ENV === "development" && (
+        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Aircall Event Tester (Only for testing purpose for now, will be
+            removed later)
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { event: "incoming_call", label: "Incoming Call" },
+                { event: "call_end_ringtone", label: "End Ringtone" },
+                { event: "outgoing_call", label: "Outgoing Call" },
+                { event: "outgoing_answered", label: "Outgoing Answered" },
+                { event: "call_ended", label: "Call Ended" },
+                { event: "comment_saved", label: "Comment Saved" }
+              ] as const
+            ).map(({ event, label }) => (
+              <button
+                key={event}
+                type="button"
+                onClick={() =>
+                  triggerEvent(event, { phone_number: lead.lead.phone })
+                }
+                className="rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 };
