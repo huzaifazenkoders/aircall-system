@@ -35,7 +35,7 @@ export const dialerAuthStyles = {
   ),
   heroImage: cn("absolute", "-bottom-0 -right-0"),
   heroCopy: cn("flex", "max-w-xl", "flex-col", "gap-5"),
-  heroTitle: cn("text-[36px]", "font-semibold", "text-brand-accent"),
+  heroTitle: cn("text-[36px]", "font-semibold", "text-white"),
   heroSubtitle: cn(
     "max-w-lg",
     "text-base",
