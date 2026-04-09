@@ -112,7 +112,9 @@ export const myListStyles = {
   sidebar: cn(
     "w-96 shrink-0 bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
   ),
-  sidebarHeader: cn("px-4 py-4 border-b border-zinc-200 flex items-center gap-2 w-full"),
+  sidebarHeader: cn(
+    "px-4 py-4 border-b border-zinc-200 flex items-center gap-2 w-full"
+  ),
   sidebarTitleContainer: cn(
     "px-4 py-4 border-b border-zinc-200 flex items-center justify-between gap-2 w-full"
   ),
@@ -239,10 +241,6 @@ export const callbackStyles = {
   ),
   emptyWrap: cn("flex min-h-[42rem] flex-1 items-center justify-center px-6"),
   emptyInner: cn("flex max-w-2xl flex-col items-center text-center"),
-  emptyTitle: cn(
-    "mt-8 text-[2rem] font-medium tracking-tight text-text-primary lg:text-[3rem]"
-  ),
-  emptyDescription: cn(
-    "mt-4 max-w-2xl text-xl leading-[1.45] text-[#667794] lg:text-[1.75rem]"
-  )
+  emptyTitle: cn("mt-8 text-2xl font-medium text-text-primary"),
+  emptyDescription: cn("mt-2 max-w-2xl text-base text-text-secondary")
 };
