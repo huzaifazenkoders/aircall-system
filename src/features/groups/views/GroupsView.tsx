@@ -73,12 +73,15 @@ const GroupsView = () => {
     search: searchValue || undefined,
     is_active: isActiveFilter
   });
-  const { data: selectedGroupInfoData } = useGetGroupInfo(selectedGroupId ?? "");
+  const { data: selectedGroupInfoData } = useGetGroupInfo(
+    selectedGroupId ?? ""
+  );
 
   const groups: Group[] = transformInfiniteData(data, "data");
   const existingMemberIds = React.useMemo(
     () =>
-      selectedGroupInfoData?.data.user_groups.map((entry) => entry.user.id) ?? [],
+      selectedGroupInfoData?.data.user_groups.map((entry) => entry.user.id) ??
+      [],
     [selectedGroupInfoData]
   );
 
@@ -93,7 +96,9 @@ const GroupsView = () => {
 
   const handleAddMembers = (memberIds: string[]) => {
     if (!selectedGroupId) return;
-    const newMemberIds = memberIds.filter((id) => !existingMemberIds.includes(id));
+    const newMemberIds = memberIds.filter(
+      (id) => !existingMemberIds.includes(id)
+    );
     if (!newMemberIds.length) return;
 
     addUsers(
@@ -234,7 +239,7 @@ const GroupsView = () => {
               searchValue={searchValue}
               statusFilter={statusFilter}
               onSearchChange={setSearchValue}
-              onStatusChange={setStatusFilter}
+              onStatusChange={(args) => setStatusFilter(args as GroupStatus)}
               onViewDetails={(groupId) => openDetails(groupId, "members")}
               onAssignList={() => setAssignListsOpen(true)}
               onAddMember={() => setAddMembersOpen(true)}

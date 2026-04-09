@@ -8,7 +8,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 import TextInput from "@/components/ui/text-input";
@@ -19,16 +19,14 @@ type CallLogFiltersProps = {
   selectedList: string;
   onListChange: (value: string) => void;
   selectedStatus: string;
-  onStatusChange: (value: string) => void;
+  onStatusChange: (value: string | null) => void;
   statusOptions: StatusOption[];
 };
 
 const CallLogFilters = ({
-  selectedList,
-  onListChange,
   selectedStatus,
   onStatusChange,
-  statusOptions,
+  statusOptions
 }: CallLogFiltersProps) => {
   return (
     <div className={callLogsStyles.toolbar}>

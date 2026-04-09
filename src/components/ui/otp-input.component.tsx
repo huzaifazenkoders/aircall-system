@@ -37,7 +37,6 @@ const OtpInput = forwardRef<HTMLInputElement, Props>(
       value,
       setValue,
       containerClassName,
-      maxLength,
       required,
       label,
       className,

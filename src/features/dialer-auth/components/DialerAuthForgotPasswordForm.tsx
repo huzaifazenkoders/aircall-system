@@ -16,7 +16,7 @@ const validationSchema = Yup.object({
   email: Yup.string()
     .trim()
     .email("Invalid email address")
-    .required("Email is required"),
+    .required("Email is required")
 });
 
 const DialerAuthForgotPasswordForm = () => {
@@ -37,10 +37,10 @@ const DialerAuthForgotPasswordForm = () => {
               `/dialer-auth/verify-code?email=${encodeURIComponent(email)}`
             );
           },
-          onError: handleMutationError,
+          onError: handleMutationError
         }
       );
-    },
+    }
   });
 
   return (
@@ -61,13 +61,11 @@ const DialerAuthForgotPasswordForm = () => {
           setValue={(val) => formik.setFieldValue("email", val)}
           placeholder="john.doe@email.com"
           error={formik.touched.email ? formik.errors.email : undefined}
-          startIcon={<Mail className={dialerAuthStyles.inputIcon} aria-hidden="true" />}
-          labelClassName={dialerAuthStyles.inputLabel}
-          className={dialerAuthStyles.inputField}
+          startIcon={<Mail aria-hidden="true" />}
         />
       </div>
 
-      <Button type="submit" size="xl" className={dialerAuthStyles.button} disabled={isPending}>
+      <Button type="submit" size="xl" disabled={isPending}>
         {isPending ? "Sending..." : "Send Code"}
       </Button>
     </form>

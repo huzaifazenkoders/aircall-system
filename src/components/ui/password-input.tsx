@@ -11,7 +11,6 @@ const PasswordInput = ({
   startIcon,
   containerClassName,
   labelClassName,
-  showToggle = true,
   ...rest
 }: Omit<React.ComponentProps<"input">, "type"> & {
   label?: string;

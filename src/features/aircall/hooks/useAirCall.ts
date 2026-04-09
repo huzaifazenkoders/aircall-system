@@ -5,6 +5,7 @@ import AircallPhone from "aircall-everywhere";
 
 type Props = {
   containerId: string;
+  // eslint-disabled-next-line
   onCallEnded?: (data: any) => void;
 };
 

@@ -8,7 +8,7 @@ import {
   Dialog,
   DialogContent,
   DialogIconClose,
-  DialogFooter,
+  DialogFooter
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,14 +16,14 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 import TextArea from "@/components/ui/text-area";
 import TimeSelector from "@/components/ui/time-selector";
 import LabelContainer from "@/components/ui/label-container";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import DateSelector from "@/components/custom/date-selector.component";
 
@@ -35,20 +35,20 @@ const DISPOSITIONS = [
   "Voicemail Left",
   "Wrong Number",
   "Do Not Call",
-  "Ban Contact",
+  "Ban Contact"
 ] as const;
 
 const KEAP_NOTE_TEMPLATES = [
   "Follow-up template",
   "No answer template",
-  "Callback template",
+  "Callback template"
 ] as const;
 
 const KEAP_TAGS = [
   "CALLBACK_SCHEDULED",
   "NO_ANSWER",
   "NOT_INTERESTED",
-  "CONNECTED",
+  "CONNECTED"
 ] as const;
 
 type CallOutcomeDialogProps = {
@@ -69,19 +69,28 @@ const CallOutcomeDialog = ({
   open,
   onOpenChange,
   isPending,
-  onSubmit,
+  onSubmit
 }: CallOutcomeDialogProps) => {
-  const [disposition, setDisposition] = React.useState("");
+  const [disposition, setDisposition] = React.useState<string | null>(null);
   const [callbackDate, setCallbackDate] = React.useState<Date | null>(null);
   const [callbackTime, setCallbackTime] = React.useState("");
   const [personalNote, setPersonalNote] = React.useState("");
-  const [keapNoteTemplate, setKeapNoteTemplate] = React.useState("");
-  const [keapTag, setKeapTag] = React.useState("");
+  const [keapNoteTemplate, setKeapNoteTemplate] = React.useState<string | null>(
+    null
+  );
+  const [keapTag, setKeapTag] = React.useState<string | null>(null);
 
   const isCallback = disposition === "Callback Scheduled";
 
   const handleSubmit = () => {
-    onSubmit?.({ disposition, callbackDate, callbackTime, personalNote, keapNoteTemplate, keapTag });
+    onSubmit?.({
+      disposition: String(disposition),
+      callbackDate,
+      callbackTime,
+      personalNote,
+      keapNoteTemplate: String(keapNoteTemplate),
+      keapTag: String(keapTag)
+    });
   };
 
   return (
@@ -90,7 +99,9 @@ const CallOutcomeDialog = ({
         {/* Header */}
         <div className="px-8 pt-8 pb-6 flex justify-between items-start">
           <div className="flex flex-col gap-1">
-            <h2 className="text-2xl font-semibold text-text-primary leading-8">Call Outcome</h2>
+            <h2 className="text-2xl font-semibold text-text-primary leading-8">
+              Call Outcome
+            </h2>
             <p className="text-sm text-muted-foreground leading-5">
               Record the result of this call to update the lead status.
             </p>
@@ -110,7 +121,11 @@ const CallOutcomeDialog = ({
               </SelectTrigger>
               <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
                 {DISPOSITIONS.map((d) => (
-                  <SelectItem key={d} value={d} className="px-3 py-2 text-sm text-text-primary">
+                  <SelectItem
+                    key={d}
+                    value={d}
+                    className="px-3 py-2 text-sm text-text-primary"
+                  >
                     {d}
                   </SelectItem>
                 ))}
@@ -129,8 +144,16 @@ const CallOutcomeDialog = ({
               <LabelContainer label="Date">
                 <DropdownMenu>
                   <DropdownMenuTrigger className="h-11 w-full rounded-lg border border-border-primary bg-input px-3 py-2 text-base text-left flex items-center justify-between">
-                    <span className={callbackDate ? "text-text-primary" : "text-text-secondary"}>
-                      {callbackDate ? moment(callbackDate).format("DD MMM YYYY") : "Select date"}
+                    <span
+                      className={
+                        callbackDate
+                          ? "text-text-primary"
+                          : "text-text-secondary"
+                      }
+                    >
+                      {callbackDate
+                        ? moment(callbackDate).format("DD MMM YYYY")
+                        : "Select date"}
                     </span>
                     <CalendarIcon className="size-5 text-text-secondary shrink-0" />
                   </DropdownMenuTrigger>
@@ -142,10 +165,7 @@ const CallOutcomeDialog = ({
               </LabelContainer>
 
               <LabelContainer label="Time">
-                <TimeSelector
-                  value={callbackTime}
-                  setValue={setCallbackTime}
-                />
+                <TimeSelector value={callbackTime} setValue={setCallbackTime} />
               </LabelContainer>
             </div>
           )}
@@ -161,13 +181,20 @@ const CallOutcomeDialog = ({
 
           {/* Apply Keap Note Template */}
           <LabelContainer label="Apply Keap Note Template">
-            <Select value={keapNoteTemplate} onValueChange={setKeapNoteTemplate}>
+            <Select
+              value={keapNoteTemplate}
+              onValueChange={setKeapNoteTemplate}
+            >
               <SelectTrigger className="w-full h-11 text-base border-border-primary">
                 <SelectValue placeholder="Select a keap note" />
               </SelectTrigger>
               <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
                 {KEAP_NOTE_TEMPLATES.map((t) => (
-                  <SelectItem key={t} value={t} className="px-3 py-2 text-sm text-text-primary">
+                  <SelectItem
+                    key={t}
+                    value={t}
+                    className="px-3 py-2 text-sm text-text-primary"
+                  >
                     {t}
                   </SelectItem>
                 ))}
@@ -183,7 +210,11 @@ const CallOutcomeDialog = ({
               </SelectTrigger>
               <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
                 {KEAP_TAGS.map((t) => (
-                  <SelectItem key={t} value={t} className="px-3 py-2 text-sm text-text-primary">
+                  <SelectItem
+                    key={t}
+                    value={t}
+                    className="px-3 py-2 text-sm text-text-primary"
+                  >
                     {t}
                   </SelectItem>
                 ))}
@@ -195,7 +226,11 @@ const CallOutcomeDialog = ({
         <div className="border-t border-border" />
 
         <DialogFooter className="px-8 py-5">
-          <Button size="lg" onClick={handleSubmit} disabled={!disposition || isPending}>
+          <Button
+            size="lg"
+            onClick={handleSubmit}
+            disabled={!disposition || isPending}
+          >
             Submit
           </Button>
         </DialogFooter>

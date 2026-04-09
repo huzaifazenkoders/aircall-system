@@ -1,24 +1,24 @@
-import React from "react";
 import { PlusIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import UsersIllustration from "@/features/users/components/UsersIllustration";
-import { usersStyles } from "@/features/users/styles/usersStyles";
+import UsersIllustration from "@/../public/assets/user/no-data.png";
+import Image from "next/image";
 
 const UsersEmptyState = ({ onAddUser }: { onAddUser: () => void }) => {
   return (
-    <section className={usersStyles.emptyState}>
-      <div className={usersStyles.illustrationWrap}>
-        <UsersIllustration />
-        <div className={usersStyles.divider} />
-      </div>
+    <section
+      className={"flex-1 h-full w-full flex items-center justify-center"}
+    >
+      <Image src={UsersIllustration} alt="" height={292} width={378} />
 
-      <h1 className={usersStyles.title}>No Users Found</h1>
-      <p className={usersStyles.description}>
+      <h1 className={"text-2xl font-medium text-text-primary"}>
+        No Users Found
+      </h1>
+      <p className={"text-base text-text-secondary"}>
         Add users to begin assigning lists and distributing leads.
       </p>
 
-      <Button className={usersStyles.primaryButton} onClick={onAddUser}>
+      <Button onClick={onAddUser}>
         <PlusIcon className="size-6" />
         Add User
       </Button>

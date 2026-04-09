@@ -3,9 +3,18 @@
 import React from "react";
 
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
-import { GroupMember } from "@/features/groups/data/groupsData";
 
-const GroupAvatar = ({ member }: { member: GroupMember }) => {
+const GroupAvatar = ({
+  member
+}: {
+  member: {
+    id: string;
+    name: string;
+    accent: string;
+    tint: string;
+    role: string;
+  };
+}) => {
   const initials = member.name
     .split(" ")
     .map((part) => part[0])
@@ -18,7 +27,7 @@ const GroupAvatar = ({ member }: { member: GroupMember }) => {
       className={groupsStyles.avatar}
       style={{
         backgroundColor: member.tint,
-        color: member.accent,
+        color: member.accent
       }}
       aria-hidden="true"
     >

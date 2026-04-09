@@ -9,10 +9,9 @@ import {
   DispositionType,
   ExistingDispositionType,
   MaxAttemptReached,
-  RemainingDispositionType,
-  ResultingLeadStatus
+  ResultingLeadStatus,
+  WorkflowStatus
 } from "../types/workflowTypes";
-import { WorkflowStatus } from "../data/workflowsData";
 
 // ─── Get Paginated Dispositions ───────────────────────────────────────────────
 
