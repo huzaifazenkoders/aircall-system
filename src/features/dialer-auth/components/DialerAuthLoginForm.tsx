@@ -22,7 +22,7 @@ const validationSchema = Yup.object({
     .required("Email is required"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
-    .required("Password is required"),
+    .required("Password is required")
 });
 
 const DialerAuthLoginForm = () => {
@@ -37,19 +37,23 @@ const DialerAuthLoginForm = () => {
         {
           payload: {
             email: values.email.trim().toLowerCase(),
-            password: values.password,
-          },
+            password: values.password
+          }
         },
         {
           onSuccess: (res) => {
             toast.success("Logged in successfully");
             setCookie("token", res.data.token);
-            router.replace("/dialer/callback-schedules");
+            if (res.data.has_reset_password) {
+              router.replace("/dialer/set-password");
+            } else {
+              router.replace("/dialer/callback-schedules");
+            }
           },
-          onError: handleMutationError,
+          onError: handleMutationError
         }
       );
-    },
+    }
   });
 
   return (
@@ -79,7 +83,9 @@ const DialerAuthLoginForm = () => {
               label="Password"
               value={formik.values.password}
               setValue={(val) => formik.setFieldValue("password", val)}
-              error={formik.touched.password ? formik.errors.password : undefined}
+              error={
+                formik.touched.password ? formik.errors.password : undefined
+              }
               startIcon={<LockKeyhole aria-hidden="true" />}
             />
 

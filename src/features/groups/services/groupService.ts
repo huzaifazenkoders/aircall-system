@@ -8,8 +8,8 @@ import { Group, GroupInfo } from "../types/groupTypes";
 
 interface GetGroupsReq extends PaginationReq {
   is_active?: boolean;
-  from?: number;
-  to?: number;
+  from?: string;
+  to?: string;
 }
 
 interface GetGroupsRes {

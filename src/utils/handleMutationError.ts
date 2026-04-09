@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 function extractErrorMessage(error: Error | AxiosError): string {
   try {
     if (axios.isAxiosError(error)) {
-      const responseMessage = error?.response?.data?.message;
+      const responseMessage = error?.response?.data?.error;
 
       // 1️⃣ Message is a plain string
       if (typeof responseMessage === "string") {
@@ -19,8 +19,12 @@ function extractErrorMessage(error: Error | AxiosError): string {
       // 2️⃣ Message is an array of constraint objects (NestJS validation errors)
       if (Array.isArray(responseMessage)) {
         const messages = responseMessage.flatMap(
-          (each: { constraints?: DynamicObject }) =>
-            each?.constraints ? Object.values(each.constraints) : []
+          (each: { constraints?: DynamicObject } | string) =>
+            typeof each === "string"
+              ? each
+              : each?.constraints
+                ? Object.values(each.constraints)
+                : []
         );
         if (messages.length > 0) return messages.join(", ");
       }

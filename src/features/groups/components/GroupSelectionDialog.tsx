@@ -31,6 +31,7 @@ import {
 import TextInput from "@/components/ui/text-input";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { useGetUsers } from "@/features/users/services/userService";
+import { useGetLists } from "@/features/list/services/listService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 type SelectionItem = {
@@ -99,16 +100,31 @@ const GroupSelectionDialog = ({
     [initialSelectedIds]
   );
   const usesUserQuery = emptyKind === "members";
+  const usesListQuery = emptyKind === "lists";
 
   const {
     data: usersData,
     isPending: isUsersPending,
-    hasNextPage,
-    fetchNextPage
+    hasNextPage: usersHasNextPage,
+    fetchNextPage: usersFetchNextPage
   } = useGetUsers({
     limit: 20,
     search: usesUserQuery ? query || undefined : undefined
   });
+
+  const {
+    data: listsData,
+    isPending: isListsPending,
+    hasNextPage: listsHasNextPage,
+    fetchNextPage: listsFetchNextPage
+  } = useGetLists({
+    limit: 20,
+    list_type: "shared",
+    search: usesListQuery ? query || undefined : undefined
+  });
+
+  const hasNextPage = usesUserQuery ? usersHasNextPage : listsHasNextPage;
+  const fetchNextPage = usesUserQuery ? usersFetchNextPage : listsFetchNextPage;
 
   React.useEffect(() => {
     if (open) {
@@ -133,18 +149,23 @@ const GroupSelectionDialog = ({
       }));
     }
 
-    const search = query.trim().toLowerCase();
-
-    if (!search) {
-      return items;
+    if (usesListQuery) {
+      const lists = transformInfiniteData(listsData, "data");
+      return lists.map((list) => ({
+        id: list.id,
+        title: list.name,
+        subtitle: `Priority ${list.priority}`
+      }));
     }
 
+    const search = query.trim().toLowerCase();
+    if (!search) return items;
     return items.filter((item) => {
       const titleMatch = item.title.toLowerCase().includes(search);
       const subtitleMatch = item.subtitle?.toLowerCase().includes(search);
       return titleMatch || subtitleMatch;
     });
-  }, [items, query, usersData, usesUserQuery]);
+  }, [items, listsData, query, usersData, usesListQuery, usesUserQuery]);
 
   const toggleItem = React.useCallback(
     (itemId: string, checked: boolean) => {
@@ -167,7 +188,7 @@ const GroupSelectionDialog = ({
     () => selectedIds.filter((id) => !lockedIds.has(id)),
     [lockedIds, selectedIds]
   );
-  const shouldShowUsersLoading = usesUserQuery && isUsersPending;
+  const shouldShowUsersLoading = (usesUserQuery && isUsersPending) || (usesListQuery && isListsPending);
 
   const EmptyIcon = emptyKind === "members" ? UsersRoundIcon : ListChecksIcon;
 
@@ -235,7 +256,7 @@ const GroupSelectionDialog = ({
                       <InfiniteScroll
                         dataLength={resolvedItems.length}
                         next={() => void fetchNextPage()}
-                        hasMore={usesUserQuery ? Boolean(hasNextPage) : false}
+                        hasMore={usesUserQuery ? Boolean(usersHasNextPage) : usesListQuery ? Boolean(listsHasNextPage) : false}
                         loader={
                           <div className="flex items-center justify-center px-4 py-4">
                             <Loader2Icon className="size-5 animate-spin text-secondary" />

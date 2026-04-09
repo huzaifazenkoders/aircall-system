@@ -17,16 +17,20 @@ import {
 import { cn } from "@/lib/utils";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { Lead } from "@/features/list/types/leadTypes";
+import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
 
 const LeadDetailsContent = ({
   lead,
-  onBack
+  onBack,
+  fromListId
 }: {
   lead: Lead | null;
   onBack?: () => void;
+  fromListId?: string;
 }) => {
   const router = useRouter();
   const leadName = getLeadName(lead);
+  const [moveLeadOpen, setMoveLeadOpen] = React.useState(false);
 
   if (!lead) return null;
 
@@ -59,14 +63,23 @@ const LeadDetailsContent = ({
             disabled={!lead.keap_contact_url}
             onClick={() => {
               if (lead.keap_contact_url) {
-                window.open(lead.keap_contact_url, "_blank", "noopener,noreferrer");
+                window.open(
+                  lead.keap_contact_url,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
               }
             }}
           >
             <ExternalLinkIcon className="size-4" aria-hidden="true" />
             Open Contact in Keap
           </Button>
-          <Button variant="outline" type="button" disabled>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => setMoveLeadOpen(true)}
+            disabled={!fromListId}
+          >
             <MoveRightIcon className="size-4" aria-hidden="true" />
             Move Lead
           </Button>
@@ -112,7 +125,9 @@ const LeadDetailsContent = ({
               </div>
               <div className="text-sm font-semibold text-muted-foreground">
                 TOTAL PURCHASE
-                <span className="ml-2 text-lg font-semibold text-secondary">$0</span>
+                <span className="ml-2 text-lg font-semibold text-secondary">
+                  $0
+                </span>
               </div>
             </div>
 
@@ -192,6 +207,16 @@ const LeadDetailsContent = ({
           </Tabs>
         </div>
       </div>
+
+      {fromListId && (
+        <MoveLeadDialog
+          open={moveLeadOpen}
+          onOpenChange={setMoveLeadOpen}
+          leadId={lead.id}
+          fromListId={fromListId}
+          onConfirm={onBack}
+        />
+      )}
     </div>
   );
 };
@@ -208,7 +233,9 @@ const Info = ({ label, value }: { label: string; value?: string | null }) => {
   return (
     <div>
       <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="mt-2 text-sm font-medium text-foreground">{value || "—"}</div>
+      <div className="mt-2 text-sm font-medium text-foreground">
+        {value || "—"}
+      </div>
     </div>
   );
 };
@@ -237,7 +264,10 @@ const HistoryItem = ({
 const getLeadName = (lead: Lead | null) => {
   if (!lead) return "Lead Details";
 
-  return [lead.first_name, lead.last_name].filter(Boolean).join(" ") || "Unnamed Lead";
+  return (
+    [lead.first_name, lead.last_name].filter(Boolean).join(" ") ||
+    "Unnamed Lead"
+  );
 };
 
 const formatLeadDate = (value?: string | null) => {

@@ -6,9 +6,15 @@ import { Button } from "@/components/ui/button";
 import CreateListDialog from "@/features/list/components/list-all/CreateListDialog";
 import ListTable from "@/features/list/components/list-all/ListTable";
 import { listStyles } from "@/features/list/styles/listStyles";
+import { ListDetail } from "@/features/list/types/listTypes";
 
 const ListManagementView = () => {
   const [createOpen, setCreateOpen] = React.useState(false);
+  const [editList, setEditList] = React.useState<ListDetail | null>(null);
+
+  const handleEditClose = (open: boolean) => {
+    if (!open) setEditList(null);
+  };
 
   return (
     <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col mt-5 px-4 md:px-6">
@@ -22,8 +28,14 @@ const ListManagementView = () => {
         </Button>
       </div>
 
-      <ListTable setCreateOpen={setCreateOpen} />
+      <ListTable setCreateOpen={setCreateOpen} setEditList={setEditList} />
       <CreateListDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateListDialog
+        open={!!editList}
+        onOpenChange={handleEditClose}
+        mode="edit"
+        initialList={editList}
+      />
     </div>
   );
 };

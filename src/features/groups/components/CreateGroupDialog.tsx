@@ -42,7 +42,7 @@ import { handleMutationError } from "@/utils/handleMutationError";
 const validationSchema = Yup.object({
   name: Yup.string().required("Group name is required"),
   description: Yup.string().required("Description is required"),
-  user_ids: Yup.array().of(Yup.string()).min(1, "Select at least one member")
+  user_ids: Yup.array().of(Yup.string())
 });
 
 const avatarPalettes = [
@@ -72,11 +72,15 @@ const CreateGroupDialog = ({
   const [query, setQuery] = React.useState("");
   const [pickerOpen, setPickerOpen] = React.useState(false);
 
-  const { data, isPending: isUsersPending, hasNextPage, fetchNextPage } =
-    useGetUsers({
-      limit: 20,
-      search: query || undefined
-    });
+  const {
+    data,
+    isPending: isUsersPending,
+    hasNextPage,
+    fetchNextPage
+  } = useGetUsers({
+    limit: 20,
+    search: query || undefined
+  });
 
   const members = React.useMemo(() => {
     const users = transformInfiniteData(data, "data");

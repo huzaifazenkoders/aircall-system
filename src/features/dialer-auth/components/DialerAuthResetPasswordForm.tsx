@@ -1,18 +1,19 @@
 "use client";
 
-import { LockKeyhole } from "lucide-react";
-import * as Yup from "yup";
 import { useFormik } from "formik";
-import { useRouter, useSearchParams } from "next/navigation";
+import { LockKeyhole } from "lucide-react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import * as Yup from "yup";
 
 import { Button } from "@/components/ui/button";
 import PasswordInput from "@/components/ui/password-input";
+import { useChangePassword } from "@/features/auth/services/authService";
 import { dialerAuthStyles } from "@/features/dialer-auth/styles/dialerAuthStyles";
-import { useResetPassword } from "@/features/auth/services/authService";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
+  old_password: Yup.string().trim().required("Old Password is required"),
   new_password: Yup.string()
     .trim()
     .min(8, "Password must be at least 8 characters")
@@ -37,21 +38,24 @@ const DialerAuthResetPasswordForm = ({
   submitLabel?: string;
 }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const reset_token = searchParams.get("reset_token") ?? "";
 
-  const { mutate: resetPassword, isPending } = useResetPassword();
+  const { mutate: resetPassword, isPending } = useChangePassword();
 
   const formik = useFormik({
-    initialValues: { new_password: "", confirm_password: "" },
+    initialValues: { old_password: "", new_password: "", confirm_password: "" },
     validationSchema,
     onSubmit: (values) => {
       resetPassword(
-        { payload: { reset_token, new_password: values.new_password.trim() } },
+        {
+          payload: {
+            old_password: values.old_password,
+            new_password: values.new_password.trim()
+          }
+        },
         {
           onSuccess: () => {
-            toast.success("Password reset successfully");
-            router.push("/dialer-auth/sign-in");
+            toast.success("Password changed successfully");
+            router.push("/dialer/assigned-lead");
           },
           onError: handleMutationError
         }
@@ -70,6 +74,21 @@ const DialerAuthResetPasswordForm = ({
         </div>
 
         <div className={dialerAuthStyles.fieldStack}>
+          <PasswordInput
+            id="dialer-auth-old_password"
+            label={"Old passowrd"}
+            value={formik.values.old_password}
+            setValue={(val) => formik.setFieldValue("old_password", val)}
+            error={
+              formik.touched.old_password
+                ? formik.errors.old_password
+                : undefined
+            }
+            showToggle={false}
+            startIcon={<LockKeyhole aria-hidden="true" />}
+            placeholder="Enter Old Password"
+          />
+
           <PasswordInput
             id="dialer-auth-reset-password"
             label={passwordLabel}

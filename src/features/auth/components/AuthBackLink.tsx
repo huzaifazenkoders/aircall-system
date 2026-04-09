@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import React from "react";
 import { ArrowLeft } from "lucide-react";
 
 import { authStyles } from "@/features/auth/styles/authStyles";
 
 const AuthBackLink = ({
-  href = "/dialer/auth/sign-in",
+  href = "/auth/sign-in",
   label = "Back"
 }: {
   href?: string;

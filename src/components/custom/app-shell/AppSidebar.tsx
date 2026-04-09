@@ -60,8 +60,9 @@ const AppSidebar = ({
       <div className="flex items-center gap-3">
         <div className="grid size-10 place-items-center rounded-xl bg-brand-accent/20">
           <HexagonIcon
-            className="size-6 text-brand-accent"
+            className="size-8 text-[#2FBF9B]"
             aria-hidden="true"
+            fill="#2FBF9B"
           />
         </div>
         <div className="text-[26px] font-semibold tracking-tight">

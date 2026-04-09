@@ -65,8 +65,8 @@ export const usersStyles = {
   menuItem: cn("gap-3 px-3 py-2 text-sm text-text-primary"),
   modalContent: cn("max-w-[790px] rounded-lg p-0"),
   modalHeader: cn("items-start p-6"),
-  modalTitle: cn("text-[24px] font-medium text-text-primary"),
-  modalSubtitle: cn("text-[14px] leading-2 text-panel-muted"),
+  modalTitle: cn("text-2xl font-medium text-text-primary"),
+  modalSubtitle: cn("text-sm text-panel-muted"),
   modalBody: cn("px-6 pt-6 pb-0"),
   sectionLabel: cn("text-sm font-medium text-[#475467]"),
   triggerField: cn(
@@ -80,7 +80,7 @@ export const usersStyles = {
   listOptionRow: cn(
     "flex items-start gap-4 px-4 py-3 text-sm text-text-primary"
   ),
-  optionMuted: cn("text-panel-muted"),
+  optionMuted: cn("text-panel-muted text-left"),
   menuItemMuted: cn("text-panel-muted"),
   cooldownGrid: cn("mt-3 grid grid-cols-1 gap-4 md:grid-cols-2"),
   timeField: cn(

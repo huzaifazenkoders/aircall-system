@@ -14,6 +14,7 @@ interface LoginReq {
 interface LoginRes {
   data: {
     token: string;
+    has_reset_password: boolean;
     user: AuthUser;
   };
   message: string;
@@ -109,5 +110,26 @@ export const useResetPassword = () =>
     mutationFn: async ({ payload }: ResetPasswordReq) => {
       const res = await axiosInstance.post("/auth/reset-password", payload);
       return res.data as ResetPasswordRes;
+    }
+  });
+
+// ─── Change Password (Authenticated) ──────────────────────────────────────────────────────────
+
+interface ChangePasswordReq {
+  payload: {
+    old_password: string;
+    new_password: string;
+  };
+}
+
+interface ChangePasswordRes {
+  message: string;
+}
+
+export const useChangePassword = () =>
+  useMutation({
+    mutationFn: async ({ payload }: ChangePasswordReq) => {
+      const res = await axiosInstance.post("/auth/change-password", payload);
+      return res.data as ChangePasswordRes;
     }
   });

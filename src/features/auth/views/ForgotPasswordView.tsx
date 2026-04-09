@@ -11,7 +11,7 @@ const ForgotPasswordView = () => {
   return (
     <div className={authStyles.pageRoot}>
       <div className={authStyles.pageTopBar}>
-        <AuthBackLink />
+        <AuthBackLink href="/auth/sign-in" />
       </div>
 
       <div className={authStyles.pageContent}>

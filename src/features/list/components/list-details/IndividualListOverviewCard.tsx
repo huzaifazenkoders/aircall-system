@@ -14,9 +14,13 @@ const STATUS_CLASSES: Record<string, string> = {
 };
 
 const IndividualListOverviewCard = ({ list }: { list: ListDetail }) => {
-  const assignedUser = list.assignments.find((assignment) => assignment.user)?.user;
+  const assignedUser = list.assignments.find(
+    (assignment) => assignment.user
+  )?.user;
   const assignedTo = assignedUser
-    ? [assignedUser.first_name, assignedUser.last_name].filter(Boolean).join(" ")
+    ? [assignedUser.first_name, assignedUser.last_name]
+        .filter(Boolean)
+        .join(" ")
     : "—";
   const cooldown = `${list.cooldown_minimum_hours} h ${list.cooldown_minimum_minutes} min`;
   const createdOn = new Date(list.created_at).toLocaleDateString("en-US");
@@ -38,9 +42,7 @@ const IndividualListOverviewCard = ({ list }: { list: ListDetail }) => {
       <div className={listDetailsStyles.idvKvGrid}>
         <div>
           <div className={listDetailsStyles.kvKey}>Name</div>
-          <div className={listDetailsStyles.idvKvVal}>
-            {list.name} ({list.id})
-          </div>
+          <div className={listDetailsStyles.idvKvVal}>{list.name}</div>
         </div>
 
         <div>

@@ -81,16 +81,18 @@ const validationSchema = Yup.object({
   list_type: Yup.string()
     .oneOf(["shared", "individual"], "Invalid list type")
     .required("List type is required"),
-  group_ids: Yup.array().when("assign_type", {
-    is: "group",
+  group_ids: Yup.array().when(["assign_type", "list_type"], {
+    is: (assign_type: string, list_type: string) =>
+      assign_type === "group" && list_type === "shared",
     then: (s) =>
       s
         .min(1, "Select at least one group")
         .required("At least one group is required"),
     otherwise: (s) => s
   }),
-  user_ids: Yup.array().when("assign_type", {
-    is: "individual",
+  user_ids: Yup.array().when(["assign_type", "list_type"], {
+    is: (assign_type: string, list_type: string) =>
+      assign_type === "individual" && list_type === "shared",
     then: (s) =>
       s
         .min(1, "Select at least one user")
@@ -132,7 +134,7 @@ const CreateListDialog = ({
       name: initialList?.name ?? "",
       description: initialList?.description ?? "",
       call_type: (initialList?.call_type ?? "") as "hot_lead" | "inbound" | "",
-      workflow_id: initialList?.workflow_id ?? "",
+      workflow_id: initialList?.workflow?.id ?? "",
       priority: initialList?.priority ?? 1,
       cooldown_minimum_hours: initialList?.cooldown_minimum_hours ?? 0,
       cooldown_minimum_minutes: initialList?.cooldown_minimum_minutes ?? 0,
@@ -244,7 +246,7 @@ const CreateListDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl overflow-visible">
+      <DialogContent className="max-w-3xl overflow-y-auto custom-scrollbar max-h-[98dvh]">
         <DialogHeader>
           <div className="min-w-0">
             <DialogTitle>
@@ -299,8 +301,10 @@ const CreateListDialog = ({
                   value={formik.values.call_type}
                   onValueChange={(v) => formik.setFieldValue("call_type", v)}
                 >
-                  <SelectTrigger className="h-11 w-full border border-border-primary px-4 text-sm text-muted-foreground">
-                    <SelectValue placeholder="Select call type" />
+                  <SelectTrigger className="h-11 w-full capitalize border border-border-primary px-4 text-sm text-muted-foreground">
+                    <SelectValue placeholder="Select call type">
+                      {formik.values.call_type.replaceAll("_", " ")}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
                     <SelectItem value="hot_lead">Hot Lead</SelectItem>
@@ -321,8 +325,14 @@ const CreateListDialog = ({
                   value={formik.values.workflow_id}
                   onValueChange={(v) => formik.setFieldValue("workflow_id", v)}
                 >
-                  <SelectTrigger className="h-11 border border-border-primary w-full px-4 text-sm text-muted-foreground">
-                    <SelectValue placeholder="Select template" />
+                  <SelectTrigger className="h-11 capitalize border border-border-primary w-full px-4 text-sm text-muted-foreground">
+                    <SelectValue placeholder="Select template">
+                      {
+                        workflows.find(
+                          (t) => t.id === formik.values.workflow_id
+                        )?.name
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
                     {workflows.map((w) => (
@@ -345,8 +355,13 @@ const CreateListDialog = ({
                 <Select
                   value={formik.values.list_type}
                   onValueChange={(v) => formik.setFieldValue("list_type", v)}
+                  disabled={
+                    initialList && initialList?.list_type === "individual"
+                      ? true
+                      : false
+                  }
                 >
-                  <SelectTrigger className="h-11 border border-border-primary w-full px-4 text-sm text-muted-foreground">
+                  <SelectTrigger className="h-11 capitalize border border-border-primary w-full px-4 text-sm text-muted-foreground">
                     <SelectValue placeholder="Select list type" />
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
@@ -460,141 +475,157 @@ const CreateListDialog = ({
               </p>
             </Field>
 
-            <Field label="Assignation">
-              <div className="grid grid-cols-2 gap-4">
-                <RadioSelector
-                  label="Assign List to Group"
-                  checked={formik.values.assign_type === "group"}
-                  onClick={() => formik.setFieldValue("assign_type", "group")}
-                />
-                <RadioSelector
-                  label="Assign List to Individual"
-                  checked={formik.values.assign_type === "individual"}
-                  onClick={() =>
-                    formik.setFieldValue("assign_type", "individual")
-                  }
-                />
-              </div>
-            </Field>
+            {initialList && initialList?.list_type === "individual" ? null : (
+              <>
+                <Field label="Assignation">
+                  <div className="grid grid-cols-2 gap-4">
+                    <RadioSelector
+                      label="Assign List to Group"
+                      checked={formik.values.assign_type === "group"}
+                      onClick={() =>
+                        formik.setFieldValue("assign_type", "group")
+                      }
+                    />
+                    <RadioSelector
+                      label="Assign List to Individual"
+                      checked={formik.values.assign_type === "individual"}
+                      onClick={() =>
+                        formik.setFieldValue("assign_type", "individual")
+                      }
+                    />
+                  </div>
+                </Field>
 
-            {formik.values.assign_type === "group" ? (
-              <Field
-                label=""
-                error={
-                  formik.touched.group_ids
-                    ? (formik.errors.group_ids as string)
-                    : undefined
-                }
-              >
-                <DropdownMenu open={groupOpen} onOpenChange={setGroupOpen}>
-                  <DropdownMenuTrigger
-                    render={
-                      <button
-                        type="button"
-                        className={cn(
-                          "flex h-11 w-full items-center rounded-lg justify-between border px-4 text-sm text-muted-foreground",
-                          groupOpen && "border-secondary"
-                        )}
-                      >
-                        <span className="truncate">
-                          {formik.values.group_ids.length > 0
-                            ? groups
-                                .filter((g) =>
-                                  formik.values.group_ids.includes(g?.id ?? "")
-                                )
-                                .map((g) => g?.name)
-                                .join(", ")
-                            : "Select group"}
-                        </span>
-                        <ChevronDownIcon
-                          className="size-4"
-                          aria-hidden="true"
-                        />
-                      </button>
+                {formik.values.assign_type === "group" ? (
+                  <Field
+                    label=""
+                    error={
+                      formik.touched.group_ids
+                        ? (formik.errors.group_ids as string)
+                        : undefined
                     }
-                  />
-                  <DropdownMenuContent
-                    className="max-h-44 w-(--anchor-width) p-2"
-                    sideOffset={8}
                   >
-                    {groups.map((g) => (
-                      <DropdownMenuCheckboxItem
-                        key={g?.id}
-                        checked={formik.values.group_ids.includes(g?.id ?? "")}
-                        onCheckedChange={() => toggleGroup(g?.id ?? "")}
-                        onSelect={(e) => e.preventDefault()}
-                        className="rounded-lg px-3 py-2 text-sm"
+                    <DropdownMenu open={groupOpen} onOpenChange={setGroupOpen}>
+                      <DropdownMenuTrigger
+                        render={
+                          <button
+                            type="button"
+                            className={cn(
+                              "flex h-11 w-full items-center rounded-lg justify-between border px-4 text-sm text-muted-foreground",
+                              groupOpen && "border-secondary"
+                            )}
+                          >
+                            <span className="truncate">
+                              {formik.values.group_ids.length > 0
+                                ? groups
+                                    .filter((g) =>
+                                      formik.values.group_ids.includes(
+                                        g?.id ?? ""
+                                      )
+                                    )
+                                    .map((g) => g?.name)
+                                    .join(", ")
+                                : "Select group"}
+                            </span>
+                            <ChevronDownIcon
+                              className="size-4"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        }
+                      />
+                      <DropdownMenuContent
+                        className="max-h-44 w-(--anchor-width) p-2"
+                        sideOffset={8}
                       >
-                        <span className="flex-1 truncate text-foreground">
-                          {g?.name}{" "}
-                          <span className="text-muted-foreground">
-                            ({g?.total_users ?? 0} users)
-                          </span>
-                        </span>
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </Field>
-            ) : (
-              <Field
-                label=""
-                error={
-                  formik.touched.user_ids
-                    ? (formik.errors.user_ids as string)
-                    : undefined
-                }
-              >
-                <DropdownMenu open={userOpen} onOpenChange={setUserOpen}>
-                  <DropdownMenuTrigger
-                    render={
-                      <button
-                        type="button"
-                        className={cn(
-                          "flex h-11 w-full items-center rounded-lg justify-between border bg-background px-4 text-sm text-muted-foreground",
-                          userOpen && "border-secondary"
-                        )}
-                      >
-                        <span className="truncate">
-                          {formik.values.user_ids.length > 0
-                            ? users
-                                .filter((u) =>
-                                  formik.values.user_ids.includes(u?.id ?? "")
-                                )
-                                .map((u) => `${u?.first_name} ${u?.last_name}`)
-                                .join(", ")
-                            : "Select individuals"}
-                        </span>
-                        <ChevronDownIcon
-                          className="size-4"
-                          aria-hidden="true"
-                        />
-                      </button>
+                        {groups.map((g) => (
+                          <DropdownMenuCheckboxItem
+                            key={g?.id}
+                            checked={formik.values.group_ids.includes(
+                              g?.id ?? ""
+                            )}
+                            onCheckedChange={() => toggleGroup(g?.id ?? "")}
+                            onSelect={(e) => e.preventDefault()}
+                            className="rounded-lg px-3 py-2 text-sm"
+                          >
+                            <span className="flex-1 truncate text-foreground">
+                              {g?.name}{" "}
+                              <span className="text-muted-foreground">
+                                ({g?.total_users ?? 0} users)
+                              </span>
+                            </span>
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </Field>
+                ) : (
+                  <Field
+                    label=""
+                    error={
+                      formik.touched.user_ids
+                        ? (formik.errors.user_ids as string)
+                        : undefined
                     }
-                  />
-                  <DropdownMenuContent
-                    className="max-h-44 w-(--anchor-width) p-2"
-                    sideOffset={8}
                   >
-                    {users.map((u) => (
-                      <DropdownMenuCheckboxItem
-                        key={u?.id}
-                        checked={formik.values.user_ids.includes(u?.id ?? "")}
-                        onCheckedChange={() => toggleUser(u?.id ?? "")}
-                        onSelect={(e) => e.preventDefault()}
-                        className="rounded-lg px-3 py-2 text-sm"
+                    <DropdownMenu open={userOpen} onOpenChange={setUserOpen}>
+                      <DropdownMenuTrigger
+                        render={
+                          <button
+                            type="button"
+                            className={cn(
+                              "flex h-11 w-full items-center rounded-lg justify-between border bg-background px-4 text-sm text-muted-foreground",
+                              userOpen && "border-secondary"
+                            )}
+                          >
+                            <span className="truncate">
+                              {formik.values.user_ids.length > 0
+                                ? users
+                                    .filter((u) =>
+                                      formik.values.user_ids.includes(
+                                        u?.id ?? ""
+                                      )
+                                    )
+                                    .map(
+                                      (u) => `${u?.first_name} ${u?.last_name}`
+                                    )
+                                    .join(", ")
+                                : "Select individuals"}
+                            </span>
+                            <ChevronDownIcon
+                              className="size-4"
+                              aria-hidden="true"
+                            />
+                          </button>
+                        }
+                      />
+                      <DropdownMenuContent
+                        className="max-h-44 w-(--anchor-width) p-2"
+                        sideOffset={8}
                       >
-                        <span className="flex-1 truncate text-foreground">
-                          {u?.first_name} {u?.last_name}{" "}
-                          <span className="text-muted-foreground">
-                            ({u?.email})
-                          </span>
-                        </span>
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </Field>
+                        {users.map((u) => (
+                          <DropdownMenuCheckboxItem
+                            key={u?.id}
+                            checked={formik.values.user_ids.includes(
+                              u?.id ?? ""
+                            )}
+                            onCheckedChange={() => toggleUser(u?.id ?? "")}
+                            onSelect={(e) => e.preventDefault()}
+                            className="rounded-lg px-3 py-2 text-sm"
+                          >
+                            <span className="flex-1 truncate text-foreground">
+                              {u?.first_name} {u?.last_name}{" "}
+                              <span className="text-muted-foreground">
+                                ({u?.email})
+                              </span>
+                            </span>
+                          </DropdownMenuCheckboxItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </Field>
+                )}
+              </>
             )}
           </DialogBody>
 

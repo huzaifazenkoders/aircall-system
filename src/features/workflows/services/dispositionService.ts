@@ -68,10 +68,10 @@ interface DispositionPayloadBase {
   workflow_id: string;
   disposition_type: DispositionType;
   resulting_lead_status: ResultingLeadStatus;
-  max_attempts: number;
+  max_attempts?: number;
   cooldown_behavior: CooldownBehavior;
-  custom_cooldown_hours: number;
-  custom_cooldown_min: number;
+  custom_cooldown_hours?: number;
+  custom_cooldown_min?: number;
   max_attempt_reached: MaxAttemptReached;
   keap_note: string;
   is_retry_allowed: boolean;

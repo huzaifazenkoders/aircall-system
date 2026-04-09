@@ -10,7 +10,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDownIcon,
-  PlusIcon
+  PlusIcon,
+  Loader2Icon
 } from "lucide-react";
 
 import {
@@ -38,6 +39,7 @@ import {
 import TextInput from "@/components/ui/text-input";
 import { User } from "@/features/users/types/userTypes";
 import { ReactDispatch } from "@/types/common";
+import UsersEmptyState from "./UsersEmptyState";
 
 const PAGE_SIZE = 10;
 
@@ -72,7 +74,9 @@ const UsersManagementTable = ({
   onAddUser,
   onViewDetails,
   onAssignList,
-  onAddToGroup
+  onAddToGroup,
+  error,
+  isPending
 }: {
   users: User[];
   selectedUserId: string;
@@ -87,6 +91,8 @@ const UsersManagementTable = ({
   onViewDetails?: ReactDispatch<string>;
   onAssignList?: ReactDispatch<string>;
   onAddToGroup?: ReactDispatch<string>;
+  isPending: boolean;
+  error: boolean;
 }) => {
   const [page, setPage] = React.useState(1);
 
@@ -132,7 +138,7 @@ const UsersManagementTable = ({
                 )
               }
             >
-              <SelectTrigger className="h-9 min-w-[110px] rounded-lg border-zinc-200 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]">
+              <SelectTrigger className="h-9 min-w-[110px] capitalize rounded-lg border-zinc-200 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -146,104 +152,121 @@ const UsersManagementTable = ({
         </div>
 
         {/* Table */}
-        <Table>
-          <TableHeader>
-            <TableRow className="border-zinc-200 bg-gray-50 hover:bg-gray-50">
-              <TableHead className="w-44 px-4 py-4 text-sm font-medium text-gray-500">
-                Name
-              </TableHead>
-              <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
-                Email
-              </TableHead>
-              <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
-                Phone Number
-              </TableHead>
-              <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
-                Assigned Group
-              </TableHead>
-              <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
-                Assigned Lists
-              </TableHead>
-              <TableHead className="w-32 px-4 py-4 text-sm font-medium text-gray-500">
-                Status
-              </TableHead>
-              <TableHead className="w-12 px-4 py-4 text-sm font-medium text-gray-500 opacity-0">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {paginated.map((user) => (
-              <TableRow
-                key={user.id}
-                className="h-16 cursor-pointer border-zinc-200 hover:bg-gray-50 data-[state=selected]:bg-gray-50"
-                data-state={user.id === selectedUserId ? "selected" : undefined}
-                onClick={() => onSelectUser(user.id)}
-              >
-                <TableCell className="w-44 px-4 text-sm text-gray-800">
-                  {user.first_name} {user.last_name}
-                </TableCell>
-                <TableCell className="w-48 px-4 text-sm text-gray-800">
-                  {user.email}
-                </TableCell>
-                <TableCell className="w-48 px-4 text-sm text-gray-800">
-                  {user.phone_number ?? "—"}
-                </TableCell>
-                <TableCell className="w-40 px-4 text-sm text-gray-800">
-                  {user.total_groups ?? 0}
-                </TableCell>
-                <TableCell className="w-40 px-4 text-sm text-gray-800">
-                  {user.total_lists ?? 0}
-                </TableCell>
-                <TableCell className="w-32 px-4">
-                  {statusBadge(user.status)}
-                </TableCell>
-                <TableCell
-                  className="w-12 px-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button
-                        variant="outline"
-                        size="icon-sm"
-                        className="size-8 border-gray-800/20"
-                      >
-                        <MoreHorizontalIcon className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="w-40 rounded-xl py-2 px-0"
-                    >
-                      <DropdownMenuItem
-                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                        onClick={() => onViewDetails?.(user.id)}
-                      >
-                        <EyeIcon className="size-4 text-gray-500" />
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                        onClick={() => onAssignList?.(user.id)}
-                      >
-                        <ListIcon className="size-4 text-gray-500" />
-                        Assign List
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                        onClick={() => onAddToGroup?.(user.id)}
-                      >
-                        <UsersIcon className="size-4 text-gray-500" />
-                        Add to Group
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        {isPending ? (
+          <div className="flex flex-1 items-center justify-center py-20">
+            <Loader2Icon className="size-8 animate-spin text-secondary" />
+          </div>
+        ) : error ? (
+          <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
+            Failed to load users. Please try again.
+          </div>
+        ) : !paginated.length ? (
+          <UsersEmptyState
+            onAddUser={onAddUser}
+            showButton={statusFilter === "All Status" ? true : false}
+          />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="border-zinc-200 bg-gray-50 hover:bg-gray-50">
+                <TableHead className="w-44 px-4 py-4 text-sm font-medium text-gray-500">
+                  Name
+                </TableHead>
+                <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
+                  Email
+                </TableHead>
+                <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
+                  Phone Number
+                </TableHead>
+                <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
+                  Assigned Group
+                </TableHead>
+                <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
+                  Assigned Lists
+                </TableHead>
+                <TableHead className="w-32 px-4 py-4 text-sm font-medium text-gray-500">
+                  Status
+                </TableHead>
+                <TableHead className="w-12 px-4 py-4 text-sm font-medium text-gray-500 opacity-0">
+                  Actions
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {paginated.map((user) => (
+                <TableRow
+                  key={user.id}
+                  className="h-16 cursor-pointer border-zinc-200 hover:bg-gray-50 data-[state=selected]:bg-gray-50"
+                  data-state={
+                    user.id === selectedUserId ? "selected" : undefined
+                  }
+                  onClick={() => onSelectUser(user.id)}
+                >
+                  <TableCell className="w-44 px-4 text-sm text-gray-800">
+                    {user.first_name} {user.last_name}
+                  </TableCell>
+                  <TableCell className="w-48 px-4 text-sm text-gray-800">
+                    {user.email}
+                  </TableCell>
+                  <TableCell className="w-48 px-4 text-sm text-gray-800">
+                    {user.phone_number ?? "—"}
+                  </TableCell>
+                  <TableCell className="w-40 px-4 text-sm text-gray-800">
+                    {user.total_groups ?? 0}
+                  </TableCell>
+                  <TableCell className="w-40 px-4 text-sm text-gray-800">
+                    {user.total_lists ?? 0}
+                  </TableCell>
+                  <TableCell className="w-32 px-4">
+                    {statusBadge(user.status)}
+                  </TableCell>
+                  <TableCell
+                    className="w-12 px-2"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          className="size-8 border-gray-800/20"
+                        >
+                          <MoreHorizontalIcon className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="w-40 rounded-xl py-2 px-0"
+                      >
+                        <DropdownMenuItem
+                          className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                          onClick={() => onViewDetails?.(user.id)}
+                        >
+                          <EyeIcon className="size-4 text-gray-500" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                          onClick={() => onAssignList?.(user.id)}
+                        >
+                          <ListIcon className="size-4 text-gray-500" />
+                          Assign List
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                          onClick={() => onAddToGroup?.(user.id)}
+                        >
+                          <UsersIcon className="size-4 text-gray-500" />
+                          Add to Group
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
         {/* Pagination */}
         <div className="flex items-center justify-end gap-6 py-2 pr-4">

@@ -13,7 +13,7 @@ const ListEmptyState = ({ onCreate }: { onCreate: () => void }) => {
       <h2 className="mt-10 text-[30px] font-semibold tracking-tight">
         Create Your First Calling List
       </h2>
-      <p className="mx-auto mt-3 max-w-[520px] text-base leading-6 text-muted-foreground">
+      <p className="mx-auto mt-3 text-base leading-6 text-muted-foreground max-w-[520px] whitespace-pre-wrap">
         Lists organize inbound leads from Keap and determine how they are
         prioritized and assigned to your sales team.
       </p>
@@ -21,7 +21,7 @@ const ListEmptyState = ({ onCreate }: { onCreate: () => void }) => {
       <Button
         type="button"
         size="xl"
-        className="mt-8 h-11 rounded-xl px-8 text-sm font-medium"
+        className="mt-8 h-11 rounded-xl px-8 text-sm font-medium "
         onClick={onCreate}
       >
         Create List

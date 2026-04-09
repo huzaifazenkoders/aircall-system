@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   SearchIcon,
   MoreVerticalIcon,
-  CalendarIcon,
   ChevronLeft,
   ChevronRight,
   Loader2Icon
@@ -32,33 +31,54 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { listStyles } from "@/features/list/styles/listStyles";
-import DateSelector from "@/components/custom/date-selector.component";
-import { useGetLists } from "@/features/list/services/listService";
+import DateRangeSelector from "@/components/ui/date-range-selector";
+import moment from "moment";
+import {
+  useGetListById,
+  useGetLists
+} from "@/features/list/services/listService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
-import { List, ListStatus } from "@/features/list/types/listTypes";
+import { List, ListDetail, ListStatus } from "@/features/list/types/listTypes";
 import ListEmptyState from "./ListEmptyState";
 import { ReactDispatch } from "@/types/common";
 
 const LIMIT = 10;
 
 const ListTable = ({
-  setCreateOpen
+  setCreateOpen,
+  setEditList
 }: {
   setCreateOpen: ReactDispatch<boolean>;
+  setEditList: ReactDispatch<ListDetail | null>;
 }) => {
   const [query, setQuery] = React.useState("");
   const [tabs, setTabs] = useState<"shared" | "idv">("shared");
+  const [dateRange, setDateRange] = React.useState<{
+    startDate: Date | null;
+    endDate: Date | null;
+  }>({ startDate: null, endDate: null });
+
+  const startDateStr = dateRange.startDate
+    ? moment(dateRange.startDate).format("YYYY-MM-DD")
+    : undefined;
+  const endDateStr = dateRange.endDate
+    ? moment(dateRange.endDate).format("YYYY-MM-DD")
+    : undefined;
 
   const sharedQuery = useGetLists({
     limit: LIMIT,
     search: query || undefined,
-    list_type: "shared"
+    list_type: "shared",
+    startDate: startDateStr,
+    endDate: endDateStr
   });
 
   const idvQuery = useGetLists({
     limit: LIMIT,
     search: query || undefined,
-    list_type: "individual"
+    list_type: "individual",
+    startDate: startDateStr,
+    endDate: endDateStr
   });
 
   const sharedLists = transformInfiniteData(sharedQuery.data, "data");
@@ -121,20 +141,7 @@ const ListTable = ({
             className="bg-transparent"
           />
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button variant="outline" className={listStyles.dateBtn}>
-                  <span>Date</span>
-                  <CalendarIcon
-                    className="ml-2 size-4 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </Button>
-              }
-            />
-            <DateSelector />
-          </DropdownMenu>
+          <DateRangeSelector value={dateRange} setValue={setDateRange} />
         </div>
 
         {(["shared", "idv"] as const).map((tab) => {
@@ -153,11 +160,9 @@ const ListTable = ({
                   Failed to load lists.
                 </div>
               ) : lists.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="flex">
-                    <ListEmptyState onCreate={() => setCreateOpen(true)} />
-                  </TableCell>
-                </TableRow>
+                <div className="flex items-center justify-center py-16">
+                  <ListEmptyState onCreate={() => setCreateOpen(true)} />
+                </div>
               ) : (
                 <>
                   <div className={listStyles.tableWrap}>
@@ -174,7 +179,12 @@ const ListTable = ({
                       </TableHeader>
                       <TableBody>
                         {lists.map((r) => (
-                          <ListRow key={r?.id} row={r!} />
+                          <ListRow
+                            key={r?.id}
+                            row={r!}
+                            setEditList={setEditList}
+                            donotShow={tab === "idv" ? true : false}
+                          />
                         ))}
                       </TableBody>
                     </Table>
@@ -215,47 +225,78 @@ const ListTable = ({
   );
 };
 
-const ListRow = ({ row }: { row: List }) => (
-  <TableRow className="h-15.5">
-    <TableCell className="font-medium text-foreground">{row.id}</TableCell>
-    <TableCell className="text-foreground">
-      <Link
-        href={`/list/${row.id}`}
-        className="font-medium text-foreground hover:underline"
-      >
-        {row.name}
-      </Link>
-    </TableCell>
-    <TableCell>{row.priority}</TableCell>
-    <TableCell>{row.total_leads ?? "-"}</TableCell>
-    <TableCell>
-      <StatusBadge status={row.status} />
-    </TableCell>
-    <TableCell className="text-right">
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={cn(
-            buttonVariants({
-              variant: "outline-transparent",
-              size: "icon",
-              className: "size-10 rounded-xl"
-            })
-          )}
+const ListRow = ({
+  row,
+  setEditList,
+  donotShow
+}: {
+  row: List;
+  setEditList: ReactDispatch<ListDetail | null>;
+  donotShow?: boolean;
+}) => {
+  const [fetchEdit, setFetchEdit] = React.useState(false);
+  const { data, isFetching } = useGetListById(fetchEdit ? row.id : "");
+
+  React.useEffect(() => {
+    if (data?.data && fetchEdit) {
+      setEditList(data.data);
+      setFetchEdit(false);
+    }
+  }, [data, fetchEdit, setEditList]);
+
+  return (
+    <TableRow className="h-15.5">
+      <TableCell className="font-medium text-foreground">{row.id}</TableCell>
+      <TableCell className="text-foreground">
+        <Link
+          href={`/list/${row.id}`}
+          className="font-medium text-foreground hover:underline"
         >
-          <MoreVerticalIcon className="size-5" aria-hidden="true" />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-36">
-          <DropdownMenuItem>
-            <Link href={`/list/${row.id}`} className="w-full">
-              View
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </TableCell>
-  </TableRow>
-);
+          {row.name}
+        </Link>
+      </TableCell>
+      <TableCell>{row.priority}</TableCell>
+      <TableCell>{row.total_leads ?? "-"}</TableCell>
+      <TableCell>
+        <StatusBadge status={row.status} />
+      </TableCell>
+      <TableCell className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className={cn(
+              buttonVariants({
+                variant: "outline-transparent",
+                size: "icon",
+                className: "size-10 rounded-xl"
+              })
+            )}
+          >
+            <MoreVerticalIcon className="size-5" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-36">
+            <DropdownMenuItem>
+              <Link href={`/list/${row.id}`} className="w-full">
+                View
+              </Link>
+            </DropdownMenuItem>
+            {!donotShow && (
+              <DropdownMenuItem
+                onClick={() => setFetchEdit(true)}
+                disabled={isFetching}
+              >
+                {isFetching ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  "Edit"
+                )}
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+};
 
 const StatusBadge = ({ status }: { status: ListStatus }) => {
   const classes =

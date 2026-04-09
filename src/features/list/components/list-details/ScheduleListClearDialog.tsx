@@ -133,14 +133,13 @@ const ScheduleListClearDialog = ({
   const isMonthly = form.recurrenceType === "monthly";
   const isWeekly = form.recurrenceType === "weekly";
 
-  const isCreateDisabled =
-    isPending ||
-    (form.scheduleType === "one_time"
-      ? !form.runDate || !form.runTime
-      : !form.recurrenceType ||
-        !form.runTime ||
-        !form.dayOfWeek ||
-        (isMonthly && !form.weekOfMonth));
+  const isCreateDisabled = isPending;
+  // (form.scheduleType === "one_time"
+  //   ? !form.runDate || !form.runTime
+  //   : !form.recurrenceType ||
+  //     !form.runTime ||
+  //     !form.dayOfWeek ||
+  //     (isMonthly && !form.weekOfMonth));
 
   const handleSubmit = () => {
     if (isCreateDisabled) return;
@@ -148,13 +147,12 @@ const ScheduleListClearDialog = ({
     onSubmit({
       cleanup_type: form.scheduleType,
       run_date: form.scheduleType === "one_time" ? form.runDate : undefined,
-      run_time: form.runTime,
-      recurrence_type:
-        isRecurring && form.recurrenceType ? form.recurrenceType : undefined,
+      run_time: moment(form.runTime, "HH:mm", true).format("hh:mm A"),
       day_of_week: isRecurring ? Number(form.dayOfWeek) : undefined,
       week_of_month:
         isRecurring && isMonthly ? Number(form.weekOfMonth) : undefined,
-      timezone: form.timezone
+      timezone: form.timezone,
+      recurrence_type: form.recurrenceType || undefined
     });
   };
 
@@ -276,7 +274,13 @@ const ScheduleListClearDialog = ({
                   }
                 >
                   <SelectTrigger className={triggerClassName}>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Select type">
+                      {
+                        recurrenceOptions.find(
+                          (e) => e.value === form.recurrenceType
+                        )?.label
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent className={selectContentClassName}>
                     {recurrenceOptions.map((option) => (
@@ -306,7 +310,13 @@ const ScheduleListClearDialog = ({
                       }
                     >
                       <SelectTrigger className={triggerClassName}>
-                        <SelectValue placeholder="Select day" />
+                        <SelectValue placeholder="Select day">
+                          {
+                            dayOptions.find(
+                              (e) => Number(e.value) === Number(form.dayOfWeek)
+                            )?.label
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className={selectContentClassName}>
                         {dayOptions.map((option) => (
@@ -352,7 +362,14 @@ const ScheduleListClearDialog = ({
                       }
                     >
                       <SelectTrigger className={triggerClassName}>
-                        <SelectValue placeholder="Select week" />
+                        <SelectValue placeholder="Select week">
+                          {
+                            weekOptions.find(
+                              (e) =>
+                                Number(e.value) === Number(form.weekOfMonth)
+                            )?.label
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className={selectContentClassName}>
                         {weekOptions.map((option) => (
@@ -380,7 +397,13 @@ const ScheduleListClearDialog = ({
                       }
                     >
                       <SelectTrigger className={triggerClassName}>
-                        <SelectValue placeholder="Select day" />
+                        <SelectValue placeholder="Select day">
+                          {
+                            dayOptions.find(
+                              (e) => Number(e.value) === Number(form.dayOfWeek)
+                            )?.label
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className={selectContentClassName}>
                         {dayOptions.map((option) => (

@@ -19,6 +19,8 @@ import { listKeys } from "@/features/list/query-keys";
 interface GetListsReq extends PaginationReq {
   status?: ListStatus;
   list_type: ListType;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface GetListsRes {
@@ -29,12 +31,34 @@ interface GetListsRes {
   message: string;
 }
 
-export function useGetLists({ limit, search, status, list_type }: GetListsReq) {
+export function useGetLists({
+  limit,
+  search,
+  status,
+  list_type,
+  startDate,
+  endDate
+}: GetListsReq) {
   return useInfiniteQuery({
-    queryKey: listKeys.list({ limit, search, status, list_type }),
+    queryKey: listKeys.list({
+      limit,
+      search,
+      status,
+      list_type,
+      startDate,
+      endDate
+    }),
     queryFn: async ({ pageParam }) => {
       const res = await axiosInstance.get("/lists/get-all", {
-        params: { page: pageParam, limit, search, status, list_type }
+        params: {
+          page: pageParam,
+          limit,
+          search,
+          status,
+          list_type,
+          startDate,
+          endDate
+        }
       });
       return res.data as GetListsRes;
     },
@@ -165,7 +189,7 @@ export const useCreateList = () =>
 export const useUpdateList = () =>
   useMutation({
     mutationFn: async ({ payload }: UpdateListReq) => {
-      const res = await axiosInstance.patch("/lists", payload);
+      const res = await axiosInstance.put("/lists", payload);
       return res.data as CreateListRes;
     }
   });
@@ -180,7 +204,7 @@ interface ToggleListStatusRes {
 export const useActivateList = () =>
   useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      const res = await axiosInstance.patch("/lists/activate", null, {
+      const res = await axiosInstance.patch("/lists/activate", undefined, {
         params: { id }
       });
       return res.data as ToggleListStatusRes;
@@ -192,7 +216,7 @@ export const useActivateList = () =>
 export const useDeactivateList = () =>
   useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      const res = await axiosInstance.patch("/lists/deactivate", null, {
+      const res = await axiosInstance.patch("/lists/inactivate", undefined, {
         params: { id }
       });
       return res.data as ToggleListStatusRes;
@@ -262,7 +286,7 @@ export const useMoveLead = () =>
 
 // ─── List Cleanup ─────────────────────────────────────────────────────────────
 
-export type ListCleanupType = "one_time" | "recurring";
+export type ListCleanupType = "one_time" | "recurring" | "now";
 export type ListCleanupRecurrenceType = "weekly" | "monthly";
 export type ListAssignType = "group" | "individual";
 
@@ -372,7 +396,10 @@ interface ToggleMyListRes {
 export const useActivateMyList = () =>
   useMutation({
     mutationFn: async ({ payload }: ToggleMyListReq) => {
-      const res = await axiosInstance.patch("/lists/my-lists/activate", payload);
+      const res = await axiosInstance.patch(
+        "/lists/my-lists/activate",
+        payload
+      );
       return res.data as ToggleMyListRes;
     }
   });
@@ -380,7 +407,10 @@ export const useActivateMyList = () =>
 export const useDeactivateMyList = () =>
   useMutation({
     mutationFn: async ({ payload }: ToggleMyListReq) => {
-      const res = await axiosInstance.patch("/lists/my-lists/inactivate", payload);
+      const res = await axiosInstance.patch(
+        "/lists/my-lists/inactivate",
+        payload
+      );
       return res.data as ToggleMyListRes;
     }
   });

@@ -1,20 +1,19 @@
 "use client";
 
 import React from "react";
-import { Loader2Icon } from "lucide-react";
 
 import AddUserToGroupDialog from "@/features/users/components/AddUserToGroupDialog";
 import AssignListsToUserDialog from "@/features/users/components/AssignListsToUserDialog";
 import GroupMembersDialog from "@/features/users/components/GroupMembersDialog";
 import RemoveGroupDialog from "@/features/users/components/RemoveGroupDialog";
-import UsersConfigDialog from "@/features/users/components/UsersConfigDialog";
 import UserDetailsSheet from "@/features/users/components/UserDetailsSheet";
+import UsersConfigDialog from "@/features/users/components/UsersConfigDialog";
 import UsersManagementTable from "@/features/users/components/UsersManagementTable";
-import { usersStyles } from "@/features/users/styles/usersStyles";
 import {
   useGetUserById,
   useGetUsers
 } from "@/features/users/services/userService";
+import { usersStyles } from "@/features/users/styles/usersStyles";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 const UsersView = () => {
@@ -35,11 +34,10 @@ const UsersView = () => {
     id: string;
     name: string;
   } | null>(null);
-  const [selectedGroupForMembers, setSelectedGroupForMembers] =
-    React.useState<{
-      id: string;
-      name: string;
-    } | null>(null);
+  const [selectedGroupForMembers, setSelectedGroupForMembers] = React.useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const { data, isPending, error } = useGetUsers({
     limit: 10,
@@ -63,41 +61,33 @@ const UsersView = () => {
   return (
     <div className={usersStyles.page}>
       <div className={usersStyles.contentWrap}>
-        {isPending ? (
-          <div className="flex flex-1 items-center justify-center py-20">
-            <Loader2Icon className="size-8 animate-spin text-secondary" />
-          </div>
-        ) : error ? (
-          <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
-            Failed to load users. Please try again.
-          </div>
-        ) : (
-          <UsersManagementTable
-            users={users}
-            selectedUserId={selectedUserId ?? ""}
-            searchValue={searchValue}
-            statusFilter={statusFilter}
-            onSearchChange={setSearchValue}
-            onStatusChange={setStatusFilter}
-            onSelectUser={(userId) => {
-              setSelectedUserId(userId as string);
-              setIsSheetOpen(true);
-            }}
-            onViewDetails={(userId) => {
-              setSelectedUserId(userId as string);
-              setIsSheetOpen(true);
-            }}
-            onAssignList={(userId) => {
-              setSelectedUserId(userId as string);
-              setIsAssignListsOpen(true);
-            }}
-            onAddToGroup={(userId) => {
-              setSelectedUserId(userId as string);
-              setIsAddGroupOpen(true);
-            }}
-            onAddUser={() => setIsConfigOpen(true)}
-          />
-        )}
+        <UsersManagementTable
+          users={users}
+          selectedUserId={selectedUserId ?? ""}
+          searchValue={searchValue}
+          statusFilter={statusFilter}
+          onSearchChange={setSearchValue}
+          onStatusChange={setStatusFilter}
+          onSelectUser={(userId) => {
+            setSelectedUserId(userId as string);
+            setIsSheetOpen(true);
+          }}
+          onViewDetails={(userId) => {
+            setSelectedUserId(userId as string);
+            setIsSheetOpen(true);
+          }}
+          onAssignList={(userId) => {
+            setSelectedUserId(userId as string);
+            setIsAssignListsOpen(true);
+          }}
+          onAddToGroup={(userId) => {
+            setSelectedUserId(userId as string);
+            setIsAddGroupOpen(true);
+          }}
+          onAddUser={() => setIsConfigOpen(true)}
+          error={!!error}
+          isPending={isPending}
+        />
       </div>
 
       <UserDetailsSheet

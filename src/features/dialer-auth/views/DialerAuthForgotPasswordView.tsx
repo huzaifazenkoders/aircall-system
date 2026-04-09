@@ -6,7 +6,7 @@ const DialerAuthForgotPasswordView = () => {
   return (
     <div className={dialerAuthStyles.pageRoot}>
       <div className={dialerAuthStyles.pageTopBar}>
-        <DialerAuthBackLink />
+        <DialerAuthBackLink href="/dialer-auth/sign-in" />
       </div>
 
       <div className={dialerAuthStyles.pageContent}>

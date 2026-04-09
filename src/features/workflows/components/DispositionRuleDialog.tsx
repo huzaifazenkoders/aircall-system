@@ -191,10 +191,16 @@ const DispositionRuleDialog = ({
         disposition_type: values.disposition_type as DispositionType,
         resulting_lead_status:
           values.resulting_lead_status as ResultingLeadStatus,
-        max_attempts: values.max_attempts,
+        max_attempts: values.is_retry_allowed ? values.max_attempts : undefined,
         cooldown_behavior: values.cooldown_behavior,
-        custom_cooldown_hours: values.custom_cooldown_hours,
-        custom_cooldown_min: values.custom_cooldown_min,
+        custom_cooldown_hours:
+          values.cooldown_behavior === "default"
+            ? undefined
+            : values.custom_cooldown_hours,
+        custom_cooldown_min:
+          values.cooldown_behavior === "default"
+            ? undefined
+            : values.custom_cooldown_min,
         max_attempt_reached: values.max_attempt_reached,
         keap_note: values.keap_note,
         is_retry_allowed: values.is_retry_allowed
@@ -229,7 +235,9 @@ const DispositionRuleDialog = ({
               toast.success("Disposition created");
               invalidate();
             },
-            onError: handleMutationError
+            onError: (e) => {
+              handleMutationError(e);
+            }
           }
         );
       }
@@ -389,28 +397,30 @@ const DispositionRuleDialog = ({
                     </RadioGroup>
                   </div>
 
-                  <div className={workflowsStyles.field}>
-                    <span className={workflowsStyles.fieldLabel}>
-                      Maximum Attempts
-                    </span>
-                    <TextInput
-                      placeholder="3"
-                      value={String(formik.values.max_attempts)}
-                      setValue={(val) =>
-                        formik.setFieldValue("max_attempts", Number(val))
-                      }
-                      error={
-                        formik.touched.max_attempts
-                          ? formik.errors.max_attempts
-                          : undefined
-                      }
-                      endIcon={
-                        <span className={workflowsStyles.suffixText}>
-                          attempts
-                        </span>
-                      }
-                    />
-                  </div>
+                  {formik.values.is_retry_allowed ? (
+                    <div className={workflowsStyles.field}>
+                      <span className={workflowsStyles.fieldLabel}>
+                        Maximum Attempts
+                      </span>
+                      <TextInput
+                        placeholder="3"
+                        value={String(formik.values.max_attempts)}
+                        setValue={(val) =>
+                          formik.setFieldValue("max_attempts", Number(val))
+                        }
+                        error={
+                          formik.touched.max_attempts
+                            ? formik.errors.max_attempts
+                            : undefined
+                        }
+                        endIcon={
+                          <span className={workflowsStyles.suffixText}>
+                            attempts
+                          </span>
+                        }
+                      />
+                    </div>
+                  ) : null}
 
                   <div className={workflowsStyles.field}>
                     <span className={workflowsStyles.fieldLabel}>

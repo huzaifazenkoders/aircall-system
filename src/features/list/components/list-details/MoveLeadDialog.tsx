@@ -40,12 +40,14 @@ const MoveLeadDialog = ({
   open,
   onOpenChange,
   leadId,
-  fromListId
+  fromListId,
+  onConfirm
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   leadId: string | null;
   fromListId: string;
+  onConfirm?: () => void;
 }) => {
   const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = React.useState(false);
@@ -95,6 +97,7 @@ const MoveLeadDialog = ({
       {
         onSuccess: (res) => {
           toast.success(res.message || "Lead moved successfully");
+          onConfirm?.();
           void queryClient.invalidateQueries({
             queryKey: listKeys.detail(fromListId)
           });

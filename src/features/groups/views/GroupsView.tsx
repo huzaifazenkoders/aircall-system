@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -34,16 +34,18 @@ import {
   GroupUser
 } from "@/features/groups/types/groupTypes";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
-import { useUnassignList } from "@/features/list/services/listService";
+import { useUnassignList, useAssignList } from "@/features/list/services/listService";
+import { useDebounce } from "use-debounce";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
 
 const GroupsView = () => {
   const queryClient = useQueryClient();
-
+  const [date, setDate] = useState<Date | null>(null);
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createdName, setCreatedName] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
+  const [searchValueDebounced] = useDebounce(searchValue, 500);
   const [statusFilter, setStatusFilter] = React.useState<
     "All Status" | GroupStatus
   >("All Status");
@@ -68,10 +70,12 @@ const GroupsView = () => {
   const isActiveFilter =
     statusFilter === "All Status" ? undefined : statusFilter === "Active";
 
-  const { data, isPending, error } = useGetGroups({
+  const { data, isPending } = useGetGroups({
     limit: 10,
-    search: searchValue || undefined,
-    is_active: isActiveFilter
+    search: searchValueDebounced || undefined,
+    is_active: isActiveFilter,
+    from: date?.toISOString(),
+    to: date?.toISOString()
   });
   const { data: selectedGroupInfoData } = useGetGroupInfo(
     selectedGroupId ?? ""
@@ -85,6 +89,13 @@ const GroupsView = () => {
     [selectedGroupInfoData]
   );
 
+  const existingListIds = React.useMemo(
+    () =>
+      selectedGroupInfoData?.data.list_assignments.map((entry) => entry.list.id) ??
+      [],
+    [selectedGroupInfoData]
+  );
+
   const { mutate: addUsers, isPending: isAddingUsers } = useAddUsersToGroup();
   const { mutate: removeUser, isPending: isRemoving } =
     useRemoveUserFromGroup();
@@ -92,7 +103,33 @@ const GroupsView = () => {
     useUpdateGroupStatus();
   const { mutate: activateGroup, isPending: isActivating } = useActivateGroup();
   const { mutate: unassignList, isPending: isUnassigning } = useUnassignList();
+  const { mutate: assignList, isPending: isAssigningList } = useAssignList();
   const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
+
+  const handleAssignLists = (listIds: string[]) => {
+    if (!selectedGroupId || !listIds.length) return;
+    assignList(
+      {
+        payload: {
+          list_id: listIds[0],
+          assign_type: "group",
+          group_ids: [selectedGroupId],
+          user_ids: []
+        }
+      },
+      {
+        onSuccess: () => {
+          toast.success("List assigned to group successfully");
+          queryClient.invalidateQueries({
+            queryKey: groupKeys.info(selectedGroupId)
+          });
+          queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setAssignListsOpen(false);
+        },
+        onError: handleMutationError
+      }
+    );
+  };
 
   const handleAddMembers = (memberIds: string[]) => {
     if (!selectedGroupId) return;
@@ -207,45 +244,37 @@ const GroupsView = () => {
   return (
     <div className={groupsStyles.page}>
       <div className={groupsStyles.pageInner}>
-        {isPending ? (
-          <div className="flex flex-1 items-center justify-center py-20">
-            <Loader2Icon className="size-8 animate-spin text-secondary" />
-          </div>
-        ) : error ? (
-          <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
-            Failed to load groups. Please try again.
-          </div>
-        ) : groups.length === 0 &&
-          !searchValue &&
-          statusFilter === "All Status" ? (
-          <GroupsEmptyState onCreate={() => setCreateOpen(true)} />
-        ) : (
-          <>
-            {createdName ? <GroupsCreatedBanner name={createdName} /> : null}
+        {createdName ? <GroupsCreatedBanner name={createdName} /> : null}
 
-            <div className={groupsStyles.pageHeader}>
-              <h1 className={groupsStyles.title}>Groups</h1>
-              <Button
-                size="xl"
-                className={groupsStyles.createButton}
-                onClick={() => setCreateOpen(true)}
-              >
-                Create Group
-              </Button>
+        <div className={groupsStyles.pageHeader}>
+          <h1 className={groupsStyles.title}>Groups</h1>
+          <Button
+            size="xl"
+            className={groupsStyles.createButton}
+            onClick={() => setCreateOpen(true)}
+          >
+            Create Group
+          </Button>
+        </div>
+
+        <GroupsTable
+          groups={groups}
+          searchValue={searchValue}
+          statusFilter={statusFilter}
+          onSearchChange={setSearchValue}
+          onStatusChange={(args) => setStatusFilter(args as GroupStatus)}
+          onViewDetails={(groupId) => openDetails(groupId, "members")}
+          onAssignList={() => setAssignListsOpen(true)}
+          onAddMember={() => setAddMembersOpen(true)}
+          isPending={isPending}
+          date={date}
+          setDate={setDate}
+          emptyState={
+            <div className="flex items-center justify-center py-20">
+              <GroupsEmptyState onCreate={() => setCreateOpen(true)} />
             </div>
-
-            <GroupsTable
-              groups={groups}
-              searchValue={searchValue}
-              statusFilter={statusFilter}
-              onSearchChange={setSearchValue}
-              onStatusChange={(args) => setStatusFilter(args as GroupStatus)}
-              onViewDetails={(groupId) => openDetails(groupId, "members")}
-              onAssignList={() => setAssignListsOpen(true)}
-              onAddMember={() => setAddMembersOpen(true)}
-            />
-          </>
-        )}
+          }
+        />
       </div>
 
       <CreateGroupDialog
@@ -295,12 +324,12 @@ const GroupsView = () => {
         fieldLabel="Lists"
         triggerLabel="Select Lists"
         searchPlaceholder="Search..."
-        submitLabel="Assign Lists"
+        submitLabel={isAssigningList ? "Assigning..." : "Assign Lists"}
         emptyTitle="No available lists found"
         emptyDescription="All available lists are already assigned to this group."
         emptyKind="lists"
-        items={[]}
-        onSubmit={() => {}}
+        initialSelectedIds={existingListIds}
+        onSubmit={handleAssignLists}
       />
 
       <GroupConfirmDialog

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { LogOutIcon } from "lucide-react";
 
 import {
@@ -10,9 +10,12 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { useMe, useToggleAvailability } from "@/features/users/services/userService";
+import {
+  useMe,
+  useToggleAvailability
+} from "@/features/users/services/userService";
 import { deleteCookie } from "cookies-next/client";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { myListStyles } from "@/features/dialer/styles/dialerStyles";
 import Toggle from "@/components/ui/toggle";
 import ConfirmDialog from "@/components/ui/confirm-dialog";
@@ -58,10 +61,22 @@ const AppTopbar = () => {
   const { data, isPending, isError } = useMe();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const pathname = usePathname();
 
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
-  const { mutate: toggleAvailability, isPending: toggling } = useToggleAvailability();
+  const { mutate: toggleAvailability, isPending: toggling } =
+    useToggleAvailability();
+
+  useEffect(() => {
+    if (
+      data?.data?.role === "sales_person" &&
+      data?.data?.has_reset_password &&
+      !pathname.includes("/dialer-auth/set-password")
+    ) {
+      router.replace("/dialer-auth/set-password");
+    }
+  }, [data]);
 
   if (isPending || isError) {
     return null;
@@ -73,7 +88,9 @@ const AppTopbar = () => {
   const handleToggle = () => {
     toggleAvailability(undefined, {
       onSuccess: () => {
-        toast.success(isUnavailable ? "You are now available" : "You are now unavailable");
+        toast.success(
+          isUnavailable ? "You are now available" : "You are now unavailable"
+        );
         queryClient.invalidateQueries({ queryKey: authKeys.me });
         setConfirmDialogOpen(false);
       },

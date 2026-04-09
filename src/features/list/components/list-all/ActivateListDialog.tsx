@@ -13,7 +13,7 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 
-const DeactivateListDialog = ({
+const ActivateListDialog = ({
   open,
   onOpenChange,
   onConfirm,
@@ -29,12 +29,11 @@ const DeactivateListDialog = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div>
-            <DialogTitle>Deactivate List?</DialogTitle>
+            <DialogTitle>Activate List?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to deactivate this list? This will stop all
-              activity for this list. Any scheduled callbacks, retries, or
-              ongoing workflows will be cancelled, and no further actions will
-              be performed.
+              Are you sure you want to activate this list? This will resume all
+              activity for this list and allow leads to be dialled according to
+              the assigned workflow.
             </DialogDescription>
           </div>
           <DialogIconClose />
@@ -48,12 +47,8 @@ const DeactivateListDialog = ({
           >
             Cancel
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isPending}
-          >
-            Deactivate List
+          <Button onClick={onConfirm} disabled={isPending}>
+            Activate List
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -61,4 +56,4 @@ const DeactivateListDialog = ({
   );
 };
 
-export default DeactivateListDialog;
+export default ActivateListDialog;

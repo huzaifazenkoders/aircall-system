@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import DeactivateListDialog from "@/features/list/components/list-all/DeactivateListDialog";
+import ActivateListDialog from "@/features/list/components/list-all/ActivateListDialog";
 import CreateListDialog from "@/features/list/components/list-all/CreateListDialog";
 import ClearListNowDialog from "@/features/list/components/list-details/ClearListNowDialog";
 import ScheduleListClearDialog from "@/features/list/components/list-details/ScheduleListClearDialog";
@@ -47,6 +48,7 @@ const ListDetailsView = () => {
   const queryClient = useQueryClient();
 
   const [deactivateOpen, setDeactivateOpen] = React.useState(false);
+  const [activateOpen, setActivateOpen] = React.useState(false);
   const [clearNowOpen, setClearNowOpen] = React.useState(false);
   const [scheduleOpen, setScheduleOpen] = React.useState(false);
   const [editOpen, setEditOpen] = React.useState(false);
@@ -75,6 +77,7 @@ const ListDetailsView = () => {
         onSuccess: () => {
           toast.success("List activated successfully");
           invalidateListQueries();
+          setActivateOpen(false);
         },
         onError: handleMutationError
       }
@@ -96,13 +99,13 @@ const ListDetailsView = () => {
   };
 
   const handleCreateCleanup = (payload: {
-    cleanup_type: "one_time" | "recurring";
+    cleanup_type: "one_time" | "recurring" | "now";
     run_date?: string;
     run_time?: string;
     recurrence_type?: "weekly" | "monthly";
     day_of_week?: number;
     week_of_month?: number;
-    timezone: string;
+    timezone?: string;
   }) => {
     createListCleanup(
       {
@@ -114,9 +117,11 @@ const ListDetailsView = () => {
       {
         onSuccess: () => {
           toast.success(
-            payload.cleanup_type === "one_time"
-              ? "List clear scheduled successfully"
-              : "Recurring list clear created successfully"
+            payload.cleanup_type === "now"
+              ? "List cleared successfully"
+              : payload.cleanup_type === "one_time"
+                ? "List clear scheduled successfully"
+                : "Recurring list clear created successfully"
           );
           invalidateListQueries();
           setClearNowOpen(false);
@@ -128,16 +133,8 @@ const ListDetailsView = () => {
   };
 
   const handleClearNow = () => {
-    const now = new Date();
-    const offset = now.getTimezoneOffset();
-    const localDate = new Date(now.getTime() - offset * 60_000);
-    const [runDate, runTime] = localDate.toISOString().split("T");
-
     handleCreateCleanup({
-      cleanup_type: "one_time",
-      run_date: runDate,
-      run_time: runTime.slice(0, 5),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+      cleanup_type: "one_time"
     });
   };
 
@@ -218,7 +215,7 @@ const ListDetailsView = () => {
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem
                   onClick={
-                    isActive ? () => setDeactivateOpen(true) : handleActivate
+                    isActive ? () => setDeactivateOpen(true) : () => setActivateOpen(true)
                   }
                   disabled={isMutatingStatus || isCreatingCleanup}
                 >
@@ -266,6 +263,12 @@ const ListDetailsView = () => {
         <SharedListDetailsBodyView list={list} listId={listId} />
       )}
 
+      <ActivateListDialog
+        open={activateOpen}
+        onOpenChange={setActivateOpen}
+        onConfirm={handleActivate}
+        isPending={isActivating}
+      />
       <DeactivateListDialog
         open={deactivateOpen}
         onOpenChange={setDeactivateOpen}

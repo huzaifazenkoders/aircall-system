@@ -354,6 +354,7 @@ const LeadsTable = ({
       <LeadDetailsDialog
         lead={selectedLead}
         open={leadDetailsOpen}
+        fromListId={listId}
         onOpenChange={(open) => {
           setLeadDetailsOpen(open);
           if (!open) {

@@ -85,6 +85,14 @@ export function proxy(request: NextRequest) {
     return redirect(request, `${ADMIN_AUTH_PREFIX}/sign-in`);
   }
 
+  if (pathname.includes("dialer-auth/set-password")) {
+    if (role === "sales_person") {
+      return NextResponse.next();
+    } else {
+      return redirect(request, DIALER_HOME_PATH);
+    }
+  }
+
   if (pathname === "/") {
     return redirect(
       request,
