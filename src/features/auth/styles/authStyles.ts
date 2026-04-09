@@ -37,7 +37,7 @@ export const authStyles = {
     "text-5xl",
     "font-semibold",
     "leading-[1.1]",
-    "text-brand-accent"
+    "text-white"
   ),
   heroSubtitle: cn(
     "max-w-xl",
