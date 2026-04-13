@@ -134,7 +134,7 @@ const ListDetailsView = () => {
 
   const handleClearNow = () => {
     handleCreateCleanup({
-      cleanup_type: "one_time"
+      cleanup_type: "now"
     });
   };
 
@@ -215,7 +215,9 @@ const ListDetailsView = () => {
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem
                   onClick={
-                    isActive ? () => setDeactivateOpen(true) : () => setActivateOpen(true)
+                    isActive
+                      ? () => setDeactivateOpen(true)
+                      : () => setActivateOpen(true)
                   }
                   disabled={isMutatingStatus || isCreatingCleanup}
                 >

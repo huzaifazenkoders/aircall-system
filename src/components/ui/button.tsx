@@ -62,7 +62,9 @@ function Button({
         handleRippleAnimation(
           e,
           variant &&
-            ["outline", "outline-transparent", "ghost"].includes(variant)
+            ["outline", "outline-transparent", "ghost", "link"].includes(
+              variant
+            )
             ? "bg-black/30"
             : undefined
         );
