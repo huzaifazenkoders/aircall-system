@@ -42,7 +42,8 @@ const UsersView = () => {
   const { data, isPending, error } = useGetUsers({
     limit: 10,
     search: searchValue || undefined,
-    status: statusFilter === "All Status" ? undefined : statusFilter
+    status: statusFilter === "All Status" ? undefined : statusFilter,
+    role: "admin"
   });
   const { data: selectedUserData } = useGetUserById(selectedUserId ?? "");
 

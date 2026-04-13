@@ -118,7 +118,7 @@ const ListDetailsView = () => {
         onSuccess: () => {
           toast.success(
             payload.cleanup_type === "now"
-              ? "List cleared successfully"
+              ? "List cleared successfully. This may take a few minutes to delete the leads."
               : payload.cleanup_type === "one_time"
                 ? "List clear scheduled successfully"
                 : "Recurring list clear created successfully"

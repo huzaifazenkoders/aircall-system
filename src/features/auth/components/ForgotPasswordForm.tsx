@@ -26,7 +26,7 @@ const ForgotPasswordForm = () => {
     validationSchema,
     onSubmit: (values) => {
       forgotPassword(
-        { payload: values },
+        { payload: { email: values.email.trim() } },
         {
           onSuccess: () => {
             toast.success("OTP sent to your email");

@@ -79,7 +79,8 @@ const CreateGroupDialog = ({
     fetchNextPage
   } = useGetUsers({
     limit: 20,
-    search: query || undefined
+    search: query || undefined,
+    role: "admin"
   });
 
   const members = React.useMemo(() => {

@@ -41,6 +41,7 @@ import {
   useGetMyLists,
   useActivateMyList,
   useDeactivateMyList,
+  useGetUserListPriorityStatus,
   type MyList
 } from "@/features/list/services/listService";
 import { useGetLeads } from "@/features/list/services/listService";
@@ -95,6 +96,17 @@ const MyListComponent = () => {
       setSelectedList(myLists[0]);
     }
   }, [myLists, selectedList]);
+
+  // ── Focus Mode initial value from API ────────────────────────────────────────
+  const { data: priorityStatusData } = useGetUserListPriorityStatus(
+    selectedList?.id ?? ""
+  );
+
+  React.useEffect(() => {
+    if (priorityStatusData?.data?.is_focus_mode !== undefined) {
+      setFocusMode(priorityStatusData.data.is_focus_mode);
+    }
+  }, [priorityStatusData]);
 
   // ── Leads ───────────────────────────────────────────────────────────────────
   const { data: leadsData, isPending: leadsLoading } = useGetLeads({

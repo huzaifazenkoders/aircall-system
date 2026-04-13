@@ -29,7 +29,7 @@ const LoginForm = () => {
     validationSchema,
     onSubmit: (values) => {
       login(
-        { payload: values },
+        { payload: { email: values.email.trim(), password: values.password.trim() } },
         {
           onSuccess: (res) => {
             toast.success("Logged in successfully");

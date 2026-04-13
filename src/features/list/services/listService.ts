@@ -414,3 +414,24 @@ export const useDeactivateMyList = () =>
       return res.data as ToggleMyListRes;
     }
   });
+
+// ─── User List Priority Status ────────────────────────────────────────────────
+
+interface UserListPriorityStatusRes {
+  data: {
+    is_focus_mode: boolean;
+  };
+  message: string;
+}
+
+export const useGetUserListPriorityStatus = (list_id: string) =>
+  useQuery({
+    queryKey: listKeys.myListPriorityStatus(list_id),
+    queryFn: async () => {
+      const res = await axiosInstance.get("/user-list-priority/my-status", {
+        params: { list_id }
+      });
+      return res.data as UserListPriorityStatusRes;
+    },
+    enabled: Boolean(list_id)
+  });

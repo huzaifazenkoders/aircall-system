@@ -109,7 +109,8 @@ const GroupSelectionDialog = ({
     fetchNextPage: usersFetchNextPage
   } = useGetUsers({
     limit: 20,
-    search: usesUserQuery ? query || undefined : undefined
+    search: usesUserQuery ? query || undefined : undefined,
+    role: "admin"
   });
 
   const {

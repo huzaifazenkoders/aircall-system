@@ -9,7 +9,8 @@ import {
   WorkflowIcon,
   PhoneCallIcon,
   SettingsIcon,
-  HexagonIcon
+  HexagonIcon,
+  XIcon
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -29,7 +30,9 @@ const navItems = [
 ] as const;
 
 const AppSidebar = ({
-  activeKey
+  activeKey,
+  mobile,
+  onClose
 }: {
   activeKey?:
     | "dashboard"
@@ -39,6 +42,8 @@ const AppSidebar = ({
     | "workflows"
     | "logs"
     | "settings";
+  mobile?: boolean;
+  onClose?: () => void;
 }) => {
   const pathname = usePathname();
   const resolvedActiveKey =
@@ -56,7 +61,10 @@ const AppSidebar = ({
               : "dashboard");
 
   return (
-    <aside className="sticky top-3 hidden h-[calc(100vh-24px)] flex-col rounded-xl bg-[image:var(--gradient)] px-7 py-8 text-white lg:flex">
+    <aside className={cn(
+      "h-[calc(100vh-24px)] flex-col rounded-xl bg-[image:var(--gradient)] px-7 py-8 text-white",
+      mobile ? "flex h-full rounded-none" : "sticky top-3 hidden lg:flex"
+    )}>
       <div className="flex items-center gap-3">
         <div className="grid size-10 place-items-center rounded-xl bg-brand-accent/20">
           <HexagonIcon
@@ -68,6 +76,16 @@ const AppSidebar = ({
         <div className="text-[26px] font-semibold tracking-tight">
           Aircall System
         </div>
+        {mobile && onClose && (
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            onClick={onClose}
+            className="ml-auto rounded-lg p-1 hover:bg-white/10"
+          >
+            <XIcon className="size-5" />
+          </button>
+        )}
       </div>
 
       <nav className="mt-12 flex flex-1 flex-col gap-3">
