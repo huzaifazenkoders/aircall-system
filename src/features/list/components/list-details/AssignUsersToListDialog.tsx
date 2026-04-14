@@ -63,7 +63,7 @@ const AssignUsersToListDialog = ({
     limit: 20,
     search: searchValue || undefined,
     status: "active",
-    role: "admin"
+    role: "sales_person"
   });
 
   const { mutate: assignList, isPending: isAssigning } = useAssignList();

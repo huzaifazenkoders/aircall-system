@@ -100,7 +100,10 @@ export function proxy(request: NextRequest) {
     );
   }
 
-  if (isAdminAuthRoute || isDialerAuthRoute) {
+  if (
+    isAdminAuthRoute ||
+    (isDialerAuthRoute && pathname !== `${DIALER_AUTH_PREFIX}/sign-in`)
+  ) {
     return redirect(
       request,
       role === "sales_person" ? DIALER_HOME_PATH : ADMIN_HOME_PATH

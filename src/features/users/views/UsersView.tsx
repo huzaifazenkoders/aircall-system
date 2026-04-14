@@ -43,7 +43,7 @@ const UsersView = () => {
     limit: 10,
     search: searchValue || undefined,
     status: statusFilter === "All Status" ? undefined : statusFilter,
-    role: "admin"
+    role: "sales_person"
   });
   const { data: selectedUserData } = useGetUserById(selectedUserId ?? "");
 

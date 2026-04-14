@@ -117,7 +117,6 @@ export const useResetPassword = () =>
 
 interface ChangePasswordReq {
   payload: {
-    old_password: string;
     new_password: string;
   };
 }

@@ -51,6 +51,7 @@ export interface Assignment {
   list_id: string;
   updated_at: string;
   user_id: string;
+  group: { id: string; name: string } | null;
 }
 
 export type ListStatus = "active" | "inactive" | "waiting";

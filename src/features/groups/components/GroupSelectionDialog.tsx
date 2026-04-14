@@ -110,7 +110,7 @@ const GroupSelectionDialog = ({
   } = useGetUsers({
     limit: 20,
     search: usesUserQuery ? query || undefined : undefined,
-    role: "admin"
+    role: "sales_person"
   });
 
   const {
@@ -189,7 +189,8 @@ const GroupSelectionDialog = ({
     () => selectedIds.filter((id) => !lockedIds.has(id)),
     [lockedIds, selectedIds]
   );
-  const shouldShowUsersLoading = (usesUserQuery && isUsersPending) || (usesListQuery && isListsPending);
+  const shouldShowUsersLoading =
+    (usesUserQuery && isUsersPending) || (usesListQuery && isListsPending);
 
   const EmptyIcon = emptyKind === "members" ? UsersRoundIcon : ListChecksIcon;
 
@@ -257,7 +258,13 @@ const GroupSelectionDialog = ({
                       <InfiniteScroll
                         dataLength={resolvedItems.length}
                         next={() => void fetchNextPage()}
-                        hasMore={usesUserQuery ? Boolean(usersHasNextPage) : usesListQuery ? Boolean(listsHasNextPage) : false}
+                        hasMore={
+                          usesUserQuery
+                            ? Boolean(usersHasNextPage)
+                            : usesListQuery
+                              ? Boolean(listsHasNextPage)
+                              : false
+                        }
                         loader={
                           <div className="flex items-center justify-center px-4 py-4">
                             <Loader2Icon className="size-5 animate-spin text-secondary" />

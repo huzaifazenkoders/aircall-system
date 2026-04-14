@@ -80,7 +80,7 @@ const CreateGroupDialog = ({
   } = useGetUsers({
     limit: 20,
     search: query || undefined,
-    role: "admin"
+    role: "sales_person"
   });
 
   const members = React.useMemo(() => {

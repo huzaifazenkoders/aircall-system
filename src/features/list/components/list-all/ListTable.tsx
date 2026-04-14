@@ -275,7 +275,7 @@ const ListRow = ({
   const assignedToLabel =
     row.assign_type === "individual"
       ? `${row.assignments.length} Individuals`
-      : row.assignments?.[0]?.group_id;
+      : row.assignments?.[0]?.group?.name;
 
   return (
     <TableRow className="h-15.5">

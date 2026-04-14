@@ -123,7 +123,7 @@ const CreateListDialog = ({
   const { data: groupsData } = useGetGroups({ limit: 100 });
   const groups = transformInfiniteData(groupsData, "data");
 
-  const { data: usersData } = useGetUsers({ limit: 100, role: "admin" });
+  const { data: usersData } = useGetUsers({ limit: 100, role: "sales_person" });
   const users = transformInfiniteData(usersData, "data");
 
   const [groupOpen, setGroupOpen] = React.useState(false);

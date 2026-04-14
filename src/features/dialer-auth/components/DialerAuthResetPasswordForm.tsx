@@ -13,7 +13,6 @@ import { dialerAuthStyles } from "@/features/dialer-auth/styles/dialerAuthStyles
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
-  old_password: Yup.string().trim().required("Old Password is required"),
   new_password: Yup.string()
     .trim()
     .min(8, "Password must be at least 8 characters")
@@ -42,13 +41,12 @@ const DialerAuthResetPasswordForm = ({
   const { mutate: resetPassword, isPending } = useChangePassword();
 
   const formik = useFormik({
-    initialValues: { old_password: "", new_password: "", confirm_password: "" },
+    initialValues: { new_password: "", confirm_password: "" },
     validationSchema,
     onSubmit: (values) => {
       resetPassword(
         {
           payload: {
-            old_password: values.old_password.trim(),
             new_password: values.new_password.trim()
           }
         },
@@ -74,21 +72,6 @@ const DialerAuthResetPasswordForm = ({
         </div>
 
         <div className={dialerAuthStyles.fieldStack}>
-          <PasswordInput
-            id="dialer-auth-old_password"
-            label={"Old passowrd"}
-            value={formik.values.old_password}
-            setValue={(val) => formik.setFieldValue("old_password", val)}
-            error={
-              formik.touched.old_password
-                ? formik.errors.old_password
-                : undefined
-            }
-            showToggle={false}
-            startIcon={<LockKeyhole aria-hidden="true" />}
-            placeholder="Enter Old Password"
-          />
-
           <PasswordInput
             id="dialer-auth-reset-password"
             label={passwordLabel}
