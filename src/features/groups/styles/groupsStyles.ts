@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 export const groupsStyles = {
-  page: cn("flex min-h-[calc(100vh-140px)] flex-1 flex-col"),
+  page: cn("flex min-h-[calc(100vh-150px)] flex-1 flex-col py-6"),
   pageInner: cn("flex flex-1 flex-col gap-6 px-4 md:px-6"),
   pageHeader: cn("flex items-center gap-6"),
   title: cn("flex-1 text-2xl font-medium text-gray-800"),

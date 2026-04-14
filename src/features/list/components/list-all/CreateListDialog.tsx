@@ -270,7 +270,11 @@ const CreateListDialog = ({
                 onBlur={formik.handleBlur}
                 placeholder="eg, Gold Cost Event"
                 className="px-4 text-sm bg-transparent"
-                error={formik.touched.name ? formik.errors.name : undefined}
+                error={
+                  formik.touched.name && formik.errors.name
+                    ? formik.errors.name
+                    : undefined
+                }
               />
             </Field>
 

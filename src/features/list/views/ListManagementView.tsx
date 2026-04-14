@@ -17,7 +17,7 @@ const ListManagementView = () => {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col mt-5 px-4 md:px-6">
+    <div className="flex min-h-[calc(100vh-150px)] flex-1 flex-col px-4 md:px-6 py-6">
       <div className={listStyles.pageHeader}>
         <h1 className={listStyles.pageTitle}>List Management</h1>
         <Button

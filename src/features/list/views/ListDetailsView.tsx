@@ -140,7 +140,7 @@ const ListDetailsView = () => {
 
   if (isPending) {
     return (
-      <div className="flex min-h-[calc(100vh-140px)] flex-1 items-center justify-center">
+      <div className="flex min-h-[calc(100vh-150px)] py-6 flex-1 items-center justify-center">
         <Loader2Icon className="size-6 animate-spin text-muted-foreground" />
       </div>
     );
@@ -148,7 +148,7 @@ const ListDetailsView = () => {
 
   if (isError || !list) {
     return (
-      <div className="flex min-h-[calc(100vh-140px)] flex-1 items-center justify-center text-sm text-destructive">
+      <div className="flex min-h-[calc(100vh-150px)] py-6 flex-1 items-center justify-center text-sm text-destructive">
         Failed to load list details.
       </div>
     );
@@ -157,7 +157,7 @@ const ListDetailsView = () => {
   const isActive = list.status === "active";
 
   return (
-    <div className="flex min-h-[calc(100vh-140px)] flex-1 flex-col mt-5 px-4 md:px-6">
+    <div className="flex min-h-[calc(100vh-150px)] flex-1 flex-col px-4 md:px-6 py-6">
       <div className={listDetailsStyles.topRow}>
         <div className="min-w-0">
           <Link href="/list" className={listDetailsStyles.backLink}>

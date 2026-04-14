@@ -166,7 +166,11 @@ const CreateGroupDialog = ({
                 placeholder="eg, Team Alpha"
                 value={formik.values.name}
                 setValue={(val) => void formik.setFieldValue("name", val)}
-                error={formik.touched.name ? formik.errors.name : undefined}
+                error={
+                  formik.touched.name && formik.errors.name
+                    ? formik.errors.name
+                    : undefined
+                }
               />
 
               <TextArea

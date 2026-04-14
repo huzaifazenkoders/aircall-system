@@ -90,7 +90,11 @@ const CreateWorkflowDialog = ({
               placeholder="eg, VIP Event Workflow"
               value={formik.values.name}
               setValue={(val) => formik.setFieldValue("name", val)}
-              error={formik.touched.name ? formik.errors.name : undefined}
+              error={
+                formik.touched.name && formik.errors.name
+                  ? formik.errors.name
+                  : undefined
+              }
             />
             <TextArea
               label="Description"

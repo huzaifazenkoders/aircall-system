@@ -34,7 +34,7 @@ const OtpVerificationForm = () => {
         {
           onSuccess: ({ data }) => {
             toast.success("OTP verified");
-            router.push(
+            router.replace(
               `/auth/reset-password?reset_token=${encodeURIComponent(data.reset_token)}`
             );
           },
@@ -70,7 +70,11 @@ const OtpVerificationForm = () => {
           <OtpInput
             value={formik.values.code}
             setValue={(val) => formik.setFieldValue("code", val)}
-            error={formik.touched.code ? formik.errors.code : undefined}
+            error={
+              formik.touched.code && formik.errors.code
+                ? formik.errors.code
+                : undefined
+            }
           />
 
           <Button

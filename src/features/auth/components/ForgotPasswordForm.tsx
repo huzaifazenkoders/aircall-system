@@ -14,7 +14,10 @@ import { useForgotPassword } from "../services/authService";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required")
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email is required")
+    .isValidEmail("Email is not valid")
 });
 
 const ForgotPasswordForm = () => {
@@ -30,7 +33,7 @@ const ForgotPasswordForm = () => {
         {
           onSuccess: () => {
             toast.success("OTP sent to your email");
-            router.push(
+            router.replace(
               `/auth/verify-code?email=${encodeURIComponent(values.email)}`
             );
           },
@@ -57,7 +60,11 @@ const ForgotPasswordForm = () => {
           value={formik.values.email}
           setValue={(val) => formik.setFieldValue("email", val)}
           placeholder="john.doe@email.com"
-          error={formik.touched.email ? formik.errors.email : undefined}
+          error={
+            formik.touched.email && formik.errors.email
+              ? formik.errors.email
+              : undefined
+          }
           startIcon={
             <Mail className={authStyles.inputIcon} aria-hidden="true" />
           }

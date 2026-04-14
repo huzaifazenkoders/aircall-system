@@ -17,6 +17,7 @@ const validationSchema = Yup.object({
     .trim()
     .email("Invalid email address")
     .required("Email is required")
+    .isValidEmail("Email is not valid")
 });
 
 const DialerAuthForgotPasswordForm = () => {
@@ -33,7 +34,7 @@ const DialerAuthForgotPasswordForm = () => {
         {
           onSuccess: () => {
             toast.success("OTP sent to your email");
-            router.push(
+            router.replace(
               `/dialer-auth/verify-code?email=${encodeURIComponent(email)}`
             );
           },
@@ -60,7 +61,11 @@ const DialerAuthForgotPasswordForm = () => {
           value={formik.values.email}
           setValue={(val) => formik.setFieldValue("email", val)}
           placeholder="john.doe@email.com"
-          error={formik.touched.email ? formik.errors.email : undefined}
+          error={
+            formik.touched.email && formik.errors.email
+              ? formik.errors.email
+              : undefined
+          }
           startIcon={<Mail aria-hidden="true" />}
         />
       </div>

@@ -50,7 +50,7 @@ const ResetPasswordForm = ({
         {
           onSuccess: () => {
             toast.success("Password reset successfully");
-            router.push("/auth/sign-in");
+            router.replace("/auth/sign-in");
           },
           onError: handleMutationError
         }

@@ -33,6 +33,9 @@ const CallbackSchedulesView = () => {
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
+  const isDefaultState = statusValue === "All Status";
+  const shouldShowEmptyStateOnly =
+    !isPending && !isError && rows.length === 0 && isDefaultState;
 
   return (
     <>
@@ -42,31 +45,40 @@ const CallbackSchedulesView = () => {
       </div>
 
       <section className={callbackStyles.card}>
-        <CallbackSchedulesFilters
-          searchValue=""
-          onSearchChange={() => {}}
-          statusValue={statusValue}
-          onStatusChange={(val) => { setStatusValue(val); setPage(1); }}
-        />
-
-        {isPending ? (
-          <div className="flex min-h-[400px] items-center justify-center">
-            <Loader2Icon className="size-8 animate-spin text-gray-400" />
-          </div>
-        ) : isError || rows.length === 0 ? (
+        {shouldShowEmptyStateOnly ? (
           <CallbackSchedulesEmptyState />
         ) : (
-          <CallbackSchedulesTable
-            rows={rows}
-            page={page}
-            total={meta?.total ?? 0}
-            totalPages={meta?.totalPages ?? 1}
-            onPageChange={setPage}
-            onSelect={(row) => {
-              setSelectedActivityId(row.id);
-              setDialogOpen(true);
-            }}
-          />
+          <>
+            <CallbackSchedulesFilters
+              searchValue=""
+              onSearchChange={() => {}}
+              statusValue={statusValue}
+              onStatusChange={(val) => {
+                setStatusValue(val);
+                setPage(1);
+              }}
+            />
+
+            {isPending ? (
+              <div className="flex min-h-[400px] items-center justify-center">
+                <Loader2Icon className="size-8 animate-spin text-gray-400" />
+              </div>
+            ) : isError || rows.length === 0 ? (
+              <CallbackSchedulesEmptyState />
+            ) : (
+              <CallbackSchedulesTable
+                rows={rows}
+                page={page}
+                total={meta?.total ?? 0}
+                totalPages={meta?.totalPages ?? 1}
+                onPageChange={setPage}
+                onSelect={(row) => {
+                  setSelectedActivityId(row.id);
+                  setDialogOpen(true);
+                }}
+              />
+            )}
+          </>
         )}
       </section>
 

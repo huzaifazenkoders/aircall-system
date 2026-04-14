@@ -22,7 +22,7 @@ import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 type StatusFilter = "all" | WorkflowStatus;
 
 const statusOptions: Array<{ label: string; value: StatusFilter }> = [
-  { label: "All Status", value: "all" },
+  { label: "All", value: "all" },
   { label: "Active", value: "publish" },
   { label: "Draft", value: "draft" }
 ];

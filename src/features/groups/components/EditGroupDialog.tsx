@@ -15,24 +15,27 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle,
+  DialogTitle
 } from "@/components/ui/dialog";
 import TextInput from "@/components/ui/text-input";
 import TextArea from "@/components/ui/text-area";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
-import { useGetGroupInfo, useUpdateGroup } from "@/features/groups/services/groupService";
+import {
+  useGetGroupInfo,
+  useUpdateGroup
+} from "@/features/groups/services/groupService";
 import { groupKeys } from "@/features/groups/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Group name is required"),
-  description: Yup.string().required("Description is required"),
+  description: Yup.string().required("Description is required")
 });
 
 const EditGroupDialog = ({
   open,
   onOpenChange,
-  groupId,
+  groupId
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -47,25 +50,33 @@ const EditGroupDialog = ({
   const formik = useFormik({
     initialValues: {
       name: group?.name ?? "",
-      description: group?.description ?? "",
+      description: group?.description ?? ""
     },
     enableReinitialize: true,
     validationSchema,
     onSubmit: (values) => {
       if (!groupId) return;
       updateGroup(
-        { payload: { id: groupId, name: values.name, description: values.description } },
+        {
+          payload: {
+            id: groupId,
+            name: values.name,
+            description: values.description
+          }
+        },
         {
           onSuccess: () => {
             toast.success("Group updated successfully");
-            queryClient.invalidateQueries({ queryKey: groupKeys.info(groupId) });
+            queryClient.invalidateQueries({
+              queryKey: groupKeys.info(groupId)
+            });
             queryClient.invalidateQueries({ queryKey: groupKeys.all });
             onOpenChange(false);
           },
-          onError: handleMutationError,
+          onError: handleMutationError
         }
       );
-    },
+    }
   });
 
   React.useEffect(() => {
@@ -77,7 +88,9 @@ const EditGroupDialog = ({
       <DialogContent className={groupsStyles.dialogContent}>
         <DialogHeader className={groupsStyles.dialogHeader}>
           <div>
-            <DialogTitle className={groupsStyles.dialogTitle}>Edit Group</DialogTitle>
+            <DialogTitle className={groupsStyles.dialogTitle}>
+              Edit Group
+            </DialogTitle>
             <DialogDescription className={groupsStyles.dialogSubtitle}>
               Update the group name and description.
             </DialogDescription>
@@ -93,20 +106,32 @@ const EditGroupDialog = ({
                 placeholder="eg, Team Alpha"
                 value={formik.values.name}
                 setValue={(val) => formik.setFieldValue("name", val)}
-                error={formik.touched.name ? formik.errors.name : undefined}
+                error={
+                  formik.touched.name && formik.errors.name
+                    ? formik.errors.name
+                    : undefined
+                }
               />
               <TextArea
                 label="Description"
                 placeholder="eg, Primary calling team for Sydney live events."
                 value={formik.values.description}
                 setValue={(val) => formik.setFieldValue("description", val)}
-                error={formik.touched.description ? formik.errors.description : undefined}
+                error={
+                  formik.touched.description && formik.errors.description
+                    ? formik.errors.description
+                    : undefined
+                }
               />
             </div>
           </DialogBody>
 
           <DialogFooter className={groupsStyles.dialogFooter}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isPending}>

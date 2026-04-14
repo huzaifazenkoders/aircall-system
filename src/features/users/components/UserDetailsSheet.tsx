@@ -102,7 +102,9 @@ const UserDetailsSheet = ({
                 : "User deactivated successfully")
           );
           void queryClient.invalidateQueries({ queryKey: userKeys.all });
-          void queryClient.invalidateQueries({ queryKey: userKeys.detail(userId) });
+          void queryClient.invalidateQueries({
+            queryKey: userKeys.detail(userId)
+          });
         },
         onError: handleMutationError
       }
@@ -329,7 +331,9 @@ const UserDetailsSheet = ({
                           >
                             <DropdownMenuItem
                               className={usersStyles.menuItem}
-                              onClick={() => router.push(`/lists/${list.list.id}`)}
+                              onClick={() =>
+                                router.replace(`/lists/${list.list.id}`)
+                              }
                             >
                               View Details
                             </DropdownMenuItem>

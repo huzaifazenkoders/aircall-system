@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 
 export const usersStyles = {
-  page: cn("flex min-h-[calc(100vh-140px)] flex-1 flex-col"),
+  page: cn("flex min-h-[calc(100vh-150px)] flex-1 flex-col py-6"),
   heading: cn("px-4 text-[24px] font-medium text-text-primary md:px-6"),
-  contentWrap: cn("mt-5 px-4 md:px-6"),
+  contentWrap: cn("mt-5 px-4 md:px-6 h-full"),
   card: cn(
     "overflow-hidden rounded-lg border border-border bg-white shadow-xs"
   ),

@@ -55,7 +55,7 @@ const DialerAuthResetPasswordForm = ({
         {
           onSuccess: () => {
             toast.success("Password changed successfully");
-            router.push("/dialer/assigned-lead");
+            router.replace("/dialer/assigned-lead");
           },
           onError: handleMutationError
         }

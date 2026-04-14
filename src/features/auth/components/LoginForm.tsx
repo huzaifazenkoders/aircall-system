@@ -16,7 +16,10 @@ import { useRouter } from "next/navigation";
 import { setCookie } from "cookies-next/client";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email is required")
+    .isValidEmail("Email is not valid"),
   password: Yup.string().required("Password is required")
 });
 
@@ -29,7 +32,12 @@ const LoginForm = () => {
     validationSchema,
     onSubmit: (values) => {
       login(
-        { payload: { email: values.email.trim(), password: values.password.trim() } },
+        {
+          payload: {
+            email: values.email.trim(),
+            password: values.password.trim()
+          }
+        },
         {
           onSuccess: (res) => {
             toast.success("Logged in successfully");
@@ -59,7 +67,11 @@ const LoginForm = () => {
             value={formik.values.email}
             setValue={(val) => formik.setFieldValue("email", val)}
             placeholder="Enter email"
-            error={formik.touched.email ? formik.errors.email : undefined}
+            error={
+              formik.touched.email && formik.errors.email
+                ? formik.errors.email
+                : undefined
+            }
             startIcon={
               <svg
                 className={authStyles.inputIcon}

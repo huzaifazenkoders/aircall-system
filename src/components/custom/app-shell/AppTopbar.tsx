@@ -141,7 +141,7 @@ const AppTopbar = () => {
               variant="destructive"
               onClick={() => {
                 deleteCookie("token");
-                router.push("/auth/sign-in");
+                router.replace("/auth/sign-in");
                 router.refresh();
               }}
             >

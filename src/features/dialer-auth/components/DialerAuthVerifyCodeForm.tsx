@@ -39,7 +39,7 @@ const DialerAuthVerifyCodeForm = () => {
         {
           onSuccess: ({ data }) => {
             toast.success("OTP verified");
-            router.push(
+            router.replace(
               `/dialer-auth/reset-password?reset_token=${encodeURIComponent(data.reset_token)}`
             );
           },
@@ -75,7 +75,11 @@ const DialerAuthVerifyCodeForm = () => {
           <OtpInput
             value={formik.values.code}
             setValue={(val) => formik.setFieldValue("code", val)}
-            error={formik.touched.code ? formik.errors.code : undefined}
+            error={
+              formik.touched.code && formik.errors.code
+                ? formik.errors.code
+                : undefined
+            }
           />
 
           <Button type="submit" size="xl" disabled={isPending}>

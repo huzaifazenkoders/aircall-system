@@ -17,7 +17,13 @@ const UsersEmptyState = ({
         "flex-1 h-full w-full flex flex-col gap-3 py-20 items-center justify-center"
       }
     >
-      <Image src={UsersIllustration} alt="" height={292} width={378} />
+      <Image
+        src={UsersIllustration}
+        alt=""
+        height={292}
+        width={378}
+        className="h-[292px] w-auto"
+      />
 
       <h1 className={"text-2xl font-medium text-text-primary"}>
         No Users Found

@@ -1,12 +1,12 @@
 import { cn } from "@/lib/utils";
 
 export const workflowsStyles = {
-  page: cn("flex min-h-[calc(100vh-140px)] flex-1 flex-col px-4 md:px-6"),
+  page: cn("flex min-h-[calc(100vh-150px)] flex-1 flex-col px-4 md:px-6 py-6"),
   pageHeader: cn("flex items-center gap-6"),
   pageTitle: cn("flex-1 text-[24px] font-medium text-gray-800"),
   pageActions: cn("flex items-center gap-3"),
   filterTrigger: cn(
-    "h-11 min-w-[110px] rounded-lg border-zinc-200 bg-white px-4 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
+    "h-11 min-w-[110px] capitalize rounded-lg border-zinc-200 bg-white px-4 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
   ),
   createButton: cn("h-11 gap-2 rounded-lg px-6 text-base font-medium"),
   cardGrid: cn("mt-6 grid gap-6 xl:grid-cols-2"),
@@ -35,7 +35,7 @@ export const workflowsStyles = {
     "text-center text-sm text-text-secondary"
   ),
   detailsPage: cn(
-    "flex min-h-[calc(100vh-140px)] flex-1 flex-col px-4 md:px-6"
+    "flex min-h-[calc(100vh-150px)] flex-1 flex-col px-4 md:px-6 py-6"
   ),
   backLink: cn(
     "inline-flex items-center gap-2 text-[16px] text-text-secondary"

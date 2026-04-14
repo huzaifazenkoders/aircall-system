@@ -100,8 +100,15 @@ const LeadsTable = ({
   }, [query, statusFilter, startDate, endDate]);
 
   const isIndividual = variant === "individual";
+  const isDefaultState =
+    query.trim() === "" &&
+    statusFilter === "all" &&
+    !startDate &&
+    !endDate;
+  const shouldShowEmptyStateOnly =
+    !isPending && !isError && !leads.length && isDefaultState;
 
-  if (!isPending && !isError && !leads.length && isIndividual) {
+  if (shouldShowEmptyStateOnly && isIndividual) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
         <Image src={NoImage} alt="No Leads Assigned Yet" height={260} width={340} />
@@ -112,6 +119,22 @@ const LeadsTable = ({
           It looks like there are currently no leads assigned to this representative&apos;s
           individual list. You can add leads manually once they become available.
         </p>
+      </div>
+    );
+  }
+
+  if (shouldShowEmptyStateOnly) {
+    return (
+      <div className={listDetailsStyles.leadTableWrap}>
+        <div className="flex flex-1 flex-col items-center justify-center px-6 py-20 text-center">
+          <Image src={NoImage} alt="No Leads Found" height={227} width={300} />
+          <h2 className="mt-5 text-lg font-semibold tracking-tight">
+            No Leads Assigned Yet
+          </h2>
+          <p className="mx-auto text-sm leading-6 text-muted-foreground">
+            It looks like there are currently no leads assigned to this list.
+          </p>
+        </div>
       </div>
     );
   }
@@ -327,29 +350,31 @@ const LeadsTable = ({
         </Table>
       </div>
 
-      <div className="flex items-center justify-end gap-6 border-t border-border px-6 py-4">
-        <span className="text-sm text-muted-foreground">
-          {start}-{end} of {total}
-        </span>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            disabled={currentPage <= 1}
-            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-          >
-            <ChevronLeftIcon className="size-4 text-muted-foreground" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            disabled={currentPage >= totalPages}
-            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-          >
-            <ChevronRightIcon className="size-4 text-muted-foreground" />
-          </Button>
+      {leads.length ? (
+        <div className="flex items-center justify-end gap-6 border-t border-border px-6 py-4">
+          <span className="text-sm text-muted-foreground">
+            {start}-{end} of {total}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={currentPage <= 1}
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            >
+              <ChevronLeftIcon className="size-4 text-muted-foreground" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={currentPage >= totalPages}
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            >
+              <ChevronRightIcon className="size-4 text-muted-foreground" />
+            </Button>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <LeadDetailsDialog
         lead={selectedLead}

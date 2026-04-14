@@ -19,7 +19,8 @@ const validationSchema = Yup.object({
   email: Yup.string()
     .trim()
     .email("Invalid email address")
-    .required("Email is required"),
+    .required("Email is required")
+    .isValidEmail("Email is not valid"),
   password: Yup.string()
     .min(8, "Password must be at least 8 characters")
     .required("Password is required")
@@ -73,7 +74,11 @@ const DialerAuthLoginForm = () => {
             value={formik.values.email}
             setValue={(val) => formik.setFieldValue("email", val)}
             placeholder="john.doe@email.com"
-            error={formik.touched.email ? formik.errors.email : undefined}
+            error={
+              formik.touched.email && formik.errors.email
+                ? formik.errors.email
+                : undefined
+            }
             startIcon={<Mail aria-hidden="true" />}
           />
 

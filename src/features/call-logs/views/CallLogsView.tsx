@@ -42,45 +42,54 @@ const CallLogsView = () => {
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
+  const isDefaultState = !selectedListId && !selectedStatus;
+  const shouldShowEmptyStateOnly =
+    !isPending && !isError && rows.length === 0 && isDefaultState;
 
   return (
     <div className={callLogsStyles.page}>
       <h1 className={callLogsStyles.title}>Call Logs</h1>
 
       <section className={callLogsStyles.card}>
-        <CallLogFilters
-          selectedStatus={selectedStatus}
-          onStatusChange={(val) => {
-            setSelectedStatus(val as string);
-            setPage(1);
-          }}
-          statusOptions={callLogStatusOptions}
-          selectedList={selectedListId}
-          onListChange={(val) => {
-            setSelectedListId(val);
-            setPage(1);
-          }}
-        />
-
-        {isPending ? (
-          <div className="flex min-h-[400px] items-center justify-center">
-            <Loader2Icon className="size-8 animate-spin text-panel-muted" />
-          </div>
-        ) : isError || rows.length === 0 ? (
+        {shouldShowEmptyStateOnly ? (
           <CallLogsEmptyState />
         ) : (
-          <CallLogsTable
-            rows={rows}
-            page={page}
-            limit={LIMIT}
-            total={meta?.total ?? 0}
-            totalPages={meta?.totalPages ?? 1}
-            onPageChange={setPage}
-            onRowSelect={(callLog) => {
-              setSelectedCallLogId(callLog.id);
-              setIsDialogOpen(true);
-            }}
-          />
+          <>
+            <CallLogFilters
+              selectedStatus={selectedStatus}
+              onStatusChange={(val) => {
+                setSelectedStatus(val as string);
+                setPage(1);
+              }}
+              statusOptions={callLogStatusOptions}
+              selectedList={selectedListId}
+              onListChange={(val) => {
+                setSelectedListId(val);
+                setPage(1);
+              }}
+            />
+
+            {isPending ? (
+              <div className="flex min-h-[400px] items-center justify-center">
+                <Loader2Icon className="size-8 animate-spin text-panel-muted" />
+              </div>
+            ) : isError || rows.length === 0 ? (
+              <CallLogsEmptyState />
+            ) : (
+              <CallLogsTable
+                rows={rows}
+                page={page}
+                limit={LIMIT}
+                total={meta?.total ?? 0}
+                totalPages={meta?.totalPages ?? 1}
+                onPageChange={setPage}
+                onRowSelect={(callLog) => {
+                  setSelectedCallLogId(callLog.id);
+                  setIsDialogOpen(true);
+                }}
+              />
+            )}
+          </>
         )}
       </section>
 

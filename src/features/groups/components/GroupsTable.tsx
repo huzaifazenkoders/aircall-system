@@ -66,6 +66,15 @@ const GroupsTable = ({
   isPending: boolean;
   emptyState: React.ReactNode;
 }) => {
+  const isDefaultState =
+    searchValue.trim() === "" && statusFilter === "All Status" && !date;
+  const shouldShowEmptyStateOnly =
+    !isPending && groups.length === 0 && isDefaultState;
+
+  if (shouldShowEmptyStateOnly) {
+    return <div className={groupsStyles.tableCard}>{emptyState}</div>;
+  }
+
   return (
     <div className={groupsStyles.tableCard}>
       <div className={groupsStyles.toolbar}>
@@ -225,24 +234,26 @@ const GroupsTable = ({
         )}
       </div>
 
-      <div className={groupsStyles.footer}>
-        <div className={groupsStyles.footerMeta}>
-          <span>Rows per page:</span>
-          <span className="text-gray-800">10</span>
-          <ChevronDownIcon className="size-4 text-gray-500" />
+      {groups.length ? (
+        <div className={groupsStyles.footer}>
+          <div className={groupsStyles.footerMeta}>
+            <span>Rows per page:</span>
+            <span className="text-gray-800">10</span>
+            <ChevronDownIcon className="size-4 text-gray-500" />
+          </div>
+          <span className="text-xs text-gray-800">
+            1–{Math.min(10, groups.length)} of {groups.length}
+          </span>
+          <div className="flex items-center">
+            <button type="button" className={groupsStyles.pagerButton}>
+              <ChevronLeftIcon className="size-4" />
+            </button>
+            <button type="button" className={groupsStyles.pagerButton}>
+              <ChevronRightIcon className="size-4" />
+            </button>
+          </div>
         </div>
-        <span className="text-xs text-gray-800">
-          1–{Math.min(10, groups.length)} of {groups.length}
-        </span>
-        <div className="flex items-center">
-          <button type="button" className={groupsStyles.pagerButton}>
-            <ChevronLeftIcon className="size-4" />
-          </button>
-          <button type="button" className={groupsStyles.pagerButton}>
-            <ChevronRightIcon className="size-4" />
-          </button>
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 };

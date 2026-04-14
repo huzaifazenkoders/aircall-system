@@ -143,7 +143,12 @@ const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
             <>
               <Button
                 onClick={() => handleStatusChange("publish")}
-                disabled={isUpdatingStatus}
+                disabled={isUpdatingStatus || !dispositions.length}
+                title={
+                  !dispositions.length
+                    ? "Need to add atleast 1 disposition to publish"
+                    : undefined
+                }
               >
                 {isUpdatingStatus ? (
                   <Loader2Icon className="size-4 animate-spin" />

@@ -88,7 +88,7 @@ const validationSchema = Yup.object({
     {
       is: (ls: string, cb: string) => ls === "cooldown" && cb === "custom",
       then: (s) => s.min(0, "Min 0").required("Required"),
-      otherwise: (s) => s
+      otherwise: (s) => s.nullable()
     }
   ),
   custom_cooldown_min: Yup.number().when(
@@ -96,7 +96,7 @@ const validationSchema = Yup.object({
     {
       is: (ls: string, cb: string) => ls === "cooldown" && cb === "custom",
       then: (s) => s.min(0).max(59).required("Required"),
-      otherwise: (s) => s
+      otherwise: (s) => s.nullable()
     }
   )
 });
@@ -249,6 +249,8 @@ const DispositionRuleDialog = ({
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isCooldown = formik.values.resulting_lead_status === "cooldown";
+
+  console.log("formik", formik.errors);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

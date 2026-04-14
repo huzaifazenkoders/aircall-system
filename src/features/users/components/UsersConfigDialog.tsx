@@ -34,13 +34,19 @@ import { handleMutationError } from "@/utils/handleMutationError";
 import { useGetGroups } from "@/features/groups/services/groupService";
 import { useGetWorkflows } from "@/features/workflows/services/workflowService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import PhoneInput from "@/components/ui/phone-input";
 
 const step1Schema = Yup.object({
   keap_id: Yup.string().required("Keap ID is required"),
   first_name: Yup.string().required("First name is required"),
   last_name: Yup.string().required("Last name is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  phone_number: Yup.string().required("Phone number is required"),
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email is required")
+    .isValidEmail("Email is not valid"),
+  phone_number: Yup.string()
+    .required("Phone number is required")
+    .isValidPhoneNumber("Phone number is not valid"),
   group_ids: Yup.array().of(Yup.string())
 });
 
@@ -103,8 +109,6 @@ const UsersConfigDialog = ({
       cooldown_minimum_minutes: 30
     },
     validationSchema: step === 1 ? step1Schema : fullSchema,
-    validateOnChange: false,
-    validateOnBlur: true,
     onSubmit: (values) => {
       if (step === 1) {
         setStep(2);
@@ -192,17 +196,17 @@ const UsersConfigDialog = ({
                   value={formik.values.keap_id}
                   setValue={(val) => void formik.setFieldValue("keap_id", val)}
                   placeholder="eg. 123"
-                  error={t.keap_id ? e.keap_id : undefined}
+                  error={t.keap_id && e.keap_id ? e.keap_id : undefined}
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <TextInput
                     label="First Name"
                     value={formik.values.first_name}
-                    setValue={(val) =>
-                      void formik.setFieldValue("first_name", val)
-                    }
+                    setValue={(val) => formik.setFieldValue("first_name", val)}
                     placeholder="eg. James"
-                    error={t.first_name ? e.first_name : undefined}
+                    error={
+                      t.first_name && e.first_name ? e.first_name : undefined
+                    }
                   />
                   <TextInput
                     label="Last Name"
@@ -211,7 +215,7 @@ const UsersConfigDialog = ({
                       void formik.setFieldValue("last_name", val)
                     }
                     placeholder="eg. Williams"
-                    error={t.last_name ? e.last_name : undefined}
+                    error={t.last_name && e.last_name ? e.last_name : undefined}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -220,16 +224,20 @@ const UsersConfigDialog = ({
                     value={formik.values.email}
                     setValue={(val) => void formik.setFieldValue("email", val)}
                     placeholder="eg. james@gmail.com"
-                    error={t.email ? e.email : undefined}
+                    error={t.email && e.email ? e.email : undefined}
                   />
-                  <TextInput
+                  <PhoneInput
                     label="Phone number"
                     value={formik.values.phone_number}
-                    setValue={(val) =>
+                    onChange={(val) =>
                       void formik.setFieldValue("phone_number", val)
                     }
                     placeholder="eg. +1 224 776 885"
-                    error={t.phone_number ? e.phone_number : undefined}
+                    error={
+                      t.phone_number && e.phone_number
+                        ? e.phone_number
+                        : undefined
+                    }
                   />
                 </div>
 
@@ -346,7 +354,11 @@ const UsersConfigDialog = ({
                       void formik.setFieldValue("list_description", val)
                     }
                     placeholder="eg. IDV list for James"
-                    error={t.list_description ? e.list_description : undefined}
+                    error={
+                      t.list_description && e.list_description
+                        ? e.list_description
+                        : undefined
+                    }
                   />
                 </div>
 

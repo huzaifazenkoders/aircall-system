@@ -18,16 +18,22 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import TextInput from "@/components/ui/text-input";
+import PhoneInput from "@/components/ui/phone-input";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { useUpdateUser } from "@/features/users/services/userService";
 import { userKeys } from "@/features/users/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Email is required"),
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email is required")
+    .isValidEmail("Email is not valid"),
   first_name: Yup.string().required("First name is required"),
   last_name: Yup.string().required("Last name is required"),
-  phone_number: Yup.string().required("Phone number is required")
+  phone_number: Yup.string()
+    .required("Phone number is required")
+    .isValidPhoneNumber("Phone number is not valid")
 });
 
 const EditUserDialog = ({
@@ -74,7 +80,9 @@ const EditUserDialog = ({
           onSuccess: (res) => {
             toast.success(res.message || "User updated successfully");
             void queryClient.invalidateQueries({ queryKey: userKeys.all });
-            void queryClient.invalidateQueries({ queryKey: userKeys.detail(user.id) });
+            void queryClient.invalidateQueries({
+              queryKey: userKeys.detail(user.id)
+            });
             onOpenChange(false);
           },
           onError: handleMutationError
@@ -108,16 +116,22 @@ const EditUserDialog = ({
                 <TextInput
                   label="First Name"
                   value={formik.values.first_name}
-                  setValue={(val) => void formik.setFieldValue("first_name", val)}
+                  setValue={(val) =>
+                    void formik.setFieldValue("first_name", val)
+                  }
                   placeholder="eg. James"
-                  error={t.first_name ? e.first_name : undefined}
+                  error={
+                    t.first_name && e.first_name ? e.first_name : undefined
+                  }
                 />
                 <TextInput
                   label="Last Name"
                   value={formik.values.last_name}
-                  setValue={(val) => void formik.setFieldValue("last_name", val)}
+                  setValue={(val) =>
+                    void formik.setFieldValue("last_name", val)
+                  }
                   placeholder="eg. Williams"
-                  error={t.last_name ? e.last_name : undefined}
+                  error={t.last_name && e.last_name ? e.last_name : undefined}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -126,21 +140,31 @@ const EditUserDialog = ({
                   value={formik.values.email}
                   setValue={(val) => void formik.setFieldValue("email", val)}
                   placeholder="eg. james@gmail.com"
-                  error={t.email ? e.email : undefined}
+                  error={t.email && e.email ? e.email : undefined}
                 />
-                <TextInput
+                <PhoneInput
                   label="Phone number"
                   value={formik.values.phone_number}
-                  setValue={(val) => void formik.setFieldValue("phone_number", val)}
+                  onChange={(val) =>
+                    void formik.setFieldValue("phone_number", val)
+                  }
                   placeholder="eg. +1 224 776 885"
-                  error={t.phone_number ? e.phone_number : undefined}
+                  error={
+                    t.phone_number && e.phone_number
+                      ? e.phone_number
+                      : undefined
+                  }
                 />
               </div>
             </div>
           </DialogBody>
 
           <DialogFooter className={usersStyles.modalFooter}>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isPending || !user?.id}>

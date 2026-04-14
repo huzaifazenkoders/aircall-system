@@ -89,6 +89,26 @@ const ListTable = ({
 
   const activeQuery = tabs === "shared" ? sharedQuery : idvQuery;
   const activeLists = tabs === "shared" ? sharedLists : idvLists;
+  const isDefaultState =
+    query.trim() === "" && !dateRange.startDate && !dateRange.endDate;
+  const hasAnyLists = sharedLists.length > 0 || idvLists.length > 0;
+  const shouldShowEmptyStateOnly =
+    isDefaultState &&
+    !sharedQuery.isPending &&
+    !idvQuery.isPending &&
+    !sharedQuery.isError &&
+    !idvQuery.isError &&
+    !hasAnyLists;
+
+  if (shouldShowEmptyStateOnly) {
+    return (
+      <div className={listStyles.card}>
+        <div className="flex items-center justify-center py-16">
+          <ListEmptyState onCreate={() => setCreateOpen(true)} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={listStyles.card}>
@@ -172,7 +192,13 @@ const ListTable = ({
                           <TableHead className="min-w-60">ID</TableHead>
                           <TableHead className="min-w-60">Name</TableHead>
                           <TableHead className="w-24">Priority</TableHead>
+                          <TableHead className="w-32">Cooldown (hrs)</TableHead>
+                          <TableHead className="w-24">In Cooldown</TableHead>
+                          <TableHead className="w-24">Avail to Call</TableHead>
                           <TableHead className="w-24">Total</TableHead>
+                          <TableHead className="min-w-40">
+                            Assigned To
+                          </TableHead>
                           <TableHead className="w-32">Status</TableHead>
                           <TableHead className="w-14" />
                         </TableRow>
@@ -244,9 +270,16 @@ const ListRow = ({
     }
   }, [data, fetchEdit, setEditList]);
 
+  console.log("row", row);
+
+  const assignedToLabel =
+    row.assign_type === "individual"
+      ? `${row.assignments.length} Individuals`
+      : row.assignments?.[0]?.group_id;
+
   return (
     <TableRow className="h-15.5">
-      <TableCell className="font-medium text-foreground">{row.id}</TableCell>
+      <TableCell className="font-medium text-foreground">{row.code}</TableCell>
       <TableCell className="text-foreground">
         <Link
           href={`/list/${row.id}`}
@@ -256,7 +289,15 @@ const ListRow = ({
         </Link>
       </TableCell>
       <TableCell>{row.priority}</TableCell>
+      <TableCell>{row.cooldown_minimum_hours ?? "-"}</TableCell>
+      <TableCell>{row.cooldown_leads ?? "-"}</TableCell>
+      <TableCell>{row.available_leads ?? "-"}</TableCell>
       <TableCell>{row.total_leads ?? "-"}</TableCell>
+      <TableCell className="text-foreground text-sm">
+        <span className="truncate" title={assignedToLabel || ""}>
+          {assignedToLabel}
+        </span>
+      </TableCell>
       <TableCell>
         <StatusBadge status={row.status} />
       </TableCell>

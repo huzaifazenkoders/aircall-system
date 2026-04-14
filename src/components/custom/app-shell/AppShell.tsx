@@ -35,7 +35,11 @@ const AppShell = ({
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <AppSidebar activeKey={activeKey} onClose={() => setSidebarOpen(false)} mobile />
+        <AppSidebar
+          activeKey={activeKey}
+          onClose={() => setSidebarOpen(false)}
+          mobile
+        />
       </div>
 
       <div className="mx-auto grid min-h-screen w-full grid-cols-1 gap-6 p-3 lg:grid-cols-[300px_1fr]">
@@ -54,7 +58,7 @@ const AppShell = ({
             </button>
           </div>
           <AppTopbar />
-          <main className="flex min-h-0 flex-1 flex-col px-1 pt-2 container mx-auto">
+          <main className="flex min-h-0 flex-1 flex-col px-1 pt-2">
             {children}
           </main>
         </div>

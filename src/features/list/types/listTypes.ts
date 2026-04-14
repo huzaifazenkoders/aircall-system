@@ -4,6 +4,7 @@ export { LeadActivityStatus, type Lead } from "./leadTypes";
 
 export interface List {
   id: string;
+  code: string;
   name: string;
   priority: number;
   status: ListStatus;

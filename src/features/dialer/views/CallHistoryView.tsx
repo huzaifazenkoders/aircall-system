@@ -46,6 +46,10 @@ const CallHistoryView = () => {
       return matchesSearch && matchesStatus;
     });
   }, [searchValue, statusValue]);
+  const isDefaultState =
+    searchValue.trim() === "" && statusValue === "All Status";
+  const shouldShowEmptyStateOnly =
+    filteredRows.length === 0 && isDefaultState;
 
   return (
     <>
@@ -70,23 +74,29 @@ const CallHistoryView = () => {
       <CallHistoryStats />
 
       <section className={callHistoryStyles.tableCard}>
-        <CallHistoryFilters
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
-          statusValue={statusValue}
-          onStatusChange={setStatusValue}
-        />
-
-        {filteredRows.length > 0 ? (
-          <CallHistoryTable
-            rows={filteredRows}
-            onSelect={(row) => {
-              setSelectedRecord(row);
-              setSheetOpen(true);
-            }}
-          />
-        ) : (
+        {shouldShowEmptyStateOnly ? (
           <CallHistoryEmptyState />
+        ) : (
+          <>
+            <CallHistoryFilters
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              statusValue={statusValue}
+              onStatusChange={setStatusValue}
+            />
+
+            {filteredRows.length > 0 ? (
+              <CallHistoryTable
+                rows={filteredRows}
+                onSelect={(row) => {
+                  setSelectedRecord(row);
+                  setSheetOpen(true);
+                }}
+              />
+            ) : (
+              <CallHistoryEmptyState />
+            )}
+          </>
         )}
       </section>
 
