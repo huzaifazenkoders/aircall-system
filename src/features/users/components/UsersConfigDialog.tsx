@@ -37,22 +37,24 @@ import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import PhoneInput from "@/components/ui/phone-input";
 
 const step1Schema = Yup.object({
-  keap_id: Yup.string().required("Keap ID is required"),
-  first_name: Yup.string().required("First name is required"),
-  last_name: Yup.string().required("Last name is required"),
+  keap_id: Yup.string().trim().required("Keap ID is required"),
+  first_name: Yup.string().trim().required("First name is required"),
+  last_name: Yup.string().trim().required("Last name is required"),
   email: Yup.string()
+    .trim()
     .email("Invalid email")
     .required("Email is required")
     .isValidEmail("Email is not valid"),
   phone_number: Yup.string()
+    .trim()
     .required("Phone number is required")
     .isValidPhoneNumber("Phone number is not valid"),
   group_ids: Yup.array().of(Yup.string())
 });
 
 const fullSchema = step1Schema.shape({
-  list_description: Yup.string().required("Description is required"),
-  workflow_id: Yup.string().required("Workflow is required"),
+  list_description: Yup.string().trim().required("Description is required"),
+  workflow_id: Yup.string().trim().required("Workflow is required"),
   cooldown_minimum_hours: Yup.number().min(0).required("Required"),
   cooldown_minimum_minutes: Yup.number().min(0).max(59).required("Required")
 });
@@ -117,14 +119,14 @@ const UsersConfigDialog = ({
       inviteUser(
         {
           payload: {
-            email: values.email,
-            first_name: values.first_name,
-            last_name: values.last_name,
-            phone_number: values.phone_number,
-            keap_id: values.keap_id,
+            email: values.email.trim(),
+            first_name: values.first_name.trim(),
+            last_name: values.last_name.trim(),
+            phone_number: values.phone_number.trim(),
+            keap_id: values.keap_id.trim(),
             group_ids: values.group_ids,
             list: {
-              description: values.list_description,
+              description: values.list_description.trim(),
               call_type: "hot_lead",
               cooldown_minimum_hours: values.cooldown_minimum_hours,
               cooldown_minimum_minutes: values.cooldown_minimum_minutes,

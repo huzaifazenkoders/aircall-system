@@ -17,10 +17,11 @@ import { setCookie } from "cookies-next/client";
 
 const validationSchema = Yup.object({
   email: Yup.string()
+    .trim()
     .email("Invalid email")
     .required("Email is required")
     .isValidEmail("Email is not valid"),
-  password: Yup.string().required("Password is required")
+  password: Yup.string().trim().required("Password is required")
 });
 
 const LoginForm = () => {
@@ -42,7 +43,11 @@ const LoginForm = () => {
           onSuccess: (res) => {
             toast.success("Logged in successfully");
             setCookie("token", res.data.token);
-            router.replace("/list");
+            if (res.data.has_reset_password) {
+              router.replace("/dialer/set-password");
+            } else {
+              router.replace("/list");
+            }
           },
           onError: handleMutationError
         }

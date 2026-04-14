@@ -26,12 +26,14 @@ import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
   email: Yup.string()
+    .trim()
     .email("Invalid email")
     .required("Email is required")
     .isValidEmail("Email is not valid"),
-  first_name: Yup.string().required("First name is required"),
-  last_name: Yup.string().required("Last name is required"),
+  first_name: Yup.string().trim().required("First name is required"),
+  last_name: Yup.string().trim().required("Last name is required"),
   phone_number: Yup.string()
+    .trim()
     .required("Phone number is required")
     .isValidPhoneNumber("Phone number is not valid")
 });
@@ -70,10 +72,10 @@ const EditUserDialog = ({
         {
           payload: {
             id: user.id,
-            email: values.email,
-            first_name: values.first_name,
-            last_name: values.last_name,
-            phone_number: values.phone_number
+            email: values.email.trim(),
+            first_name: values.first_name.trim(),
+            last_name: values.last_name.trim(),
+            phone_number: values.phone_number.trim()
           }
         },
         {

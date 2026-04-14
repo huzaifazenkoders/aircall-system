@@ -10,6 +10,7 @@ import { t } from "@/lib/i18n/messages";
 // ✅ Name Schema - Now using chainable methods
 export const nameSchema = ({ fieldName }: { fieldName: string }) => {
   return Yup.string()
+    .trim()
     .required(t("isRequired", { field: fieldName }))
     .min(3, t("mustContainAtLeast", { field: fieldName, count: 3 }))
     .max(35, t("cannotExceedCharacters", { field: fieldName, count: 35 }))
@@ -22,6 +23,7 @@ export const nameSchema = ({ fieldName }: { fieldName: string }) => {
 // ✅ Email Schema - Now using chainable methods
 export const emailSchema = () => {
   return Yup.string()
+    .trim()
     .required(t("isRequired", { field: t("email") }))
     .isValidEmail(t("shouldBeValid", { field: t("email") }))
     .notOnlySpacesRule(t("cannotContainEmptySpaces", { field: t("email") }))
@@ -33,6 +35,7 @@ export const emailSchema = () => {
 // ✅ Phone Schema
 export const phoneSchema = () => {
   return Yup.string()
+    .trim()
     .required(t("isRequired", { field: t("phoneNumber") }))
     .isValidPhoneNumber(t("shouldBeValid", { field: t("phoneNumber") }));
 };

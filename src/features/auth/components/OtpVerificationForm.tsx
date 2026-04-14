@@ -13,6 +13,7 @@ import { useResendOtp, useVerifyOtp } from "../services/authService";
 
 const validationSchema = Yup.object({
   code: Yup.string()
+    .trim()
     .length(6, "Code must be 6 digits")
     .required("Code is required")
 });
@@ -30,7 +31,7 @@ const OtpVerificationForm = () => {
     validationSchema,
     onSubmit: (values) => {
       verifyOtp(
-        { payload: { email, code: values.code } },
+        { payload: { email, code: values.code.trim() } },
         {
           onSuccess: ({ data }) => {
             toast.success("OTP verified");

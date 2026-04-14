@@ -15,6 +15,7 @@ import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
   email: Yup.string()
+    .trim()
     .email("Invalid email")
     .required("Email is required")
     .isValidEmail("Email is not valid")

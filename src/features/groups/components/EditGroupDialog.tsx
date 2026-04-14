@@ -28,8 +28,8 @@ import { groupKeys } from "@/features/groups/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
-  name: Yup.string().required("Group name is required"),
-  description: Yup.string().required("Description is required")
+  name: Yup.string().trim().required("Group name is required"),
+  description: Yup.string().trim().required("Description is required")
 });
 
 const EditGroupDialog = ({
@@ -60,8 +60,8 @@ const EditGroupDialog = ({
         {
           payload: {
             id: groupId,
-            name: values.name,
-            description: values.description
+            name: values.name.trim(),
+            description: values.description.trim()
           }
         },
         {

@@ -73,11 +73,12 @@ const emptyValues: DispositionFormValues = {
 
 const validationSchema = Yup.object({
   disposition_type: Yup.string()
+    .trim()
     .required("Disposition type is required")
     .max(250, "Disposition name cannot exceed 250 characters."),
-  resulting_lead_status: Yup.string().required(
-    "Resulting lead status is required"
-  ),
+  resulting_lead_status: Yup.string()
+    .trim()
+    .required("Resulting lead status is required"),
   max_attempts: Yup.number().when("resulting_lead_status", {
     is: "cooldown",
     then: (s) => s.min(1, "Min 1").required("Required"),
@@ -188,9 +189,9 @@ const DispositionRuleDialog = ({
     onSubmit: (values) => {
       const payload = {
         workflow_id: workflowId,
-        disposition_type: values.disposition_type as DispositionType,
+        disposition_type: values.disposition_type.trim() as DispositionType,
         resulting_lead_status:
-          values.resulting_lead_status as ResultingLeadStatus,
+          values.resulting_lead_status.trim() as ResultingLeadStatus,
         max_attempts: values.is_retry_allowed ? values.max_attempts : undefined,
         cooldown_behavior: values.cooldown_behavior,
         custom_cooldown_hours:

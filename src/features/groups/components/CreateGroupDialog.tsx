@@ -40,8 +40,8 @@ import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
 
 const validationSchema = Yup.object({
-  name: Yup.string().required("Group name is required"),
-  description: Yup.string().required("Description is required"),
+  name: Yup.string().trim().required("Group name is required"),
+  description: Yup.string().trim().required("Description is required"),
   user_ids: Yup.array().of(Yup.string())
 });
 
@@ -99,8 +99,8 @@ const CreateGroupDialog = ({
       createGroup(
         {
           payload: {
-            name: values.name,
-            description: values.description,
+            name: values.name.trim(),
+            description: values.description.trim(),
             is_active: true,
             user_ids: values.user_ids
           }

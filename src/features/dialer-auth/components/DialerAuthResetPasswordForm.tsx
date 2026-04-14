@@ -48,7 +48,7 @@ const DialerAuthResetPasswordForm = ({
       resetPassword(
         {
           payload: {
-            old_password: values.old_password,
+            old_password: values.old_password.trim(),
             new_password: values.new_password.trim()
           }
         },
