@@ -62,7 +62,9 @@ const CallHistoryView = () => {
         </DropdownMenu>
       </div>
 
-      <CallHistoryStats />
+      {data?.data?.my_stats && (
+        <CallHistoryStats myStats={data?.data?.my_stats} />
+      )}
 
       <>
         {shouldShowEmptyStateOnly ? (

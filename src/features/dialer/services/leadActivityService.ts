@@ -82,6 +82,13 @@ interface GetMyCallLogsRes {
   data: {
     data: CallHistory[];
     meta: IPagination;
+    my_stats: {
+      total_calls: number;
+      calls_today: number;
+      connected_positive: number;
+      no_answer: number;
+      callback_scheduled: number;
+    };
   };
   message: string;
 }

@@ -1,11 +1,28 @@
 import React from "react";
-import { callHistorySummary } from "@/features/dialer/data/dialerData";
 import { callHistoryStyles } from "@/features/dialer/styles/dialerStyles";
 
-const CallHistoryStats = () => {
+const CallHistoryStats = ({
+  myStats
+}: {
+  myStats: {
+    total_calls: number;
+    calls_today: number;
+    connected_positive: number;
+    no_answer: number;
+    callback_scheduled: number;
+  };
+}) => {
+  const stats = [
+    { label: "Total Calls", value: myStats.total_calls },
+    { label: "Calls Today", value: myStats.calls_today },
+    { label: "Connected/Positive", value: myStats.connected_positive },
+    { label: "No Answer", value: myStats.no_answer },
+    { label: "Callback Scheduled", value: myStats.callback_scheduled }
+  ];
+
   return (
     <section className={callHistoryStyles.statsCard}>
-      {callHistorySummary.map((item, index) => (
+      {stats.map((item, index) => (
         <React.Fragment key={item.label}>
           {index > 0 && <div className={callHistoryStyles.statDivider} />}
           <div className={callHistoryStyles.statItem}>
@@ -19,4 +36,3 @@ const CallHistoryStats = () => {
 };
 
 export default CallHistoryStats;
-
