@@ -28,19 +28,7 @@ import {
 import DateSelector from "@/components/custom/date-selector.component";
 import { useGetWorkflowDispositions } from "@/features/assigned-leads/services/assignedLeadService";
 import { Loader2Icon } from "lucide-react";
-
-const KEAP_NOTE_TEMPLATES = [
-  "Follow-up template",
-  "No answer template",
-  "Callback template"
-] as const;
-
-const KEAP_TAGS = [
-  "CALLBACK_SCHEDULED",
-  "NO_ANSWER",
-  "NOT_INTERESTED",
-  "CONNECTED"
-] as const;
+import TextInput from "@/components/ui/text-input";
 
 type CallOutcomeDialogProps = {
   open: boolean;
@@ -192,47 +180,20 @@ const CallOutcomeDialog = ({
           />
 
           {/* Apply Keap Note Template */}
-          <LabelContainer label="Apply Keap Note Template">
-            <Select
-              value={keapNoteTemplate}
-              onValueChange={setKeapNoteTemplate}
-            >
-              <SelectTrigger className="w-full h-11 text-base border-border-primary">
-                <SelectValue placeholder="Select a keap note" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
-                {KEAP_NOTE_TEMPLATES.map((t) => (
-                  <SelectItem
-                    key={t}
-                    value={t}
-                    className="px-3 py-2 text-sm text-text-primary"
-                  >
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </LabelContainer>
+          <TextInput
+            label="Apply Keap Note Template"
+            value={keapNoteTemplate || ""}
+            setValue={(r) => setKeapNoteTemplate(r)}
+            placeholder="Select a keap note"
+          />
 
           {/* Keap Tag */}
-          <LabelContainer label="Keap Tag">
-            <Select value={keapTag} onValueChange={setKeapTag}>
-              <SelectTrigger className="w-full h-11 text-base border-border-primary">
-                <SelectValue placeholder="Select a keap tag" />
-              </SelectTrigger>
-              <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
-                {KEAP_TAGS.map((t) => (
-                  <SelectItem
-                    key={t}
-                    value={t}
-                    className="px-3 py-2 text-sm text-text-primary"
-                  >
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </LabelContainer>
+          <TextInput
+            label="Keap Tag"
+            value={keapTag || ""}
+            setValue={(r) => setKeapTag(r)}
+            placeholder="Select a keap tag"
+          />
         </div>
 
         <div className="border-t border-border" />

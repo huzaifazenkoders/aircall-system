@@ -98,13 +98,12 @@ const MyListComponent = () => {
   }, [myLists, selectedList]);
 
   // ── Focus Mode initial value from API ────────────────────────────────────────
-  const { data: priorityStatusData } = useGetUserListPriorityStatus(
-    selectedList?.id ?? ""
-  );
+  const { data: priorityStatusData, isPending: gettingStatus } =
+    useGetUserListPriorityStatus(selectedList?.id ?? "");
 
   React.useEffect(() => {
-    if (priorityStatusData?.data?.is_focus_mode !== undefined) {
-      setFocusMode(priorityStatusData.data.is_focus_mode);
+    if (priorityStatusData?.data?.isActive !== undefined) {
+      setFocusMode(priorityStatusData.data.isActive);
     }
   }, [priorityStatusData]);
 
@@ -134,7 +133,7 @@ const MyListComponent = () => {
     });
 
   const handleToggleList = (list: MyList) => {
-    if (list.is_active) {
+    if (list.user_priorities?.[0]?.is_active) {
       deactivateMyList(
         { payload: { list_id: list.id } },
         {
@@ -166,19 +165,6 @@ const MyListComponent = () => {
   };
 
   const handleFocusMode = () => {
-    activateMyList(
-      { payload: { list_id: "all" } },
-      {
-        onSuccess: () => {
-          setFocusMode(true);
-          invalidateMyLists();
-        },
-        onError: handleMutationError
-      }
-    );
-  };
-
-  const handleResumeAll = () => {
     deactivateMyList(
       { payload: { list_id: "all" } },
       {
@@ -191,7 +177,28 @@ const MyListComponent = () => {
     );
   };
 
+  const handleResumeAll = () => {
+    activateMyList(
+      { payload: { list_id: "all" } },
+      {
+        onSuccess: () => {
+          setFocusMode(true);
+          invalidateMyLists();
+        },
+        onError: handleMutationError
+      }
+    );
+  };
+
   const togglePending = activating || deactivating;
+
+  if (gettingStatus) {
+    return (
+      <div className="flex flex-1 items-center justify-center py-20">
+        <Loader2Icon className="size-8 animate-spin text-gray-400" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -209,7 +216,7 @@ const MyListComponent = () => {
                 aria-label="Toggle focus mode"
                 disabled={togglePending}
                 onClick={() =>
-                  focusMode
+                  !focusMode
                     ? setResumeAllDialogOpen(true)
                     : setFocusModeDialogOpen(true)
                 }
@@ -253,7 +260,7 @@ const MyListComponent = () => {
                   key={list.id}
                   className={cn(
                     myListStyles.listCard,
-                    list.is_active
+                    list.user_priorities?.[0]?.is_active
                       ? myListStyles.listCardActive
                       : myListStyles.listCardInactive,
                     selectedList?.id === list.id && "border-3 border-primary"
@@ -266,7 +273,9 @@ const MyListComponent = () => {
                     </span>
                     <div className={myListStyles.listCardToggleWrap}>
                       <span className={myListStyles.listCardToggleLabel}>
-                        {list.is_active ? "Active" : "Inactive"}
+                        {list.user_priorities?.[0]?.is_active
+                          ? "Active"
+                          : "Inactive"}
                       </span>
                       <button
                         type="button"
@@ -277,7 +286,7 @@ const MyListComponent = () => {
                           handleToggleList(list);
                         }}
                       >
-                        <Toggle active={list.is_active} />
+                        <Toggle active={list.user_priorities?.[0]?.is_active} />
                       </button>
                     </div>
                   </div>

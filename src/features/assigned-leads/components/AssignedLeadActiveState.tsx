@@ -104,18 +104,8 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
       {
         onSuccess: () => {
           setCallOutcomeOpen(false);
-          toast.success("Call Logged Successfully", {
-            // react-hot-toast supports a description via the icon/style options;
-            // we pass it as a two-line message using \n
-            id: "call-logged"
-          });
-          // Show description as a follow-up info toast
-          toast(
-            "The call outcome has been recorded. A new contact will be assigned automatically.",
-            {
-              id: "call-logged-desc",
-              icon: "ℹ️"
-            }
+          toast.success(
+            "Call Logged Successfully. The call outcome has been recorded. A new contact will be assigned automatically."
           );
           queryClient.invalidateQueries({
             queryKey: assignedLeadKeys.currentLead

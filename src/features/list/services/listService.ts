@@ -355,7 +355,9 @@ export interface MyList {
   priority: number;
   total_leads: number;
   assigned_diallers: number;
-  is_active: boolean;
+  user_priorities: {
+    is_active: boolean;
+  }[];
 }
 
 interface GetMyListsRes {
@@ -419,7 +421,8 @@ export const useDeactivateMyList = () =>
 
 interface UserListPriorityStatusRes {
   data: {
-    is_focus_mode: boolean;
+    exists: boolean;
+    isActive: boolean;
   };
   message: string;
 }
