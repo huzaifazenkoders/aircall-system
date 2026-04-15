@@ -71,7 +71,9 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
 
   const handleOutcomeSubmit = ({
     disposition,
-    personalNote
+    personalNote,
+    callbackDate,
+    callbackTime
   }: {
     disposition: string;
     callbackDate: Date | null;
@@ -88,7 +90,9 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
           disposition_id: DISPOSITION_ID_MAP[disposition] ?? disposition,
           notes: personalNote.trim(),
           attempt_number: lead.attempt_number,
-          call_status: CALL_STATUS_MAP[disposition] ?? "completed"
+          call_status: CALL_STATUS_MAP[disposition] ?? "completed",
+          callback_date: callbackDate ? callbackDate.toISOString() : undefined,
+          callback_time: callbackTime || undefined
         }
       },
       {
