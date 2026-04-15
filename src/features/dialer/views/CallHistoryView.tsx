@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { CalendarDaysIcon, CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2Icon } from "lucide-react";
 
 import CallHistoryDetailsSheet from "@/features/dialer/components/CallHistoryDetailsSheet";
 import CallHistoryEmptyState from "@/features/dialer/components/CallHistoryEmptyState";
@@ -9,13 +9,14 @@ import CallHistoryFilters from "@/features/dialer/components/CallHistoryFilters"
 import CallHistoryStats from "@/features/dialer/components/CallHistoryStats";
 import CallHistoryTable from "@/features/dialer/components/CallHistoryTable";
 import {
-  callHistoryRows,
-  type CallHistoryRecord
-} from "@/features/dialer/data/dialerData";
-import {
   callHistoryStyles,
   dialerShellStyles
 } from "@/features/dialer/styles/dialerStyles";
+import {
+  useGetMyCallLogs,
+  useGetMyCallLogDetail
+} from "@/features/dialer/services/leadActivityService";
+import { MyCallStatus } from "@/features/dialer/types/leadActivityTypes";
 import DateSelector from "@/components/custom/date-selector.component";
 import {
   DropdownMenu,
@@ -23,33 +24,29 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
+const LIMIT = 10;
+
 const CallHistoryView = () => {
+  const [page, setPage] = React.useState(1);
   const [searchValue, setSearchValue] = React.useState("");
-  const [statusValue, setStatusValue] = React.useState("All Status");
-  const [selectedRecord, setSelectedRecord] =
-    React.useState<CallHistoryRecord | null>(null);
+  const [statusValue, setStatusValue] = React.useState("");
+  const [selectedId, setSelectedId] = React.useState("");
   const [sheetOpen, setSheetOpen] = React.useState(false);
 
-  const filteredRows = React.useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
+  const { data, isPending, isError } = useGetMyCallLogs({
+    page,
+    limit: LIMIT,
+    call_status: (statusValue as MyCallStatus) || undefined
+  });
 
-    return callHistoryRows.filter((row) => {
-      const matchesSearch =
-        !query ||
-        [row.leadName, row.phone, row.list, row.callTime]
-          .join(" ")
-          .toLowerCase()
-          .includes(query);
-      const matchesStatus =
-        statusValue === "All Status" || row.disposition === statusValue;
+  const { data: detailData, isPending: isDetailPending } =
+    useGetMyCallLogDetail(selectedId);
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [searchValue, statusValue]);
-  const isDefaultState =
-    searchValue.trim() === "" && statusValue === "All Status";
+  const rows = data?.data?.data ?? [];
+  const meta = data?.data?.meta;
+  const isDefaultState = !statusValue;
   const shouldShowEmptyStateOnly =
-    filteredRows.length === 0 && isDefaultState;
+    !isPending && !isError && rows.length === 0 && isDefaultState;
 
   return (
     <>
@@ -73,37 +70,56 @@ const CallHistoryView = () => {
 
       <CallHistoryStats />
 
-      <section className={callHistoryStyles.tableCard}>
+      <>
         {shouldShowEmptyStateOnly ? (
           <CallHistoryEmptyState />
         ) : (
-          <>
+          <section className={callHistoryStyles.tableCard}>
             <CallHistoryFilters
               searchValue={searchValue}
-              onSearchChange={setSearchValue}
-              statusValue={statusValue}
-              onStatusChange={setStatusValue}
+              onSearchChange={(val) => {
+                setSearchValue(val);
+                setPage(1);
+              }}
+              statusValue={statusValue || "All"}
+              onStatusChange={(val) => {
+                setStatusValue(val === "All" ? "" : val);
+                setPage(1);
+              }}
             />
 
-            {filteredRows.length > 0 ? (
+            {isPending ? (
+              <div className="flex min-h-[400px] items-center justify-center">
+                <Loader2Icon className="size-8 animate-spin text-panel-muted" />
+              </div>
+            ) : isError || rows.length === 0 ? (
+              <CallHistoryEmptyState />
+            ) : (
               <CallHistoryTable
-                rows={filteredRows}
+                rows={rows}
+                page={page}
+                limit={LIMIT}
+                total={meta?.total ?? 0}
+                totalPages={meta?.totalPages ?? 1}
+                onPageChange={setPage}
                 onSelect={(row) => {
-                  setSelectedRecord(row);
+                  setSelectedId(row.id);
                   setSheetOpen(true);
                 }}
               />
-            ) : (
-              <CallHistoryEmptyState />
             )}
-          </>
+          </section>
         )}
-      </section>
+      </>
 
       <CallHistoryDetailsSheet
         open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        record={selectedRecord}
+        onOpenChange={(open) => {
+          setSheetOpen(open);
+          if (!open) setSelectedId("");
+        }}
+        record={detailData?.data ?? null}
+        isLoading={isDetailPending}
       />
     </>
   );

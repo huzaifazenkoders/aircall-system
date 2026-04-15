@@ -101,23 +101,26 @@ const LeadsTable = ({
 
   const isIndividual = variant === "individual";
   const isDefaultState =
-    query.trim() === "" &&
-    statusFilter === "all" &&
-    !startDate &&
-    !endDate;
+    query.trim() === "" && statusFilter === "all" && !startDate && !endDate;
   const shouldShowEmptyStateOnly =
     !isPending && !isError && !leads.length && isDefaultState;
 
   if (shouldShowEmptyStateOnly && isIndividual) {
     return (
       <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-        <Image src={NoImage} alt="No Leads Assigned Yet" height={260} width={340} />
+        <Image
+          src={NoImage}
+          alt="No Leads Assigned Yet"
+          height={260}
+          width={340}
+        />
         <h2 className="mt-8 text-[28px] font-semibold tracking-tight text-foreground">
           No Leads Assigned Yet
         </h2>
         <p className="mt-4 max-w-[620px] text-lg leading-8 text-muted-foreground">
-          It looks like there are currently no leads assigned to this representative&apos;s
-          individual list. You can add leads manually once they become available.
+          It looks like there are currently no leads assigned to this
+          representative&apos;s individual list. You can add leads manually once
+          they become available.
         </p>
       </div>
     );
@@ -142,7 +145,9 @@ const LeadsTable = ({
   return (
     <div
       className={cn(
-        isIndividual ? listDetailsStyles.leadTableWrapFlush : listDetailsStyles.leadTableWrap
+        isIndividual
+          ? listDetailsStyles.leadTableWrapFlush
+          : listDetailsStyles.leadTableWrap
       )}
     >
       <div className={listDetailsStyles.leadToolbar}>
@@ -196,7 +201,9 @@ const LeadsTable = ({
             }}
             setValue={(range) => {
               setStartDate(
-                range.startDate ? range.startDate.toISOString().slice(0, 10) : ""
+                range.startDate
+                  ? range.startDate.toISOString().slice(0, 10)
+                  : ""
               );
               setEndDate(
                 range.endDate ? range.endDate.toISOString().slice(0, 10) : ""
@@ -226,7 +233,10 @@ const LeadsTable = ({
           <TableBody>
             {isPending ? (
               <TableRow>
-                <TableCell colSpan={isIndividual ? 6 : 6} className="h-32 text-center">
+                <TableCell
+                  colSpan={isIndividual ? 6 : 6}
+                  className="h-32 text-center"
+                >
                   <div className="flex items-center justify-center gap-2 text-muted-foreground">
                     <Loader2Icon className="size-4 animate-spin" />
                     Loading leads...
@@ -307,7 +317,7 @@ const LeadsTable = ({
                       {getDaysToExpiry(lead)}
                     </TableCell>
                   ) : null}
-                  <TableCell className={cn("font-medium text-foreground", isIndividual ? "" : "text-right")}>
+                  <TableCell className={cn("font-medium text-foreground")}>
                     {getAttemptCount(lead)}
                   </TableCell>
                   <TableCell className="text-right">
@@ -321,7 +331,10 @@ const LeadsTable = ({
                           })
                         )}
                       >
-                        <MoreVerticalIcon className="size-3" aria-hidden="true" />
+                        <MoreVerticalIcon
+                          className="size-3"
+                          aria-hidden="true"
+                        />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-40">
                         <DropdownMenuItem
@@ -444,7 +457,10 @@ const formatLeadStatus = (status: LeadDisplayStatus) =>
     .join(" ");
 
 const getLeadStatus = (lead: Lead): LeadDisplayStatus =>
-  lead.activity_status || lead.lead_status || lead.status || LeadActivityStatus.Completed;
+  lead.activity_status ||
+  lead.lead_status ||
+  lead.status ||
+  LeadActivityStatus.Completed;
 
 const LeadStatusBadge = ({ status }: { status: LeadDisplayStatus }) => {
   const classes =

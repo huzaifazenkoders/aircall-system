@@ -12,23 +12,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { type CallHistoryRecord } from "@/features/dialer/data/dialerData";
+import { MyCallLog } from "@/features/dialer/types/leadActivityTypes";
 import { callHistoryStyles } from "@/features/dialer/styles/dialerStyles";
 
-const dispositionVariantMap = {
-  Connected: "connected",
-  Callback: "callback",
-  "No Answer": "no-answer",
-  "Not Interested": "not-interested",
-  "Wrong Number": "wrong-number",
-} as const;
+const callStatusVariantMap: Record<string, string> = {
+  completed: "connected",
+  failed: "not-interested",
+  no_answer: "no-answer",
+};
+
+const callStatusLabelMap: Record<string, string> = {
+  completed: "Completed",
+  failed: "Failed",
+  no_answer: "No Answer",
+};
 
 const CallHistoryTable = ({
   rows,
   onSelect,
+  page,
+  limit,
+  total,
+  totalPages,
+  onPageChange,
 }: {
-  rows: CallHistoryRecord[];
-  onSelect: (row: CallHistoryRecord) => void;
+  rows: MyCallLog[];
+  onSelect: (row: MyCallLog) => void;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }) => {
   return (
     <>
@@ -48,14 +62,16 @@ const CallHistoryTable = ({
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id} className={callHistoryStyles.row} onClick={() => onSelect(row)}>
-              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.leadName}</TableCell>
-              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.phone}</TableCell>
-              <TableCell className={callHistoryStyles.cell}>{row.list}</TableCell>
+              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">
+                {row.lead ? `${row.lead.first_name} ${row.lead.last_name}` : "—"}
+              </TableCell>
+              <TableCell className="flex-1 pl-4 text-sm text-gray-800 leading-5">{row.lead?.phone ?? "—"}</TableCell>
+              <TableCell className={callHistoryStyles.cell}>{row.list?.name ?? "—"}</TableCell>
               <TableCell className="w-40 px-4 py-3.5 text-sm text-gray-800 leading-5">{row.duration}</TableCell>
-              <TableCell className={callHistoryStyles.cell}>{row.callTime}</TableCell>
+              <TableCell className={callHistoryStyles.cell}>{row.created_at}</TableCell>
               <TableCell className="flex-1 pl-2 pr-4 py-3.5">
-                <Badge variant={dispositionVariantMap[row.disposition]} className={callHistoryStyles.statusBadge}>
-                  {row.disposition}
+                <Badge variant={callStatusVariantMap[row.call_status] as never} className={callHistoryStyles.statusBadge}>
+                  {callStatusLabelMap[row.call_status] ?? row.call_status}
                 </Badge>
               </TableCell>
               <TableCell className={callHistoryStyles.arrowCell}>
@@ -80,16 +96,18 @@ const CallHistoryTable = ({
         <div className="flex items-center gap-2">
           <span className={callHistoryStyles.paginationText}>Rows per page:</span>
           <button type="button" className="flex items-center gap-2 text-xs text-gray-800 leading-5">
-            10
+            {limit}
             <ChevronDownIcon className="size-4 text-gray-500" />
           </button>
         </div>
-        <span className="text-xs text-gray-800 leading-5">1-5 of 13</span>
+        <span className="text-xs text-gray-800 leading-5">
+          {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
+        </span>
         <div className="flex items-start">
-          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
+          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton} onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
             <ChevronLeftIcon className="size-6" />
           </Button>
-          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton}>
+          <Button variant="ghost" size="icon" className={callHistoryStyles.paginationButton} onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
             <ChevronRightIcon className="size-6" />
           </Button>
         </div>

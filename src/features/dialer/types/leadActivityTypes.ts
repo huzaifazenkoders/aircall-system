@@ -1,4 +1,5 @@
 export type LeadActivityStatus = "scheduled" | "cooldown";
+export type MyCallStatus = "completed" | "failed" | "no_answer";
 
 export interface LeadActivityPurchase {
   id: string;
@@ -46,4 +47,44 @@ export interface LeadActivityDetail extends LeadActivity {
   keap_notes: string[];
   personal_notes: string[];
   keap_contact_url?: string;
+}
+
+export interface MyCallLog {
+  id: string;
+  lead_id: string;
+  list_id: string;
+  call_status: MyCallStatus;
+  duration: string;
+  created_at: string;
+  lead?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    timezone: string;
+    event_name: string;
+  };
+  list?: {
+    id: string;
+    name: string;
+  };
+  assigned_to?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+  };
+  disposition?: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface MyCallLogDetail extends MyCallLog {
+  notes: string;
+  personal_note: string;
+  keap_note: string;
+  recording_url?: string;
+  recording_duration: string;
+  next_action: string;
 }

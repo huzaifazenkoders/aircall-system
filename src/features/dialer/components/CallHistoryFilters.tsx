@@ -48,19 +48,17 @@ const CallHistoryFilters = ({
             className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]"
           >
             {[
-              "All Status",
-              "No Answer",
-              "Connected",
-              "Callback",
-              "Not Interested",
-              "Wrong Number"
+              { label: "All Status", value: "" },
+              { label: "Completed", value: "completed" },
+              { label: "Failed", value: "failed" },
+              { label: "No Answer", value: "no_answer" }
             ].map((option) => (
               <SelectItem
-                key={option}
-                value={option}
+                key={option.value}
+                value={option.value || "All"}
                 className="rounded-none px-3 py-2 text-sm text-text-primary"
               >
-                {option}
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>

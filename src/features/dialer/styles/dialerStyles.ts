@@ -68,10 +68,8 @@ export const callHistoryStyles = {
   paginationButton: cn("p-2 rounded-lg text-gray-500 hover:bg-muted"),
   emptyWrap: cn("flex min-h-[42rem] flex-1 items-center justify-center px-6"),
   emptyInner: cn("flex max-w-2xl flex-col items-center text-center"),
-  emptyTitle: cn("mt-8 text-2xl font-medium text-text-primary lg:text-[3rem]"),
-  emptyDescription: cn(
-    "mt-4 max-w-2xl text-xl leading-[1.45] text-[#667794] lg:text-[1.75rem]"
-  ),
+  emptyTitle: cn("mt-4 text-2xl font-medium text-text-primary"),
+  emptyDescription: cn("mt-2 max-w-2xl text-sm"),
   sheetHeader: cn("px-8 pt-8 pb-6"),
   sheetTitle: cn(
     "text-[2.125rem] font-semibold tracking-tight text-text-primary"
