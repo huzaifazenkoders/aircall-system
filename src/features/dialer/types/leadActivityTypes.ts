@@ -88,3 +88,51 @@ export interface MyCallLogDetail extends MyCallLog {
   recording_duration: string;
   next_action: string;
 }
+
+export interface CallHistory {
+  id: string;
+  lead_name: string;
+  lead_phone: string;
+  list_name: string;
+  user_name: string;
+  disposition_type: string;
+  call_time: string;
+  attempt_number: number;
+  call_status: string;
+}
+
+export interface CallHistoryDetails {
+  id: "f14f14dd-5076-4365-93b3-62c1cfe1ede3";
+  created_at: "2026-04-15T13:37:02.668Z";
+  lead_name: "first name last name";
+  lead_phone: "+92333333333";
+  list_name: "Huzaifa's Lista";
+  user_name: "Izhana Aarain";
+  disposition_name: null;
+  disposition_type: "no_answer";
+  resulting_lead_status: "completed";
+  call_time: "2026-04-15T13:37:02.585Z";
+  notes: "no answer";
+  attempt_number: 1;
+  call_status: "completed";
+  lead: {
+    id: "bb9d2f4e-19c3-4f5b-9a54-16fbf7d1296c";
+    first_name: "first name";
+    last_name: "last name";
+    phone: "+92333333333";
+    email: "leadA@yopmail.com";
+    timezone: "ASia";
+    event_location: "location";
+    event_date: "2026-04-09";
+    is_referral: true;
+    referred_by: "faris shafi";
+  };
+  disposition: {
+    id: "eb0db2c2-c823-495e-ab8f-217671e7c6c3";
+    name: null;
+    disposition_type: "no_answer";
+    resulting_lead_status: "completed";
+    max_attempts: 3;
+    cooldown_behavior: "default";
+  };
+}

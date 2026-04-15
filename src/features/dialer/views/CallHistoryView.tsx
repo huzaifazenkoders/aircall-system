@@ -12,10 +12,7 @@ import {
   callHistoryStyles,
   dialerShellStyles
 } from "@/features/dialer/styles/dialerStyles";
-import {
-  useGetMyCallLogs,
-  useGetMyCallLogDetail
-} from "@/features/dialer/services/leadActivityService";
+import { useGetMyCallLogs } from "@/features/dialer/services/leadActivityService";
 import { MyCallStatus } from "@/features/dialer/types/leadActivityTypes";
 import DateSelector from "@/components/custom/date-selector.component";
 import {
@@ -38,9 +35,6 @@ const CallHistoryView = () => {
     limit: LIMIT,
     call_status: (statusValue as MyCallStatus) || undefined
   });
-
-  const { data: detailData, isPending: isDetailPending } =
-    useGetMyCallLogDetail(selectedId);
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
@@ -89,7 +83,7 @@ const CallHistoryView = () => {
             />
 
             {isPending ? (
-              <div className="flex min-h-[400px] items-center justify-center">
+              <div className="flex min-h-100 items-center justify-center">
                 <Loader2Icon className="size-8 animate-spin text-panel-muted" />
               </div>
             ) : isError || rows.length === 0 ? (
@@ -112,15 +106,16 @@ const CallHistoryView = () => {
         )}
       </>
 
-      <CallHistoryDetailsSheet
-        open={sheetOpen}
-        onOpenChange={(open) => {
-          setSheetOpen(open);
-          if (!open) setSelectedId("");
-        }}
-        record={detailData?.data ?? null}
-        isLoading={isDetailPending}
-      />
+      {sheetOpen && (
+        <CallHistoryDetailsSheet
+          open={sheetOpen}
+          onOpenChange={(open) => {
+            setSheetOpen(open);
+            if (!open) setSelectedId("");
+          }}
+          id={selectedId}
+        />
+      )}
     </>
   );
 };

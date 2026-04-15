@@ -41,7 +41,7 @@ const CallHistoryFilters = ({
           onValueChange={(value) => onStatusChange(value ?? "All Status")}
         >
           <SelectTrigger className={callHistoryStyles.filterTrigger}>
-            <SelectValue />
+            <SelectValue>{statusValue.replaceAll("_", " ")}</SelectValue>
           </SelectTrigger>
           <SelectContent
             align="end"

@@ -1,15 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "@/services/axios";
-import { IPagination } from "@/types/common";
 import { dialerKeys } from "@/features/dialer/query-keys";
 import {
+  CallHistory,
+  CallHistoryDetails,
   LeadActivity,
   LeadActivityDetail,
   LeadActivityStatus,
-  MyCallLog,
   MyCallLogDetail,
   MyCallStatus
 } from "@/features/dialer/types/leadActivityTypes";
+import { axiosInstance } from "@/services/axios";
+import { IPagination } from "@/types/common";
+import { useQuery } from "@tanstack/react-query";
 
 // ─── Get Scheduled / Cooldown Activities ─────────────────────────────────────
 
@@ -79,7 +80,7 @@ interface GetMyCallLogsReq {
 
 interface GetMyCallLogsRes {
   data: {
-    data: MyCallLog[];
+    data: CallHistory[];
     meta: IPagination;
   };
   message: string;
@@ -114,7 +115,7 @@ export function useGetMyCallLogs({
 // ─── Get My Call Log Detail ───────────────────────────────────────────────────
 
 interface GetMyCallLogDetailRes {
-  data: MyCallLogDetail;
+  data: CallHistoryDetails;
   message: string;
 }
 
@@ -126,7 +127,6 @@ export function useGetMyCallLogDetail(id: string) {
         params: { id }
       });
       return res.data as GetMyCallLogDetailRes;
-    },
-    enabled: Boolean(id)
+    }
   });
 }
