@@ -92,7 +92,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
           notes: personalNote.trim(),
           attempt_number: lead.attempt_number,
           call_status: CALL_STATUS_MAP[disposition] ?? "completed",
-          scheduled_callback:
+          scheduled_call_at:
             callbackDate && callbackTime
               ? moment(callbackDate)
                   .set({

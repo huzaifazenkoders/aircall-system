@@ -58,7 +58,7 @@ interface CreateCallLogReq {
     notes: string;
     attempt_number: number;
     call_status: CallStatus;
-    scheduled_callback?: string;
+    scheduled_call_at?: string;
   };
 }
 
