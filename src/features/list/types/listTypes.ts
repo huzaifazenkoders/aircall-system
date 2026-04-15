@@ -30,7 +30,11 @@ export interface ListDetail extends Omit<List, "assignments"> {
   assignments: {
     is_active: boolean;
     id: string;
-    group: { id: string; name: string } | null;
+    group: {
+      id: string;
+      name: string;
+      user_groups: { id: string; user: AuthUser }[];
+    } | null;
     user: AuthUser | null;
   }[];
   cleanups: {

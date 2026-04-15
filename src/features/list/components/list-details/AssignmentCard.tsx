@@ -44,7 +44,7 @@ import { handleMutationError } from "@/utils/handleMutationError";
 interface GroupWithMembers {
   id: string;
   name: string;
-  members: AuthUser[];
+  user_groups: AuthUser[];
 }
 
 type ConfirmAction =
@@ -74,7 +74,8 @@ const AssignmentCard = ({ list }: { list: ListDetail }) => {
   const queryClient = useQueryClient();
   const [assignGroupsOpen, setAssignGroupsOpen] = React.useState(false);
   const [assignUsersOpen, setAssignUsersOpen] = React.useState(false);
-  const [confirmAction, setConfirmAction] = React.useState<ConfirmAction | null>(null);
+  const [confirmAction, setConfirmAction] =
+    React.useState<ConfirmAction | null>(null);
   const { mutate: unassignList, isPending: isUnassigning } = useUnassignList();
   const { mutate: removeUserFromGroup, isPending: isRemovingUser } =
     useRemoveUserFromGroup();
@@ -213,8 +214,8 @@ const AssignmentCard = ({ list }: { list: ListDetail }) => {
             </Button>
           </div>
 
-        <div className="self-stretch px-4 pb-4 flex flex-col justify-start items-start gap-4">
-          {groups.map((group) => (
+          <div className="self-stretch px-4 pb-4 flex flex-col justify-start items-start gap-4">
+            {groups.map((group) => (
               <GroupCard
                 key={group.id}
                 group={group}
@@ -303,7 +304,9 @@ const AssignmentCard = ({ list }: { list: ListDetail }) => {
             />
           ))}
           {users.length === 0 && (
-            <p className="text-sm text-gray-500">No individuals assigned yet.</p>
+            <p className="text-sm text-gray-500">
+              No individuals assigned yet.
+            </p>
           )}
         </div>
       </div>
@@ -340,10 +343,10 @@ const GroupCard = ({
   onRemoveMember: (member: AuthUser) => void;
 }) => {
   const [expanded, setExpanded] = React.useState(true);
-  const hasMore = group.members.length > PREVIEW_COUNT;
+  const hasMore = group.user_groups.length > PREVIEW_COUNT;
   const visibleMembers = expanded
-    ? group.members
-    : group.members.slice(0, PREVIEW_COUNT);
+    ? group.user_groups
+    : group.user_groups.slice(0, PREVIEW_COUNT);
 
   return (
     <div className="self-stretch flex flex-col justify-start items-start w-full">
@@ -358,7 +361,7 @@ const GroupCard = ({
           <div className="flex items-center gap-2">
             <div className="px-2 py-0.5 bg-teal-50 rounded-full outline outline-1 outline-offset-[-1px] outline-teal-100 flex justify-center items-center gap-1">
               <div className="text-teal-600 text-xs font-medium leading-4">
-                {group.members.length} Members
+                {group.user_groups.length} Members
               </div>
             </div>
             <DropdownMenu>
@@ -370,7 +373,9 @@ const GroupCard = ({
                 <MoreVerticalIcon className="size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onUnassign}>Unassign</DropdownMenuItem>
+                <DropdownMenuItem onClick={onUnassign}>
+                  Unassign
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -402,7 +407,9 @@ const GroupCard = ({
               className="self-stretch inline-flex justify-between items-center"
             >
               <span className="text-teal-600 text-sm font-medium leading-5">
-                {expanded ? "Hide" : `View all ${group.members.length} members`}
+                {expanded
+                  ? "Hide"
+                  : `View all ${group.user_groups.length} members`}
               </span>
               {expanded ? (
                 <ChevronUpIcon
@@ -461,8 +468,10 @@ const UserRow = ({
           >
             <MoreVerticalIcon className="size-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onAction}>{actionLabel}</DropdownMenuItem>
+          <DropdownMenuContent align="end" className={"min-w-fit"}>
+            <DropdownMenuItem onClick={onAction}>
+              {actionLabel}
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       ) : null}
@@ -531,12 +540,12 @@ function buildGroups(list: ListDetail): GroupWithMembers[] {
 
   for (const assignment of list.assignments) {
     if (!assignment.group) continue;
-    const { id, name } = assignment.group;
+    const { id, name, user_groups } = assignment.group;
     if (!groupMap.has(id)) {
-      groupMap.set(id, { id, name, members: [] });
+      groupMap.set(id, { id, name, user_groups: [] });
     }
-    if (assignment.user) {
-      groupMap.get(id)!.members.push(assignment.user);
+    if (user_groups) {
+      groupMap.get(id)!.user_groups.push(...user_groups.map((ug) => ug.user));
     }
   }
 
@@ -549,7 +558,9 @@ function initials(name: string) {
 }
 
 function getUserName(user: AuthUser) {
-  return [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email;
+  return (
+    [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email
+  );
 }
 
 function getConfirmCopy(action: ConfirmAction | null): {
