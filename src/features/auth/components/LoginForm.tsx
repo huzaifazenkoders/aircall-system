@@ -44,7 +44,7 @@ const LoginForm = () => {
             toast.success("Logged in successfully");
             setCookie("token", res.data.token);
             if (res.data.has_reset_password) {
-              router.replace("/dialer/set-password");
+              router.replace("/dialer-auth/set-password");
             } else {
               router.replace("/list");
             }
