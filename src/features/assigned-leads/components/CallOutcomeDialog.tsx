@@ -75,11 +75,11 @@ const CallOutcomeDialog = ({
 
   const { data: dispositionsData, isPending: isLoadingDispositions } =
     useGetWorkflowDispositions(workflowId);
-  const dispositions = dispositionsData?.data ?? [];
+  const dispositions = dispositionsData?.data?.dispositions ?? [];
 
-  console.log("dispositions", dispositions);
-
-  const isCallback = disposition === "Callback Scheduled";
+  const isCallback = dispositions.some(
+    (t) => t.disposition_type === "callback_scheduled" && t.id === disposition
+  );
 
   const handleSubmit = () => {
     onSubmit?.({
@@ -116,7 +116,14 @@ const CallOutcomeDialog = ({
           <LabelContainer label="Disposition">
             <Select value={disposition} onValueChange={setDisposition}>
               <SelectTrigger className="w-full h-11 text-base border-border-primary">
-                <SelectValue placeholder="Select disposition" />
+                <SelectValue
+                  placeholder="Select disposition"
+                  className={"capitalize"}
+                >
+                  {dispositions
+                    .find((t) => t.id === disposition)
+                    ?.disposition_type.replaceAll("_", " ")}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="rounded-lg border border-border bg-input py-2 shadow-[0_18px_40px_rgba(15,23,42,0.1)]">
                 {isLoadingDispositions ? (
@@ -127,10 +134,10 @@ const CallOutcomeDialog = ({
                   dispositions.map((d) => (
                     <SelectItem
                       key={d.id}
-                      value={d.name}
-                      className="px-3 py-2 text-sm text-text-primary"
+                      value={d.id}
+                      className="px-3 py-2 text-sm text-text-primary capitalize"
                     >
-                      {d.name}
+                      {d.disposition_type.replaceAll("_", " ")}
                     </SelectItem>
                   ))
                 )}

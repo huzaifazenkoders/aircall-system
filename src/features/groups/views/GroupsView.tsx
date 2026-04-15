@@ -34,7 +34,10 @@ import {
   GroupUser
 } from "@/features/groups/types/groupTypes";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
-import { useUnassignList, useAssignList } from "@/features/list/services/listService";
+import {
+  useUnassignList,
+  useAssignList
+} from "@/features/list/services/listService";
 import { useDebounce } from "use-debounce";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
@@ -91,8 +94,9 @@ const GroupsView = () => {
 
   const existingListIds = React.useMemo(
     () =>
-      selectedGroupInfoData?.data.list_assignments.map((entry) => entry.list.id) ??
-      [],
+      selectedGroupInfoData?.data.list_assignments.map(
+        (entry) => entry.list.id
+      ) ?? [],
     [selectedGroupInfoData]
   );
 
@@ -264,8 +268,14 @@ const GroupsView = () => {
           onSearchChange={setSearchValue}
           onStatusChange={(args) => setStatusFilter(args as GroupStatus)}
           onViewDetails={(groupId) => openDetails(groupId, "members")}
-          onAssignList={() => setAssignListsOpen(true)}
-          onAddMember={() => setAddMembersOpen(true)}
+          onAssignList={(grpId) => {
+            setAssignListsOpen(true);
+            setSelectedGroupId(grpId);
+          }}
+          onAddMember={(grpId) => {
+            setAddMembersOpen(true);
+            setSelectedGroupId(grpId);
+          }}
           isPending={isPending}
           date={date}
           setDate={setDate}

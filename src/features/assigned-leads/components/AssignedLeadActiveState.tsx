@@ -116,8 +116,6 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
     );
   };
 
-  const leadName = `${lead.lead.first_name} ${lead.lead.last_name}`;
-
   return (
     <>
       <div className={s.page}>
@@ -292,13 +290,15 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
         </div>
       </div>
 
-      <CallOutcomeDialog
-        open={callOutcomeOpen}
-        onOpenChange={setCallOutcomeOpen}
-        isPending={isPending}
-        workflowId={lead.list.workflow_id}
-        onSubmit={handleOutcomeSubmit}
-      />
+      {lead.workflow_id && (
+        <CallOutcomeDialog
+          open={callOutcomeOpen}
+          onOpenChange={setCallOutcomeOpen}
+          isPending={isPending}
+          workflowId={lead.workflow_id}
+          onSubmit={handleOutcomeSubmit}
+        />
+      )}
 
       {process.env.NODE_ENV === "development" && (
         <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">

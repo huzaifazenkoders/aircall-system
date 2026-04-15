@@ -42,5 +42,6 @@ export interface CurrentLead {
     amount: string;
     purchase_date: string;
   }[];
+  workflow_id?: string;
   total_purchase?: string;
 }

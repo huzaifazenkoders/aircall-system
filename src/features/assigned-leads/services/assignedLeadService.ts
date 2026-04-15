@@ -28,10 +28,11 @@ export function useGetCurrentLead() {
 export interface WorkflowDisposition {
   id: string;
   name: string;
+  disposition_type: string;
 }
 
 interface GetWorkflowDispositionsRes {
-  data: WorkflowDisposition[];
+  data: { dispositions: WorkflowDisposition[] };
   message: string;
 }
 
