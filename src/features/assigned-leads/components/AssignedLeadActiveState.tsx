@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ExternalLinkIcon } from "lucide-react";
+import moment from "moment";
 
 import {
   Table,
@@ -91,8 +92,15 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
           notes: personalNote.trim(),
           attempt_number: lead.attempt_number,
           call_status: CALL_STATUS_MAP[disposition] ?? "completed",
-          callback_date: callbackDate ? callbackDate.toISOString() : undefined,
-          callback_time: callbackTime || undefined
+          scheduled_callback:
+            callbackDate && callbackTime
+              ? moment(callbackDate)
+                  .set({
+                    hour: parseInt(callbackTime.split(":")[0], 10),
+                    minute: parseInt(callbackTime.split(":")[1], 10)
+                  })
+                  .toISOString()
+              : undefined
         }
       },
       {
