@@ -76,6 +76,7 @@ interface GetMyCallLogsReq {
   list_id?: string;
   assigned_to?: string;
   call_status?: MyCallStatus;
+  date?: string;
 }
 
 interface GetMyCallLogsRes {
@@ -99,7 +100,8 @@ export function useGetMyCallLogs({
   lead_id,
   list_id,
   assigned_to,
-  call_status
+  call_status,
+  date
 }: GetMyCallLogsReq) {
   return useQuery({
     queryKey: dialerKeys.myLogs({
@@ -108,11 +110,20 @@ export function useGetMyCallLogs({
       lead_id,
       list_id,
       assigned_to,
-      call_status
+      call_status,
+      date
     }),
     queryFn: async () => {
       const res = await axiosInstance.get("/call-logs/my-logs", {
-        params: { page, limit, lead_id, list_id, assigned_to, call_status }
+        params: {
+          page,
+          limit,
+          lead_id,
+          list_id,
+          assigned_to,
+          call_status,
+          date
+        }
       });
       return res.data as GetMyCallLogsRes;
     }

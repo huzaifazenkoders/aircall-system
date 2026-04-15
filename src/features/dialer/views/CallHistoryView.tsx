@@ -27,13 +27,15 @@ const CallHistoryView = () => {
   const [page, setPage] = React.useState(1);
   const [searchValue, setSearchValue] = React.useState("");
   const [statusValue, setStatusValue] = React.useState("");
+  const [selectedDate, setSelectedDate] = React.useState<string | undefined>();
   const [selectedId, setSelectedId] = React.useState("");
   const [sheetOpen, setSheetOpen] = React.useState(false);
 
   const { data, isPending, isError } = useGetMyCallLogs({
     page,
     limit: LIMIT,
-    call_status: (statusValue as MyCallStatus) || undefined
+    call_status: (statusValue as MyCallStatus) || undefined,
+    date: selectedDate
   });
 
   const rows = data?.data?.data ?? [];
@@ -47,18 +49,20 @@ const CallHistoryView = () => {
       <div className={dialerShellStyles.titleRow}>
         <h1 className={dialerShellStyles.title}>Call History</h1>
         <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="outline-transparent">
-                <span>Date</span>
-                <CalendarIcon
-                  className="ml-2 size-4 text-muted-foreground"
-                  aria-hidden="true"
-                />
-              </Button>
+          <DropdownMenuTrigger>
+            <Button variant="outline-transparent">
+              <span>Date</span>
+              <CalendarIcon
+                className="ml-2 size-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </Button>
+          </DropdownMenuTrigger>
+          <DateSelector
+            setValue={(date) =>
+              setSelectedDate(date.toISOString().split("T")[0])
             }
           />
-          <DateSelector />
         </DropdownMenu>
       </div>
 

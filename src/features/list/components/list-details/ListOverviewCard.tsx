@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { CopyIcon } from "lucide-react";
+import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
 import { ListDetail } from "@/features/list/types/listTypes";
@@ -33,8 +35,21 @@ const ListOverviewCard = ({ list }: { list: ListDetail }) => {
 
       <div className={listDetailsStyles.kvList}>
         <div className={listDetailsStyles.kvKey}>Name</div>
-        <div className={listDetailsStyles.kvVal}>
-          {list.name} ({list.id})
+        <div className={cn(listDetailsStyles.kvVal, "flex items-center")}>
+          <span>
+            {list.name} ({list.code})
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(list.code);
+              toast.success("Code copied to clipboard!");
+            }}
+            className="ml-2 p-1 rounded hover:bg-muted transition-colors"
+            title="Copy code"
+          >
+            <CopyIcon className="size-4 text-muted-foreground" />
+          </button>
         </div>
 
         <div className={listDetailsStyles.kvKey}>Priority</div>
