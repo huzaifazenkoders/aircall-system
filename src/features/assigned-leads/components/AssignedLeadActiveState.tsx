@@ -312,37 +312,35 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
         />
       )}
 
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Aircall Event Tester (Only for testing purpose for now, will be
-            removed later)
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {(
-              [
-                { event: "incoming_call", label: "Incoming Call" },
-                { event: "call_end_ringtone", label: "End Ringtone" },
-                { event: "outgoing_call", label: "Outgoing Call" },
-                { event: "outgoing_answered", label: "Outgoing Answered" },
-                { event: "call_ended", label: "Call Ended" },
-                { event: "comment_saved", label: "Comment Saved" }
-              ] as const
-            ).map(({ event, label }) => (
-              <button
-                key={event}
-                type="button"
-                onClick={() =>
-                  triggerEvent(event, { phone_number: lead.lead.phone })
-                }
-                className="rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+      <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Aircall Event Tester (Only for testing purpose for now, will be
+          removed later)
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              { event: "incoming_call", label: "Incoming Call" },
+              { event: "call_end_ringtone", label: "End Ringtone" },
+              { event: "outgoing_call", label: "Outgoing Call" },
+              { event: "outgoing_answered", label: "Outgoing Answered" },
+              { event: "call_ended", label: "Call Ended" },
+              { event: "comment_saved", label: "Comment Saved" }
+            ] as const
+          ).map(({ event, label }) => (
+            <button
+              key={event}
+              type="button"
+              onClick={() =>
+                triggerEvent(event, { phone_number: lead.lead.phone })
+              }
+              className="rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/70 transition-colors"
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
     </>
   );
 };
