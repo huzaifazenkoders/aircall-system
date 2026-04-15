@@ -52,13 +52,11 @@ export function useGetWorkflowDispositions(workflowId: string) {
 
 interface CreateCallLogReq {
   payload: {
-    lead_id: string;
-    list_id: string;
+    lead_activity_id: string;
     disposition_id: string;
-    notes: string;
-    attempt_number: number;
-    call_status: CallStatus;
     scheduled_call_at?: string;
+    call_status: string;
+    notes: string;
   };
 }
 
@@ -70,7 +68,10 @@ interface CreateCallLogRes {
 export function useCreateCallLog() {
   return useMutation({
     mutationFn: async ({ payload }: CreateCallLogReq) => {
-      const res = await axiosInstance.post("/call-logs", payload);
+      const res = await axiosInstance.post(
+        "/lead-activities/call-outcome",
+        payload
+      );
       return res.data as CreateCallLogRes;
     }
   });

@@ -86,11 +86,9 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
     createCallLog(
       {
         payload: {
-          lead_id: lead.lead_id,
-          list_id: lead.list_id,
+          lead_activity_id: lead.lead_id,
           disposition_id: DISPOSITION_ID_MAP[disposition] ?? disposition,
           notes: personalNote.trim(),
-          attempt_number: lead.attempt_number,
           call_status: CALL_STATUS_MAP[disposition] ?? "completed",
           scheduled_call_at:
             callbackDate && callbackTime
