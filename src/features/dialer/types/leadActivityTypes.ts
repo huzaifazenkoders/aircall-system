@@ -16,10 +16,17 @@ export interface LeadActivityTimeline {
 
 export interface LeadActivity {
   id: string;
-  lead_id: string;
+  lead_id?: string;
   list_id: string;
   status: LeadActivityStatus;
-  scheduled_at: string | null;
+  scheduled_at?: string | null;
+  scheduled_time?: string | null;
+  lead_name?: string;
+  lead_phone?: string;
+  list_name?: string;
+  attempt_count?: number;
+  disposition_type?: string;
+  disposition_name?: string | null;
   lead?: {
     id: string;
     first_name: string;
@@ -41,12 +48,46 @@ export interface LeadActivity {
 }
 
 export interface LeadActivityDetail extends LeadActivity {
-  total_purchase: string;
-  purchases: LeadActivityPurchase[];
-  timeline: LeadActivityTimeline[];
-  keap_notes: string[];
-  personal_notes: string[];
+  workflow_id?: string;
+  assigned_user_id?: string;
+  attempt_count?: number;
+  last_attempt_at?: string;
+  next_allowed_at?: string;
+  scheduled_call_at?: string | null;
+  keap_note?: string | null;
+  keap_tag?: string | null;
+  total_purchase?: string;
+  purchases?: LeadActivityPurchase[];
+  timeline?: LeadActivityTimeline[];
+  keap_notes?: string[];
+  personal_notes?: string[];
   keap_contact_url?: string;
+  workflow?: {
+    id: string;
+    name: string;
+  };
+  assigned_user?: {
+    id: string;
+    full_name: string;
+  };
+  last_disposition?: {
+    name: string | null;
+    disposition_type: string;
+    resulting_lead_status: string;
+    max_attempts: number;
+    cooldown_behavior: string;
+    custom_cooldown_hours: number;
+    custom_cooldown_min?: number;
+    max_attempt_reached: string;
+    is_retry_allowed: boolean;
+  };
+  call_logs?: {
+    id: string;
+    created_at: string;
+    disposition_type: string;
+    call_time: string;
+    attempt_number: number;
+  }[];
 }
 
 export interface MyCallLog {

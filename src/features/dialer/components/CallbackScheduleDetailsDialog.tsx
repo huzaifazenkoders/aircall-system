@@ -62,21 +62,17 @@ const CallbackScheduleDetailsDialog = ({
             <div className={callbackStyles.dialogTitle}>
               {record?.lead
                 ? `${record.lead.first_name} ${record.lead.last_name}`
-                : "—"}
+                : "Lead Details"}
             </div>
           </div>
 
           {record?.keap_contact_url ? (
-            <Button variant="outline" size="sm">
-              <a
-                href={record.keap_contact_url}
-                target="_blank"
-                rel="noreferrer"
-              >
+            <a href={record.keap_contact_url} target="_blank" rel="noreferrer">
+              <Button variant="outline" size="sm">
                 <ExternalLinkIcon className="size-4" />
                 Open Contact in Keap
-              </a>
-            </Button>
+              </Button>
+            </a>
           ) : (
             <Button variant="outline" size="sm" disabled>
               <ExternalLinkIcon className="size-4" />
@@ -87,7 +83,7 @@ const CallbackScheduleDetailsDialog = ({
 
         <DialogBody className="min-h-0 p-0">
           {isPending || !record ? (
-            <div className="flex min-h-[400px] items-center justify-center">
+            <div className="flex min-h-100 items-center justify-center">
               <Loader2Icon className="size-8 animate-spin text-gray-400" />
             </div>
           ) : (
@@ -102,13 +98,13 @@ const CallbackScheduleDetailsDialog = ({
                     <div>
                       <div className={callbackStyles.detailLabel}>Email</div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.email ?? "—"}
+                        {record.lead?.email ?? "N/A"}
                       </div>
                     </div>
                     <div>
                       <div className={callbackStyles.detailLabel}>Phone</div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.phone ?? "—"}
+                        {record.lead?.phone ?? "N/A"}
                       </div>
                     </div>
                     <div>
@@ -116,23 +112,7 @@ const CallbackScheduleDetailsDialog = ({
                         Send Timezone
                       </div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.timezone ?? "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div className={callbackStyles.detailLabel}>
-                        Registered Event
-                      </div>
-                      <div className={callbackStyles.detailValue}>
-                        {record.lead?.event_name ?? "—"}
-                      </div>
-                    </div>
-                    <div>
-                      <div className={callbackStyles.detailLabel}>
-                        Event Date
-                      </div>
-                      <div className={callbackStyles.detailValue}>
-                        {record.lead?.event_date ?? "—"}
+                        {record.lead?.timezone ?? "N/A"}
                       </div>
                     </div>
                     <div>
@@ -140,7 +120,15 @@ const CallbackScheduleDetailsDialog = ({
                         Event Location
                       </div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.event_location ?? "—"}
+                        {record.lead?.event_location ?? "N/A"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={callbackStyles.detailLabel}>
+                        Event Date
+                      </div>
+                      <div className={callbackStyles.detailValue}>
+                        {record.lead?.event_date ?? "N/A"}
                       </div>
                     </div>
                     <div>
@@ -148,7 +136,7 @@ const CallbackScheduleDetailsDialog = ({
                         Referred By
                       </div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.referred_by ?? "—"}
+                        {record.lead?.referred_by ?? "N/A"}
                       </div>
                     </div>
                   </div>
@@ -165,82 +153,93 @@ const CallbackScheduleDetailsDialog = ({
                       </div>
                       <div className="mt-2">
                         <span className={callbackStyles.pill}>
-                          {record.status}
+                          {record.status ?? "N/A"}
                         </span>
                       </div>
                     </div>
                     <div>
                       <div className={callbackStyles.detailLabel}>
-                        Lead Owner
+                        Assigned User
                       </div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.lead_owner ?? "—"}
+                        {record.assigned_user?.full_name ?? "N/A"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={callbackStyles.detailLabel}>Workflow</div>
+                      <div className={callbackStyles.detailValue}>
+                        {record.workflow?.name ?? "N/A"}
                       </div>
                     </div>
                     <div>
                       <div className={callbackStyles.detailLabel}>
-                        Lead Arrival Time
+                        Attempt Count
                       </div>
                       <div className={callbackStyles.detailValue}>
-                        {record.lead?.created_at
-                          ? new Date(record.lead.created_at).toLocaleString()
-                          : "—"}
+                        {record.attempt_count ?? "N/A"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={callbackStyles.detailLabel}>
+                        Last Attempt
+                      </div>
+                      <div className={callbackStyles.detailValue}>
+                        {record.last_attempt_at
+                          ? new Date(record.last_attempt_at).toLocaleString()
+                          : "N/A"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={callbackStyles.detailLabel}>
+                        Next Allowed
+                      </div>
+                      <div className={callbackStyles.detailValue}>
+                        {record.next_allowed_at
+                          ? new Date(record.next_allowed_at).toLocaleString()
+                          : "N/A"}
                       </div>
                     </div>
                   </div>
                 </section>
 
-                <section className={callbackStyles.purchaseCard}>
-                  <div className={callbackStyles.purchaseHeader}>
-                    <div className={callbackStyles.purchaseTitle}>
-                      Purchase History
+                {record.last_disposition && (
+                  <section>
+                    <div className={callbackStyles.sectionTitle}>
+                      LAST DISPOSITION
                     </div>
-                    <div className={callbackStyles.purchaseTotalWrap}>
-                      <span className={callbackStyles.purchaseTotalLabel}>
-                        Total Purchase
-                      </span>
-                      <span className={callbackStyles.purchaseTotalValue}>
-                        {record.total_purchase}
-                      </span>
+                    <div className={callbackStyles.infoGrid}>
+                      <div>
+                        <div className={callbackStyles.detailLabel}>Type</div>
+                        <div className={callbackStyles.detailValue}>
+                          {record.last_disposition.disposition_type ?? "N/A"}
+                        </div>
+                      </div>
+                      <div>
+                        <div className={callbackStyles.detailLabel}>Result</div>
+                        <div className={callbackStyles.detailValue}>
+                          {record.last_disposition.resulting_lead_status ??
+                            "N/A"}
+                        </div>
+                      </div>
+                      <div>
+                        <div className={callbackStyles.detailLabel}>
+                          Max Attempts
+                        </div>
+                        <div className={callbackStyles.detailValue}>
+                          {record.last_disposition.max_attempts ?? "N/A"}
+                        </div>
+                      </div>
+                      <div>
+                        <div className={callbackStyles.detailLabel}>
+                          Cooldown Behavior
+                        </div>
+                        <div className={callbackStyles.detailValue}>
+                          {record.last_disposition.cooldown_behavior ?? "N/A"}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className={callbackStyles.purchaseTableWrap}>
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className={callbackStyles.purchaseHead}>
-                            Product
-                          </th>
-                          <th className={callbackStyles.purchaseHead}>
-                            Amount
-                          </th>
-                          <th className={callbackStyles.purchaseHead}>
-                            Purchase Date
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {record.purchases.map((purchase) => (
-                          <tr
-                            key={purchase.id}
-                            className="border-b border-border last:border-b-0"
-                          >
-                            <td className={callbackStyles.purchaseCell}>
-                              {purchase.product}
-                            </td>
-                            <td className={callbackStyles.purchaseCell}>
-                              {purchase.amount}
-                            </td>
-                            <td className={callbackStyles.purchaseCell}>
-                              {purchase.purchase_date}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
+                  </section>
+                )}
               </div>
 
               {/* Right panel */}
@@ -263,40 +262,52 @@ const CallbackScheduleDetailsDialog = ({
 
                 {activeTab === "call-history" ? (
                   <div className={callbackStyles.timeline}>
-                    {record.timeline.map((item, index) => (
-                      <div
-                        key={item.id}
-                        className={callbackStyles.timelineItem}
-                      >
-                        <div className={callbackStyles.timelineRail}>
-                          <div className={callbackStyles.timelineDot}>
-                            <CircleIcon className="size-4 fill-none" />
+                    {record.call_logs && record.call_logs.length > 0 ? (
+                      record.call_logs.map((log, index) => (
+                        <div
+                          key={log.id}
+                          className={callbackStyles.timelineItem}
+                        >
+                          <div className={callbackStyles.timelineRail}>
+                            <div className={callbackStyles.timelineDot}>
+                              <CircleIcon className="size-4 fill-none" />
+                            </div>
+                            {index < (record.call_logs?.length ?? 0) - 1 && (
+                              <div className={callbackStyles.timelineLine} />
+                            )}
                           </div>
-                          {index < record.timeline.length - 1 && (
-                            <div className={callbackStyles.timelineLine} />
-                          )}
+                          <div className="pt-1">
+                            <div className={callbackStyles.timelineTitle}>
+                              Attempt {log.attempt_number}
+                            </div>
+                            <div className={callbackStyles.timelineSubtitle}>
+                              {log.disposition_type} -{" "}
+                              {new Date(log.created_at).toLocaleString()}
+                            </div>
+                          </div>
                         </div>
-                        <div className="pt-1">
-                          <div className={callbackStyles.timelineTitle}>
-                            {item.title}
-                          </div>
-                          <div className={callbackStyles.timelineSubtitle}>
-                            {item.subtitle}
-                          </div>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center text-gray-500 py-8">
+                        No call history available
                       </div>
-                    ))}
+                    )}
+                  </div>
+                ) : activeTab === "keap-notes" ? (
+                  <div className={callbackStyles.noteList}>
+                    {record.keap_note ? (
+                      <div className={callbackStyles.noteItem}>
+                        {record.keap_note}
+                      </div>
+                    ) : (
+                      <div className="text-center text-gray-500 py-8">
+                        No Keap notes available
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className={callbackStyles.noteList}>
-                    {(activeTab === "keap-notes"
-                      ? record.keap_notes
-                      : record.personal_notes
-                    ).map((note, i) => (
-                      <div key={i} className={callbackStyles.noteItem}>
-                        {note}
-                      </div>
-                    ))}
+                  <div className="text-center text-gray-500 py-8">
+                    No personal notes available
                   </div>
                 )}
               </div>

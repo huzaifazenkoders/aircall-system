@@ -405,36 +405,18 @@ const MyListComponent = () => {
                       </div>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      {lead.activity_status ? (
-                        <span
-                          className={cn(
-                            "px-2 py-1 rounded-lg text-xs font-medium leading-4 tracking-tight",
-                            leadStatusStyle[lead.activity_status as LeadStatus]
-                          )}
-                        >
-                          {lead.activity_status}
-                        </span>
-                      ) : (
-                        "-"
-                      )}
+                      <span className="px-2 py-1 rounded-lg text-xs font-medium leading-4 tracking-tight bg-gray-100 text-gray-500">
+                        N/A
+                      </span>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      {lead.assigned_rep
-                        ? `${lead.assigned_rep.first_name ?? ""} ${lead.assigned_rep.last_name ?? ""}`.trim() ||
-                          "-"
-                        : "-"}
+                      <div className="text-sm text-gray-800 leading-5">N/A</div>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      {lead.last_disposition ? (
-                        <div className="text-sm font-medium text-gray-800 leading-5">
-                          {lead.last_disposition}
-                        </div>
-                      ) : (
-                        "-"
-                      )}
+                      <div className="text-sm text-gray-800 leading-5">N/A</div>
                     </TableCell>
                     <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
-                      {lead.attempts ?? lead.attempt ?? 0}
+                      N/A
                     </TableCell>
                   </TableRow>
                 ))}

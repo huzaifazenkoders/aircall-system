@@ -71,7 +71,7 @@ export const workflowsStyles = {
   ruleBody: cn("grid gap-6 p-4 md:grid-cols-2"),
   ruleStat: cn("flex flex-col"),
   ruleStatLabel: cn("text-[12px] leading-5 text-text-secondary"),
-  ruleStatValue: cn("text-[13px] font-medium text-text-primary"),
+  ruleStatValue: cn("text-[13px] font-medium text-text-primary capitalize"),
   menuContent: cn(
     "min-w-42 rounded-lg border border-border bg-white shadow-[0_20px_40px_rgba(15,23,42,0.14)]"
   ),

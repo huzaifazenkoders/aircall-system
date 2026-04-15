@@ -7,7 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
 import { Disposition } from "@/features/workflows/types/workflowTypes";
@@ -20,15 +20,15 @@ const DISPOSITION_LABELS: Record<string, string> = {
   voicemail_left: "Voicemail Left",
   wrong_number: "Wrong Number",
   do_not_call: "Do Not Call",
-  ban_contact: "Ban Contact",
+  ban_contact: "Ban Contact"
 };
 
 function buildStats(d: Disposition) {
   const isCooldown = d.resulting_lead_status === "cooldown";
   const cooldownValue = isCooldown
     ? d.cooldown_behavior === "custom"
-      ? `Custom (${d.custom_cooldown_hours} hr)`
-      : "Default (12 hr)"
+      ? `Custom (${d.custom_cooldown_hours ? `${d.custom_cooldown_hours} hr ` : ""}${d.custom_cooldown_min ? `${d.custom_cooldown_min} min` : ""})`
+      : "—"
     : "—";
 
   return [
@@ -36,26 +36,28 @@ function buildStats(d: Disposition) {
     { label: "Cooldown", value: isCooldown ? cooldownValue : "—" },
     {
       label: "Attempts",
-      value: isCooldown && d.is_retry_allowed ? String(d.max_attempts) : "—",
+      value: isCooldown && d.is_retry_allowed ? String(d.max_attempts) : "—"
     },
     {
       label: "Final Action",
-      value: isCooldown ? d.max_attempt_reached : d.resulting_lead_status || "—",
-    },
+      value: isCooldown ? d.max_attempt_reached : d.resulting_lead_status || "—"
+    }
   ];
 }
 
 const WorkflowRuleCard = ({
   disposition,
   onEdit,
-  onDelete,
+  onDelete
 }: {
   disposition: Disposition;
   onEdit: () => void;
   onDelete: () => void;
 }) => {
   const stats = buildStats(disposition);
-  const title = DISPOSITION_LABELS[disposition.disposition_type] ?? disposition.disposition_type;
+  const title =
+    DISPOSITION_LABELS[disposition.disposition_type] ??
+    disposition.disposition_type;
 
   return (
     <article className={workflowsStyles.ruleCard}>
@@ -71,7 +73,10 @@ const WorkflowRuleCard = ({
             className={workflowsStyles.menuContent}
             sideOffset={8}
           >
-            <DropdownMenuItem className={workflowsStyles.menuItem} onClick={onEdit}>
+            <DropdownMenuItem
+              className={workflowsStyles.menuItem}
+              onClick={onEdit}
+            >
               <PencilIcon className="size-4" />
               Edit
             </DropdownMenuItem>

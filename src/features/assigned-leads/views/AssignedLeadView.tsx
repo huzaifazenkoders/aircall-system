@@ -8,10 +8,10 @@ import AssignedLeadEmptyState from "@/features/assigned-leads/components/Assigne
 import { useGetCurrentLead } from "@/features/assigned-leads/services/assignedLeadService";
 
 const AssignedLeadView = () => {
-  const { data, isFetching, isError, refetch } = useGetCurrentLead();
+  const { data, isPending, isError, refetch } = useGetCurrentLead();
   const lead = data?.data ?? null;
 
-  if (isFetching) {
+  if (isPending) {
     return (
       <div className={s.page}>
         <div className="flex min-h-[60vh] items-center justify-center">
