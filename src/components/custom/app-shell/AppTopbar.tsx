@@ -100,7 +100,7 @@ const AppTopbar = () => {
 
   return (
     <>
-      <header className="flex items-center justify-end border-b gap-2 border-border px-1 pb-5">
+      <header className="flex items-center justify-end border-b gap-2 border-border px-3 md:px-5 pb-5">
         {data.data.role === "sales_person" ? (
           <div className="flex items-center gap-2 ml-auto">
             <span className={myListStyles.listCardToggleLabel}>
