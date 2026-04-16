@@ -177,9 +177,9 @@ const DispositionRuleDialog = ({
           is_retry_allowed: editingDisposition.is_retry_allowed,
           max_attempts: editingDisposition.max_attempts,
           cooldown_behavior: editingDisposition.cooldown_behavior,
-          custom_cooldown_hours: editingDisposition.custom_cooldown_hours,
-          custom_cooldown_min: editingDisposition.custom_cooldown_min,
-          max_attempt_reached: editingDisposition.max_attempt_reached,
+          custom_cooldown_hours: editingDisposition.custom_cooldown_hours || 0,
+          custom_cooldown_min: editingDisposition.custom_cooldown_min || 0,
+          max_attempt_reached: editingDisposition.max_attempt_reached || 0,
           keap_note: editingDisposition.keap_note,
           keap_tag: ""
         }
