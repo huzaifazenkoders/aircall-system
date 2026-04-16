@@ -46,6 +46,8 @@ import NoImage from "@/../public/assets/list/no-leads.png";
 import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
 import LeadDetailsDialog from "@/features/list/components/list-details/LeadDetailsDialog";
 import DateRangeSelector from "@/components/ui/date-range-selector";
+import { ReactDispatch } from "@/types/common";
+import { ListStats } from "../../types/listTypes";
 
 const PAGE_SIZE = 10;
 
@@ -61,10 +63,12 @@ const statusOptions = [
 
 const LeadsTable = ({
   listId,
-  variant = "shared"
+  variant = "shared",
+  setListStats
 }: {
   listId: string;
   variant?: "shared" | "individual";
+  setListStats: ReactDispatch<ListStats | null>;
 }) => {
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
@@ -98,6 +102,10 @@ const LeadsTable = ({
   React.useEffect(() => {
     setPage(1);
   }, [query, statusFilter, startDate, endDate]);
+
+  React.useEffect(() => {
+    if (data && data?.data?.lead_stats) setListStats(data?.data?.lead_stats);
+  }, [data]);
 
   const isIndividual = variant === "individual";
   const isDefaultState =
@@ -305,11 +313,13 @@ const LeadsTable = ({
                     </TableCell>
                   )}
                   <TableCell>
-                    <div className="font-medium text-foreground">
+                    <div className="font-medium text-foreground capitalize">
                       {getDispositionName(lead)}
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      {formatLeadDate(lead.updated_at ?? lead.created_at)}
+                      {formatLeadDate(
+                        lead?.lead_activities?.[0]?.last_attempt_at
+                      )}
                     </div>
                   </TableCell>
                   {isIndividual ? (
@@ -419,21 +429,16 @@ const LeadsTable = ({
 const getLeadName = (lead: Lead) => lead.first_name + " " + lead.last_name;
 
 const getAssignedRepName = (lead: Lead) => {
-  const rep = lead.assigned_rep;
-  if (!rep) return "N/A";
-
-  return (
-    rep.name ||
-    [rep.first_name, rep.last_name].filter(Boolean).join(" ") ||
-    rep.email ||
-    "N/A"
-  );
+  const ass = lead?.lead_activities?.[0]?.assigned_user;
+  return ass ? ass?.first_name + " " + ass?.last_name : "N/A";
 };
 
 const getDispositionName = (lead: Lead) =>
-  lead.last_disposition || lead.disposition || "N/A";
+  lead.lead_activities?.[0]?.last_disposition_type?.replaceAll("_", " ") ||
+  "N/A";
 
-const getAttemptCount = (lead: Lead) => lead.attempts ?? lead.attempt ?? "N/A";
+const getAttemptCount = (lead: Lead) =>
+  lead?.lead_activities?.[0]?.attempt_count || "0";
 
 const getDaysToExpiry = (lead: Lead) => lead.days_to_expiry ?? "N/A";
 
@@ -457,10 +462,7 @@ const formatLeadStatus = (status: LeadDisplayStatus) =>
     .join(" ");
 
 const getLeadStatus = (lead: Lead): LeadDisplayStatus =>
-  lead.activity_status ||
-  lead.lead_status ||
-  lead.status ||
-  LeadActivityStatus.Completed;
+  (lead.lead_activities?.[0]?.status as LeadDisplayStatus) || "N/A";
 
 const LeadStatusBadge = ({ status }: { status: LeadDisplayStatus }) => {
   const classes =

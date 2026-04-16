@@ -25,7 +25,8 @@ export type LeadDisplayStatus =
   | LeadActivityStatus
   | "invalid"
   | "banned"
-  | "expired";
+  | "expired"
+  | "N/A";
 
 export interface Lead {
   call_priority: number;
@@ -57,4 +58,20 @@ export interface Lead {
   attempts?: number;
   days_to_expiry?: number;
   assigned_rep?: LeadAssignedRep | null;
+  lead_activities?: {
+    id: string;
+    last_disposition_type: string;
+    last_resulting_lead_status: string;
+    assigned_user_id: string;
+    attempt_count: number;
+    last_attempt_at: string;
+    next_allowed_at: null;
+    scheduled_call_at: null;
+    status: string;
+    assigned_user: {
+      id: string;
+      first_name: string;
+      last_name: string;
+    };
+  }[];
 }

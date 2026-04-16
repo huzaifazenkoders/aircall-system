@@ -45,9 +45,7 @@ export const assignedLeadStyles = {
     "inline-flex items-center gap-2 text-sm font-semibold text-secondary"
   ),
 
-  contentGrid: cn(
-    "grid gap-10 px-8 py-8 lg:px-10 xl:grid-cols-[minmax(0,1fr)_420px]"
-  ),
+  contentGrid: cn("grid gap-10 px-8 py-8 lg:px-10 grid-cols-1"),
 
   sectionTitle: cn("text-xs font-semibold tracking-wider text-foreground"),
   infoGrid3: cn(

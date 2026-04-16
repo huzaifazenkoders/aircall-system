@@ -110,8 +110,8 @@ const LeadDetailsContent = ({
               <div className="text-sm text-muted-foreground">
                 Current Status
               </div>
-              <div className="mt-3 inline-flex rounded-lg bg-muted px-4 py-1 text-xs font-medium text-muted-foreground">
-                Unavailable
+              <div className="mt-3 inline-flex capitalize rounded-lg bg-muted px-4 py-1 text-xs font-medium text-muted-foreground">
+                {lead.lead_activities?.[0]?.status}
               </div>
             </div>
             <Info label="Lead Owner" value={lead.lead_owner} />

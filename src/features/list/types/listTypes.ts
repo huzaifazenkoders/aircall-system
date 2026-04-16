@@ -62,3 +62,12 @@ export type ListStatus = "active" | "inactive" | "waiting";
 export type ListType = "shared" | "individual";
 export type CallType = "hot_lead" | "inbound";
 export type AssignType = "group" | "individual";
+
+export interface ListStats {
+  available_to_call: number;
+  calls_completed: number;
+  invalid_banned: number;
+  leads_in_cooldown: number;
+  scheduled_callbacks: number;
+  total_leads: number;
+}

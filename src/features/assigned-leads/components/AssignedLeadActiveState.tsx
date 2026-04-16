@@ -21,12 +21,16 @@ import AssignedLeadTimelineItem from "@/features/assigned-leads/components/Assig
 import { useAircall } from "@/features/aircall/hooks/useAirCall";
 import CallOutcomeDialog from "@/features/assigned-leads/components/CallOutcomeDialog";
 import { CurrentLead } from "@/features/assigned-leads/types/assignedLeadTypes";
-import { useCreateCallLog } from "@/features/assigned-leads/services/assignedLeadService";
+import {
+  useCreateCallLog,
+  useStartCall
+} from "@/features/assigned-leads/services/assignedLeadService";
 import { assignedLeadKeys } from "@/features/assigned-leads/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const DISPOSITION_ID_MAP: Record<string, string> = {
   "No Answer": "no_answer",
@@ -52,12 +56,18 @@ const CALL_STATUS_MAP: Record<string, "completed" | "failed" | "no_answer"> = {
 
 const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
   const queryClient = useQueryClient();
-  const [callOutcomeOpen, setCallOutcomeOpen] = React.useState(false);
+  const [callOutcomeOpen, setCallOutcomeOpen] = React.useState(
+    lead.status === "in_progress"
+  );
 
   const { mutate: createCallLog, isPending } = useCreateCallLog();
+  const { mutate: startCall } = useStartCall();
 
   const { dial, isReady, triggerEvent } = useAircall({
     containerId: "#phone-container",
+    onCallInitiated: () => {
+      startCall(lead.id);
+    },
     onCallEnded: () => {
       setCallOutcomeOpen(true);
     }
@@ -86,7 +96,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
     createCallLog(
       {
         payload: {
-          lead_activity_id: lead.lead_id,
+          lead_activity_id: lead.id,
           disposition_id: DISPOSITION_ID_MAP[disposition] ?? disposition,
           notes: personalNote.trim(),
           call_status: CALL_STATUS_MAP[disposition] ?? "completed",
@@ -161,11 +171,11 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
                     />
                     <AssignedLeadInfo
                       label="Event Name"
-                      value={lead.lead.event_name}
+                      value={lead.lead.event_name || "N/A"}
                     />
                     <AssignedLeadInfo
                       label="Event Date"
-                      value={lead.lead.event_date}
+                      value={lead.lead.event_date || "N/A"}
                     />
                     <AssignedLeadInfo
                       label="Location"
@@ -189,7 +199,9 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
                   <div className={s.infoGrid2}>
                     <div>
                       <div className={s.infoLabel}>Current Status</div>
-                      <div className={s.statusBadge}>{lead.status}</div>
+                      <div className={cn(s.statusBadge, "capitalize")}>
+                        {lead.status.replaceAll("_", " ")}
+                      </div>
                     </div>
                     <AssignedLeadInfo
                       label="Assigned Representation"

@@ -48,6 +48,19 @@ export function useGetWorkflowDispositions(workflowId: string) {
   });
 }
 
+// ─── Start Call ──────────────────────────────────────────────────────────────
+
+export function useStartCall() {
+  return useMutation({
+    mutationFn: async (lead_activity_id: string) => {
+      const res = await axiosInstance.post("/lead-activities/start-call", {
+        lead_activity_id
+      });
+      return res.data;
+    }
+  });
+}
+
 // ─── Create Call Log ──────────────────────────────────────────────────────────
 
 interface CreateCallLogReq {

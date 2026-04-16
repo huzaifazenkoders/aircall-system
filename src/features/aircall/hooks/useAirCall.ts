@@ -13,15 +13,20 @@ type AircallEvent =
 
 type Props = {
   containerId: string;
-  // eslint-disabled-next-line
+  // eslint-disable-next-line
   onCallEnded?: (data: any) => void;
+  onCallInitiated?: () => void;
 };
 
-export function useAircall({ containerId, onCallEnded }: Props) {
+export function useAircall({ containerId, onCallEnded, onCallInitiated }: Props) {
   const phoneRef = useRef<AircallPhone | null>(null);
   const [isReady, setIsReady] = useState(false);
   // eslint-disable-next-line
   const callbacksRef = useRef<Partial<Record<AircallEvent, (data: any) => void>>>({});
+  const onCallInitiatedRef = useRef(onCallInitiated);
+  const onCallEndedRef = useRef(onCallEnded);
+  onCallInitiatedRef.current = onCallInitiated;
+  onCallEndedRef.current = onCallEnded;
 
   useEffect(() => {
     if (phoneRef.current) return;
@@ -45,11 +50,12 @@ export function useAircall({ containerId, onCallEnded }: Props) {
 
     register("outgoing_call", () => {
       console.log("Call started");
+      onCallInitiatedRef.current?.();
     });
 
     register("call_ended", (data) => {
       console.log("Call ended");
-      if (onCallEnded) onCallEnded(data);
+      onCallEndedRef.current?.(data);
     });
 
     register("incoming_call", (data) => {

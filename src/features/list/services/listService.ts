@@ -10,7 +10,8 @@ import {
   List,
   ListDetail,
   ListStatus,
-  ListType
+  ListType,
+  ListStats
 } from "@/features/list/types/listTypes";
 import { listKeys } from "@/features/list/query-keys";
 
@@ -80,6 +81,7 @@ interface GetLeadsRes {
   data: {
     data: Lead[];
     meta: IPagination;
+    lead_stats: ListStats;
   };
   message: string;
 }
