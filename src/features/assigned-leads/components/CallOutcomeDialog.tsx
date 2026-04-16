@@ -65,6 +65,13 @@ const CallOutcomeDialog = ({
       (t.resulting_lead_status === "scheduled" && t.id === disposition)
   );
 
+  const isPastDateTime = React.useMemo(() => {
+    if (!isCallback || !callbackDate || !callbackTime) return false;
+    const combined =
+      moment(callbackDate).format("YYYY-MM-DD") + " " + callbackTime;
+    return moment(combined, "YYYY-MM-DD HH:mm").isBefore(moment());
+  }, [isCallback, callbackDate, callbackTime]);
+
   const handleSubmit = () => {
     onSubmit?.({
       disposition: String(disposition),
@@ -155,12 +162,21 @@ const CallOutcomeDialog = ({
                   <DateSelector
                     value={callbackDate ?? undefined}
                     setValue={setCallbackDate}
+                    minDate={new Date()}
                   />
                 </DropdownMenu>
               </LabelContainer>
 
               <LabelContainer label="Time">
-                <TimeSelector value={callbackTime} setValue={setCallbackTime} />
+                <TimeSelector
+                  value={callbackTime}
+                  setValue={setCallbackTime}
+                  minTime={
+                    callbackDate && moment(callbackDate).isSame(moment(), "day")
+                      ? moment().format("HH:mm")
+                      : null
+                  }
+                />
               </LabelContainer>
             </div>
           )}
@@ -193,14 +209,19 @@ const CallOutcomeDialog = ({
 
         <div className="border-t border-border" />
 
-        <DialogFooter className="px-8 py-5">
+        <DialogFooter className="px-8 py-5 flex-col items-end gap-2">
           <Button
             size="lg"
             onClick={handleSubmit}
-            disabled={!disposition || isPending}
+            disabled={!disposition || isPending || isPastDateTime}
           >
             Submit
           </Button>
+          {isPastDateTime && (
+            <p className="text-sm text-destructive">
+              Cannot select date/time in the past
+            </p>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

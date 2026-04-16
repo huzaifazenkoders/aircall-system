@@ -51,15 +51,19 @@ const SelectorButton = React.forwardRef<
     onClick?: VoidFunction;
     children?: React.ReactNode;
     className?: string;
+    disabled?: boolean;
   }
->(({ onClick, children, className }, ref) => (
+>(({ onClick, children, className, disabled }, ref) => (
   <button
     ref={ref}
     type="button"
-    onClick={() => onClick?.()}
+    disabled={disabled}
+    onClick={() => !disabled && onClick?.()}
     className={cn(
       "flex h-9 min-w-9 items-center justify-center rounded-md p-3 text-sm whitespace-nowrap",
-      "cursor-pointer hover:bg-background-secondary hover:text-text-primary",
+      disabled
+        ? "cursor-not-allowed opacity-40"
+        : "cursor-pointer hover:bg-background-secondary hover:text-text-primary",
       className
     )}
   >
@@ -118,13 +122,20 @@ const composeTimeValue = ({
   return moment({ hour: nextHour24, minute }).format("HH:mm");
 };
 
+const getEffectiveHour24 = (hour12: string, period: "AM" | "PM") => {
+  const h = Number(hour12) % 12; // 12 -> 0
+  return period === "PM" ? h + 12 : h;
+};
+
 const TimeGrid = ({
   selectedValue,
   minuteStep = 1,
+  minTime,
   onSelect
 }: {
   selectedValue?: string | null;
   minuteStep?: number;
+  minTime?: string | null;
   onSelect: (time: string) => void;
 }) => {
   const [is24Hour, setIs24Hour] = React.useState(() =>
@@ -145,6 +156,32 @@ const TimeGrid = ({
 
   const parsed = parseTimeParts(selectedValue);
   const safeMinuteStep = Math.max(1, minuteStep);
+  const parsedMin = minTime ? parseTimeParts(minTime) : null;
+
+  const isHourDisabled = (hour: string) => {
+    if (!parsedMin) return false;
+    const effective = is24Hour
+      ? Number(hour)
+      : getEffectiveHour24(hour, parsed.period);
+    return effective < parsedMin.hour24;
+  };
+
+  const isMinuteDisabled = (minute: string) => {
+    if (!parsedMin) return false;
+    const effectiveHour = is24Hour
+      ? parsed.hour24
+      : getEffectiveHour24(parsed.hour12, parsed.period);
+    if (effectiveHour > parsedMin.hour24) return false;
+    if (effectiveHour < parsedMin.hour24) return true;
+    return Number(minute) < parsedMin.minute;
+  };
+
+  const isPeriodDisabled = (period: "AM" | "PM") => {
+    if (!parsedMin) return false;
+    // AM covers 00:00–11:59; disabled entirely if minTime is 12:00 or later
+    if (period === "AM") return parsedMin.hour24 >= 12;
+    return false;
+  };
 
   const hours = is24Hour
     ? Array.from({ length: 24 }, (_, hour) => hour.toString().padStart(2, "0"))
@@ -191,6 +228,7 @@ const TimeGrid = ({
             const isSelected = is24Hour
               ? parsed.hour24 === Number(hour)
               : parsed.hour12 === hour;
+            const hourDisabled = isHourDisabled(hour);
 
             return (
               <SelectorButton
@@ -198,6 +236,7 @@ const TimeGrid = ({
                 ref={(node) => {
                   hourRefs.current[hour] = node;
                 }}
+                disabled={hourDisabled}
                 onClick={() =>
                   onSelect(
                     composeTimeValue({
@@ -230,6 +269,7 @@ const TimeGrid = ({
         <div className="flex flex-col gap-1">
           {minutes.map((minute) => {
             const isSelected = parsed.minute === Number(minute);
+            const minuteDisabled = isMinuteDisabled(minute);
 
             return (
               <SelectorButton
@@ -237,6 +277,7 @@ const TimeGrid = ({
                 ref={(node) => {
                   minuteRefs.current[minute] = node;
                 }}
+                disabled={minuteDisabled}
                 onClick={() =>
                   onSelect(
                     composeTimeValue({
@@ -270,6 +311,7 @@ const TimeGrid = ({
           <div className="flex flex-col gap-1">
             {(["AM", "PM"] as const).map((period) => {
               const isSelected = parsed.period === period;
+              const periodDisabled = isPeriodDisabled(period);
 
               return (
                 <SelectorButton
@@ -277,6 +319,7 @@ const TimeGrid = ({
                   ref={(node) => {
                     periodRefs.current[period] = node;
                   }}
+                  disabled={periodDisabled}
                   onClick={() =>
                     onSelect(
                       composeTimeValue({
@@ -351,9 +394,10 @@ interface Props extends BaseSelectorProps {
   value?: TimeValue | null;
   setValue?: (value: TimeValue) => void;
   minuteStep?: number;
+  minTime?: string | null;
 }
 
-const TimeSelector = ({ value, setValue, minuteStep = 1, ...rest }: Props) => {
+const TimeSelector = ({ value, setValue, minuteStep = 1, minTime, ...rest }: Props) => {
   return (
     <SelectorRoot
       {...rest}
@@ -364,6 +408,7 @@ const TimeSelector = ({ value, setValue, minuteStep = 1, ...rest }: Props) => {
         <TimeGrid
           selectedValue={value}
           minuteStep={minuteStep}
+          minTime={minTime}
           onSelect={(time) => {
             setValue?.(time);
             rest.onOpenChange?.(false);
