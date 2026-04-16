@@ -1,16 +1,17 @@
 "use client";
 
-import React from "react";
-import moment from "moment";
 import { CalendarIcon } from "lucide-react";
+import moment from "moment";
+import React from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogIconClose,
-  DialogFooter
-} from "@/components/ui/dialog";
+import DateSelector from "@/components/custom/date-selector.component";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import LabelContainer from "@/components/ui/label-container";
 import {
   Select,
   SelectContent,
@@ -19,16 +20,10 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import TextArea from "@/components/ui/text-area";
+import TextInput from "@/components/ui/text-input";
 import TimeSelector from "@/components/ui/time-selector";
-import LabelContainer from "@/components/ui/label-container";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import DateSelector from "@/components/custom/date-selector.component";
 import { useGetWorkflowDispositions } from "@/features/assigned-leads/services/assignedLeadService";
 import { Loader2Icon } from "lucide-react";
-import TextInput from "@/components/ui/text-input";
 
 type CallOutcomeDialogProps = {
   open: boolean;
@@ -47,7 +42,6 @@ type CallOutcomeDialogProps = {
 
 const CallOutcomeDialog = ({
   open,
-  onOpenChange,
   isPending,
   workflowId,
   onSubmit
@@ -66,7 +60,9 @@ const CallOutcomeDialog = ({
   const dispositions = dispositionsData?.data?.dispositions ?? [];
 
   const isCallback = dispositions.some(
-    (t) => t.disposition_type === "callback_scheduled" && t.id === disposition
+    (t) =>
+      (t.disposition_type === "callback_scheduled" && t.id === disposition) ||
+      (t.resulting_lead_status === "scheduled" && t.id === disposition)
   );
 
   const handleSubmit = () => {
@@ -81,7 +77,7 @@ const CallOutcomeDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open}>
       <DialogContent className="max-w-[588px] rounded-[20px] p-0 gap-0">
         {/* Header */}
         <div className="px-8 pt-8 pb-6 flex justify-between items-start">
@@ -93,7 +89,6 @@ const CallOutcomeDialog = ({
               Record the result of this call to update the lead status.
             </p>
           </div>
-          <DialogIconClose className="-mt-1 -mr-1 shrink-0" />
         </div>
 
         <div className="border-t border-border" />

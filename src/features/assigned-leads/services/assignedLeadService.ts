@@ -29,6 +29,7 @@ export interface WorkflowDisposition {
   id: string;
   name: string;
   disposition_type: string;
+  resulting_lead_status: string;
 }
 
 interface GetWorkflowDispositionsRes {
