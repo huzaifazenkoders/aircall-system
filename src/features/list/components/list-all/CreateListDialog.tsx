@@ -145,7 +145,7 @@ const CreateListDialog = ({
       cooldown_minimum_hours: initialList?.cooldown_minimum_hours ?? 0,
       cooldown_minimum_minutes: initialList?.cooldown_minimum_minutes ?? 0,
       assign_type: (initialList?.assign_type ?? "group") as AssignType,
-      list_type: (initialList?.list_type ?? "shared") as
+      list_type: (initialList?.list_type || "shared") as
         | "shared"
         | "individual",
       group_ids: initialList
@@ -356,8 +356,8 @@ const CreateListDialog = ({
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <Field
+            {/* <div className="grid grid-cols-2 gap-6"> */}
+            {/* <Field
                 label="List Type"
                 error={
                   formik.touched.list_type ? formik.errors.list_type : undefined
@@ -380,58 +380,56 @@ const CreateListDialog = ({
                     <SelectItem value="individual">Individual</SelectItem>
                   </SelectContent>
                 </Select>
-              </Field>
+              </Field> */}
 
-              <Field label="Priority Level">
-                <div className="flex items-center gap-2">
-                  <TextInput
-                    id="priority"
-                    value={String(formik.values.priority)}
-                    setValue={(v) =>
-                      formik.setFieldValue("priority", Number(v) || 1)
+            <Field label="Priority Level">
+              <div className="flex items-center gap-2">
+                <TextInput
+                  id="priority"
+                  value={String(formik.values.priority)}
+                  setValue={(v) =>
+                    formik.setFieldValue("priority", Number(v) || 1)
+                  }
+                  onBlur={formik.handleBlur}
+                  className="px-4 text-sm bg-transparent w-full"
+                  containerClassName="w-full"
+                  error={
+                    formik.touched.priority ? formik.errors.priority : undefined
+                  }
+                />
+                <div className="grid grid-rows-2 overflow-hidden rounded-xl">
+                  <button
+                    type="button"
+                    className="grid place-items-center text-muted-foreground hover:text-primary"
+                    onClick={() =>
+                      formik.setFieldValue(
+                        "priority",
+                        Math.min(99, formik.values.priority + 1)
+                      )
                     }
-                    onBlur={formik.handleBlur}
-                    className="px-4 text-sm bg-transparent w-full"
-                    containerClassName="w-full"
-                    error={
-                      formik.touched.priority
-                        ? formik.errors.priority
-                        : undefined
+                  >
+                    <ChevronUpIcon className="size-5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    className="grid place-items-center text-muted-foreground hover:text-primary"
+                    onClick={() =>
+                      formik.setFieldValue(
+                        "priority",
+                        Math.max(1, formik.values.priority - 1)
+                      )
                     }
-                  />
-                  <div className="grid grid-rows-2 overflow-hidden rounded-xl">
-                    <button
-                      type="button"
-                      className="grid place-items-center text-muted-foreground hover:text-primary"
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "priority",
-                          Math.min(99, formik.values.priority + 1)
-                        )
-                      }
-                    >
-                      <ChevronUpIcon className="size-5" aria-hidden="true" />
-                    </button>
-                    <button
-                      type="button"
-                      className="grid place-items-center text-muted-foreground hover:text-primary"
-                      onClick={() =>
-                        formik.setFieldValue(
-                          "priority",
-                          Math.max(1, formik.values.priority - 1)
-                        )
-                      }
-                    >
-                      <ChevronDownIcon className="size-5" aria-hidden="true" />
-                    </button>
-                  </div>
+                  >
+                    <ChevronDownIcon className="size-5" aria-hidden="true" />
+                  </button>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  1 is highest priority. Leads will remain in the highest
-                  priority list.
-                </p>
-              </Field>
-            </div>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                1 is highest priority. Leads will remain in the highest priority
+                list.
+              </p>
+            </Field>
+            {/* </div> */}
 
             <Field label="Minimum Hours Between Calls">
               <div className="grid grid-cols-2 gap-6">
