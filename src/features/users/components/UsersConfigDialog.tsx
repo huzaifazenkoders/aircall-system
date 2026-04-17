@@ -53,7 +53,6 @@ const step1Schema = Yup.object({
 });
 
 const fullSchema = step1Schema.shape({
-  list_description: Yup.string().trim().required("Description is required"),
   workflow_id: Yup.string().trim().required("Workflow is required"),
   cooldown_minimum_hours: Yup.number().min(0).required("Required"),
   cooldown_minimum_minutes: Yup.number().min(0).max(59).required("Required")
@@ -105,7 +104,6 @@ const UsersConfigDialog = ({
       email: "",
       phone_number: "",
       group_ids: [] as string[],
-      list_description: "",
       workflow_id: "",
       cooldown_minimum_hours: 12,
       cooldown_minimum_minutes: 30
@@ -126,7 +124,6 @@ const UsersConfigDialog = ({
             keap_id: values.keap_id.trim(),
             group_ids: values.group_ids,
             list: {
-              description: values.list_description.trim(),
               call_type: "hot_lead",
               cooldown_minimum_hours: values.cooldown_minimum_hours,
               cooldown_minimum_minutes: values.cooldown_minimum_minutes,
@@ -240,6 +237,7 @@ const UsersConfigDialog = ({
                         ? e.phone_number
                         : undefined
                     }
+                    defaultCountry="us"
                   />
                 </div>
 
@@ -348,7 +346,7 @@ const UsersConfigDialog = ({
                   ) : null}
                 </div>
 
-                <div className="mt-5">
+                {/* <div className="mt-5">
                   <TextInput
                     label="List Description"
                     value={formik.values.list_description}
@@ -362,7 +360,7 @@ const UsersConfigDialog = ({
                         : undefined
                     }
                   />
-                </div>
+                </div> */}
 
                 <div className="mt-8">
                   <label className={usersStyles.sectionLabel}>

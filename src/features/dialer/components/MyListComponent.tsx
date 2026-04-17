@@ -31,9 +31,7 @@ import { Button } from "@/components/ui/button";
 import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
-import {
-  leadStatusOptions
-} from "@/features/dialer/data/dialerData";
+import { leadStatusOptions } from "@/features/dialer/data/dialerData";
 import { myListStyles } from "@/features/dialer/styles/dialerStyles";
 import Toggle from "@/components/ui/toggle";
 import {

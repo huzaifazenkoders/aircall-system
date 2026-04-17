@@ -130,54 +130,53 @@ const UsersManagementTable = ({
 
           {/* Card */}
           <div className="w-full overflow-hidden rounded-lg bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]">
-            {isPending ? (
-              <div className="flex flex-1 items-center justify-center py-20">
-                <Loader2Icon className="size-8 animate-spin text-secondary" />
-              </div>
-            ) : error ? (
-              <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
-                Failed to load users. Please try again.
-              </div>
-            ) : (
-              <>
-                {/* Toolbar */}
-                <div className="flex items-center gap-4 border-b border-zinc-200 px-6 py-6">
-                  <TextInput
-                    setValue={onSearchChange}
-                    value={searchValue}
-                    placeholder="Search by name, email, or phone"
-                    className="w-96 text-sm"
-                    startIcon={<SearchIcon className="size-4 text-gray-500" />}
-                  />
-                  <div className="flex flex-1 justify-end">
-                    <Select
-                      value={statusFilter}
-                      onValueChange={(val) =>
-                        onStatusChange(
-                          val as "All Status" | "active" | "suspend" | "invited"
-                        )
-                      }
-                    >
-                      <SelectTrigger className="h-9 min-w-[110px] capitalize rounded-lg border-zinc-200 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="All Status">All Status</SelectItem>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="invited">Invited</SelectItem>
-                        <SelectItem value="suspend">Suspended</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <>
+              {/* Toolbar */}
+              <div className="flex items-center gap-4 border-b border-zinc-200 px-6 py-6">
+                <TextInput
+                  setValue={onSearchChange}
+                  value={searchValue}
+                  placeholder="Search by name, email, or phone"
+                  className="w-96 text-sm"
+                  startIcon={<SearchIcon className="size-4 text-gray-500" />}
+                />
+                <div className="flex flex-1 justify-end">
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(val) =>
+                      onStatusChange(
+                        val as "All Status" | "active" | "suspend" | "invited"
+                      )
+                    }
+                  >
+                    <SelectTrigger className="h-9 min-w-[110px] capitalize rounded-lg border-zinc-200 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="All Status">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="invited">Invited</SelectItem>
+                      <SelectItem value="suspend">Suspended</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+              </div>
 
-                {/* Table */}
-                {!paginated.length ? (
-                  <UsersEmptyState
-                    onAddUser={onAddUser}
-                    showButton={statusFilter === "All Status" ? true : false}
-                  />
-                ) : (
+              {/* Table */}
+              {isPending ? (
+                <div className="flex flex-1 items-center justify-center py-20">
+                  <Loader2Icon className="size-8 animate-spin text-secondary" />
+                </div>
+              ) : error ? (
+                <div className="flex flex-1 items-center justify-center py-20 text-sm text-red-500">
+                  Failed to load users. Please try again.
+                </div>
+              ) : !paginated.length ? (
+                <UsersEmptyState
+                  onAddUser={onAddUser}
+                  showButton={statusFilter === "All Status" ? true : false}
+                />
+              ) : (
                   <Table>
                     <TableHeader>
                       <TableRow className="border-zinc-200 bg-gray-50 hover:bg-gray-50">
@@ -313,8 +312,7 @@ const UsersManagementTable = ({
                     </Button>
                   </div>
                 </div>
-              </>
-            )}
+            </>
           </div>
         </div>
       }

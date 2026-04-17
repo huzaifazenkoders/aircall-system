@@ -15,9 +15,11 @@ import {
 } from "@/features/users/services/userService";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { useDebounce } from "use-debounce";
 
 const UsersView = () => {
   const [searchValue, setSearchValue] = React.useState("");
+  const [searchValueD] = useDebounce(searchValue, 500);
   const [statusFilter, setStatusFilter] = React.useState<
     "All Status" | "active" | "suspend" | "invited"
   >("All Status");
@@ -41,7 +43,7 @@ const UsersView = () => {
 
   const { data, isPending, error } = useGetUsers({
     limit: 10,
-    search: searchValue || undefined,
+    search: searchValueD || undefined,
     status: statusFilter === "All Status" ? undefined : statusFilter,
     role: "sales_person"
   });

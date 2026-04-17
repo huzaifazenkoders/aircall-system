@@ -28,7 +28,7 @@ export const callLogsStyles = {
   row: cn("cursor-pointer border-border hover:bg-[#FBFCFD]"),
   cell: cn("px-5 pt-3 pb-3 text-sm text-text-primary"),
   dispositionCell: cn("w-[1%] whitespace-nowrap"),
-  dispositionBadge: cn("rounded-lg px-3 py-2 text-xs font-medium"),
+  dispositionBadge: cn("capitalize rounded-lg px-3 py-2 text-xs font-medium"),
   arrowButton: cn(
     "grid size-11 place-items-center rounded-full text-[#667085] transition-colors hover:bg-muted hover:text-text-primary"
   ),

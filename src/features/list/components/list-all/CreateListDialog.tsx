@@ -43,8 +43,14 @@ import { useGetUsers } from "@/features/users/services/userService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { listKeys } from "@/features/list/query-keys";
-import { AssignType, ListDetail } from "@/features/list/types/listTypes";
+import {
+  AssignType,
+  CALL_TYPES,
+  CallType,
+  ListDetail
+} from "@/features/list/types/listTypes";
 import RadioSelector from "../RadioSelector";
+import TextArea from "@/components/ui/text-area";
 
 const validationSchema = Yup.object({
   name: Yup.string()
@@ -57,7 +63,7 @@ const validationSchema = Yup.object({
     .max(500, "Description must be at most 500 characters")
     .required("Description is required"),
   call_type: Yup.string()
-    .oneOf(["hot_lead", "inbound"], "Invalid call type")
+    .oneOf([...CALL_TYPES], "Invalid call type")
     .required("Call type is required"),
   workflow_id: Yup.string().trim().required("Workflow template is required"),
   priority: Yup.number()
@@ -133,7 +139,7 @@ const CreateListDialog = ({
     () => ({
       name: initialList?.name ?? "",
       description: initialList?.description ?? "",
-      call_type: (initialList?.call_type ?? "") as "hot_lead" | "inbound" | "",
+      call_type: (initialList?.call_type || "hot_lead") as CallType,
       workflow_id: initialList?.workflow?.id ?? "",
       priority: initialList?.priority ?? 1,
       cooldown_minimum_hours: initialList?.cooldown_minimum_hours ?? 0,
@@ -172,7 +178,7 @@ const CreateListDialog = ({
       const payload = {
         name: values.name.trim(),
         description: values.description.trim(),
-        call_type: values.call_type as "hot_lead" | "inbound",
+        call_type: values.call_type,
         workflow_id: values.workflow_id.trim(),
         priority: values.priority,
         cooldown_minimum_hours: values.cooldown_minimum_hours,
@@ -279,7 +285,7 @@ const CreateListDialog = ({
             </Field>
 
             <Field label="Description">
-              <TextInput
+              <TextArea
                 id="description"
                 value={formik.values.description}
                 setValue={(v) => formik.setFieldValue("description", v)}
@@ -312,7 +318,8 @@ const CreateListDialog = ({
                   </SelectTrigger>
                   <SelectContent alignItemWithTrigger={false}>
                     <SelectItem value="hot_lead">Hot Lead</SelectItem>
-                    <SelectItem value="inbound">Inbound</SelectItem>
+                    <SelectItem value="warm_lead">Warm Lead</SelectItem>
+                    <SelectItem value="cold_lead">Cold Lead</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>

@@ -158,10 +158,14 @@ const ListTable = ({
                 aria-hidden="true"
               />
             }
-            className="bg-transparent"
+            className="bg-transparent  w-100"
           />
 
-          <DateRangeSelector value={dateRange} setValue={setDateRange} />
+          <DateRangeSelector
+            value={dateRange}
+            setValue={setDateRange}
+            placeholder="Date"
+          />
         </div>
 
         {(["shared", "idv"] as const).map((tab) => {

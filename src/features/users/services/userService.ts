@@ -96,7 +96,6 @@ interface InviteUserReq {
     keap_id: string;
     group_ids: string[];
     list: {
-      description: string;
       call_type: "hot_lead";
       cooldown_minimum_hours: number;
       cooldown_minimum_minutes: number;

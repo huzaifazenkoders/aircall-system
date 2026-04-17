@@ -17,7 +17,10 @@ import DispositionRuleDialog from "@/features/workflows/components/DispositionRu
 import WorkflowConfirmDialog from "@/features/workflows/components/WorkflowConfirmDialog";
 import WorkflowRuleCard from "@/features/workflows/components/WorkflowRuleCard";
 import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
-import { useGetDispositions } from "@/features/workflows/services/dispositionService";
+import {
+  useGetDispositions,
+  useGetRemainingDispositionTypes
+} from "@/features/workflows/services/dispositionService";
 import { useUpdateWorkflowStatus } from "@/features/workflows/services/workflowService";
 import { workflowKeys } from "@/features/workflows/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
@@ -48,6 +51,11 @@ const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
   } = useGetDispositions({ workflow_id: workflowId, limit: 20 });
 
   const dispositions = transformInfiniteData(dispositionsData, "dispositions");
+
+  const { data: remainingTypesData } = useGetRemainingDispositionTypes({
+    id: workflowId
+  });
+  const hasRemainingTypes = (remainingTypesData?.data?.length ?? 1) > 0;
 
   const workflow = dispositionsData?.pages?.[0]?.data;
 
@@ -180,17 +188,19 @@ const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
             />
           ))}
 
-          <button
-            type="button"
-            className={workflowsStyles.addRuleCard}
-            onClick={() => {
-              setEditingDisposition(null);
-              setIsRuleDialogOpen(true);
-            }}
-          >
-            <PlusCircleIcon className={workflowsStyles.addRuleIcon} />
-            <span className={workflowsStyles.addRuleText}>Add Disposition</span>
-          </button>
+          {hasRemainingTypes && (
+            <button
+              type="button"
+              className={workflowsStyles.addRuleCard}
+              onClick={() => {
+                setEditingDisposition(null);
+                setIsRuleDialogOpen(true);
+              }}
+            >
+              <PlusCircleIcon className={workflowsStyles.addRuleIcon} />
+              <span className={workflowsStyles.addRuleText}>Add Disposition</span>
+            </button>
+          )}
         </div>
       )}
 

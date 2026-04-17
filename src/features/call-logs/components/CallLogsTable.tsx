@@ -8,7 +8,8 @@ import {
   ChevronRightIcon
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
+import { DispositionBadge } from "@/features/workflows/components/DispositionBadge";
+import { DispositionType } from "@/features/workflows/types/workflowTypes";
 import {
   Table,
   TableBody,
@@ -25,13 +26,13 @@ import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
 const callStatusVariantMap: Record<string, string> = {
   completed: "connected",
   failed: "not-interested",
-  no_answer: "no-answer",
+  no_answer: "no-answer"
 };
 
 const callStatusLabelMap: Record<string, string> = {
   completed: "Completed",
   failed: "Failed",
-  no_answer: "No Answer",
+  no_answer: "No Answer"
 };
 
 type CallLogsTableProps = {
@@ -44,7 +45,15 @@ type CallLogsTableProps = {
   onRowSelect: (callLog: CallLog) => void;
 };
 
-const CallLogsTable = ({ rows, page, limit, total, totalPages, onPageChange, onRowSelect }: CallLogsTableProps) => {
+const CallLogsTable = ({
+  rows,
+  page,
+  limit,
+  total,
+  totalPages,
+  onPageChange,
+  onRowSelect
+}: CallLogsTableProps) => {
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(page * limit, total);
   return (
@@ -78,15 +87,19 @@ const CallLogsTable = ({ rows, page, limit, total, totalPages, onPageChange, onR
               onClick={() => onRowSelect(row)}
             >
               <TableCell className={callLogsStyles.cell}>
-                {row.lead ? `${row.lead.first_name} ${row.lead.last_name}` : row.lead_id}
+                {`${row.lead_name}`}
               </TableCell>
-              <TableCell className={callLogsStyles.cell}>{row.lead?.phone ?? "—"}</TableCell>
               <TableCell className={callLogsStyles.cell}>
-                {row.assigned_to ? `${row.assigned_to.first_name} ${row.assigned_to.last_name}` : "—"}
+                {row.lead_phone ?? "—"}
               </TableCell>
-              <TableCell className={callLogsStyles.cell}>{row.list?.name ?? "—"}</TableCell>
               <TableCell className={callLogsStyles.cell}>
-                {new Date(row.created_at).toLocaleString()}
+                {row.user_name || "—"}
+              </TableCell>
+              <TableCell className={callLogsStyles.cell}>
+                {row.list_name ?? "—"}
+              </TableCell>
+              <TableCell className={callLogsStyles.cell}>
+                {new Date(row.call_time).toLocaleString()}
               </TableCell>
               <TableCell
                 className={cn(
@@ -94,12 +107,9 @@ const CallLogsTable = ({ rows, page, limit, total, totalPages, onPageChange, onR
                   callLogsStyles.dispositionCell
                 )}
               >
-                <Badge
-                  variant={callStatusVariantMap[row.call_status] as never}
-                  className={callLogsStyles.dispositionBadge}
-                >
-                  {callStatusLabelMap[row.call_status]}
-                </Badge>
+                <DispositionBadge
+                  type={row.disposition_type as DispositionType}
+                />
               </TableCell>
               <TableCell className={cn(callLogsStyles.cell, "py-4 pr-4")}>
                 <Button
@@ -132,7 +142,9 @@ const CallLogsTable = ({ rows, page, limit, total, totalPages, onPageChange, onR
         </div>
 
         <div className="flex items-center gap-10">
-          <span className={callLogsStyles.paginationText}>{from}-{to} of {total}</span>
+          <span className={callLogsStyles.paginationText}>
+            {from}-{to} of {total}
+          </span>
           <div className={callLogsStyles.paginationActions}>
             <Button
               variant="ghost"

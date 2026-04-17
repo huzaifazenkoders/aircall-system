@@ -10,6 +10,13 @@ export interface CallLog {
   call_status: CallStatus;
   created_at: string;
   updated_at: string;
+  call_time: string;
+  disposition_type: string;
+  lead_name: string;
+  lead_phone: string;
+  list_name: string;
+  resulting_lead_status: string;
+  user_name: string;
   lead?: {
     id: string;
     first_name: string;

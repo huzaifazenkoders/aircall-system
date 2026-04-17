@@ -60,7 +60,8 @@ export interface Assignment {
 
 export type ListStatus = "active" | "inactive" | "waiting";
 export type ListType = "shared" | "individual";
-export type CallType = "hot_lead" | "inbound";
+export const CALL_TYPES = ["hot_lead", "warm_lead", "cold_lead"] as const;
+export type CallType = (typeof CALL_TYPES)[number];
 export type AssignType = "group" | "individual";
 
 export interface ListStats {

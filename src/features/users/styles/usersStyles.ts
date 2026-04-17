@@ -22,7 +22,7 @@ export const usersStyles = {
   sheetTitleRow: cn("flex items-start gap-4"),
   sheetTitle: cn("text-[24px] font-medium text-text-primary"),
   statusPill: cn(
-    "rounded-2xl bg-success-soft px-3 py-1 text-sm text-success-fg"
+    "capitalize rounded-2xl bg-success-soft px-3 py-1 text-sm text-success-fg"
   ),
   createdText: cn("pl-[52px] mt-0 text-sm text-panel-muted"),
   iconButton: cn(
