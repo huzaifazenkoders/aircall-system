@@ -75,6 +75,7 @@ const DialerAuthResetPasswordForm = ({
           <PasswordInput
             id="dialer-auth-reset-password"
             label={passwordLabel}
+            required
             value={formik.values.new_password}
             setValue={(val) => formik.setFieldValue("new_password", val)}
             error={
@@ -90,6 +91,7 @@ const DialerAuthResetPasswordForm = ({
           <PasswordInput
             id="dialer-auth-reset-confirm-password"
             label={confirmPasswordLabel}
+            required
             value={formik.values.confirm_password}
             setValue={(val) => formik.setFieldValue("confirm_password", val)}
             error={

@@ -163,6 +163,7 @@ const CreateGroupDialog = ({
             <div className={groupsStyles.formGrid}>
               <TextInput
                 label="Group Name"
+                required
                 placeholder="eg, Team Alpha"
                 value={formik.values.name}
                 setValue={(val) => void formik.setFieldValue("name", val)}
@@ -175,6 +176,7 @@ const CreateGroupDialog = ({
 
               <TextArea
                 label="Description"
+                required
                 placeholder="eg, Primary calling team for Sydney live events."
                 value={formik.values.description}
                 setValue={(val) =>

@@ -272,6 +272,7 @@ const DispositionRuleDialog = ({
                 <div className={workflowsStyles.field}>
                   <span className={workflowsStyles.fieldLabel}>
                     Disposition Type
+                    <span className="text-xl text-red-600 ms-1">*</span>
                   </span>
                   {isLoadingTypes ? (
                     <div className="flex h-11 items-center">
@@ -324,6 +325,7 @@ const DispositionRuleDialog = ({
                 <div className={workflowsStyles.field}>
                   <span className={workflowsStyles.fieldLabel}>
                     Resulting Lead Status
+                    <span className="text-xl text-red-600 ms-1">*</span>
                   </span>
                   <Select
                     value={formik.values.resulting_lead_status}

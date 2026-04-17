@@ -87,6 +87,7 @@ const CreateWorkflowDialog = ({
           <DialogBody className={workflowsStyles.dialogBody}>
             <TextInput
               label="Workflow Name"
+              required
               placeholder="eg, VIP Event Workflow"
               value={formik.values.name}
               setValue={(val) => formik.setFieldValue("name", val)}
@@ -98,6 +99,7 @@ const CreateWorkflowDialog = ({
             />
             <TextArea
               label="Description"
+              required
               placeholder="eg, Special automation rules for VIP campaign leads."
               value={formik.values.description}
               setValue={(val) => formik.setFieldValue("description", val)}

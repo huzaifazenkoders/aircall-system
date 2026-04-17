@@ -268,7 +268,7 @@ const CreateListDialog = ({
 
         <form onSubmit={formik.handleSubmit}>
           <DialogBody className="space-y-5">
-            <Field label="List Name">
+            <Field label="List Name" required>
               <TextInput
                 id="name"
                 value={formik.values.name}
@@ -284,7 +284,7 @@ const CreateListDialog = ({
               />
             </Field>
 
-            <Field label="Description">
+            <Field label="Description" required>
               <TextArea
                 id="description"
                 value={formik.values.description}
@@ -303,6 +303,7 @@ const CreateListDialog = ({
             <div className="grid grid-cols-2 gap-6">
               <Field
                 label="Call Type"
+                required
                 error={
                   formik.touched.call_type ? formik.errors.call_type : undefined
                 }
@@ -326,6 +327,7 @@ const CreateListDialog = ({
 
               <Field
                 label="Assign Workflow Template"
+                required
                 error={
                   formik.touched.workflow_id
                     ? formik.errors.workflow_id
@@ -382,7 +384,7 @@ const CreateListDialog = ({
                 </Select>
               </Field> */}
 
-            <Field label="Priority Level">
+            <Field label="Priority Level" required>
               <div className="flex items-center gap-2">
                 <TextInput
                   id="priority"
@@ -431,7 +433,7 @@ const CreateListDialog = ({
             </Field>
             {/* </div> */}
 
-            <Field label="Minimum Hours Between Calls">
+            <Field label="Minimum Hours Between Calls" required>
               <div className="grid grid-cols-2 gap-6">
                 <TextInput
                   id="cooldown_minimum_hours"
@@ -671,15 +673,20 @@ const CreateListDialog = ({
 const Field = ({
   label,
   error,
+  required,
   children
 }: {
   label: string;
   error?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) => (
   <div>
     {label && (
-      <label className="text-sm font-medium text-foreground">{label}</label>
+      <label className="text-sm font-medium text-foreground">
+        {label}
+        {required && <span className="text-xl text-red-600 ms-1">*</span>}
+      </label>
     )}
     <div className={cn(label && "mt-2")}>{children}</div>
     {error && <p className="mt-1 text-sm text-destructive">{error}</p>}

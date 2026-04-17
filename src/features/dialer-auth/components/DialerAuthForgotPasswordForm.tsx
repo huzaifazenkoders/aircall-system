@@ -58,6 +58,7 @@ const DialerAuthForgotPasswordForm = () => {
         <TextInput
           id="dialer-auth-forgot-email"
           label="Email address"
+          required
           value={formik.values.email}
           setValue={(val) => formik.setFieldValue("email", val)}
           placeholder="john.doe@email.com"

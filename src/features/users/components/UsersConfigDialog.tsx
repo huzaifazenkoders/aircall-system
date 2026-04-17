@@ -192,6 +192,7 @@ const UsersConfigDialog = ({
               <div className="grid gap-5">
                 <TextInput
                   label="Keap Id"
+                  required
                   value={formik.values.keap_id}
                   setValue={(val) => void formik.setFieldValue("keap_id", val)}
                   placeholder="eg. 123"
@@ -200,6 +201,7 @@ const UsersConfigDialog = ({
                 <div className="grid grid-cols-2 gap-4">
                   <TextInput
                     label="First Name"
+                    required
                     value={formik.values.first_name}
                     setValue={(val) => formik.setFieldValue("first_name", val)}
                     placeholder="eg. James"
@@ -209,6 +211,7 @@ const UsersConfigDialog = ({
                   />
                   <TextInput
                     label="Last Name"
+                    required
                     value={formik.values.last_name}
                     setValue={(val) =>
                       void formik.setFieldValue("last_name", val)
@@ -220,6 +223,7 @@ const UsersConfigDialog = ({
                 <div className="grid grid-cols-2 gap-4">
                   <TextInput
                     label="Email"
+                    required
                     value={formik.values.email}
                     setValue={(val) => void formik.setFieldValue("email", val)}
                     placeholder="eg. james@gmail.com"
@@ -227,6 +231,7 @@ const UsersConfigDialog = ({
                   />
                   <PhoneInput
                     label="Phone number"
+                    required
                     value={formik.values.phone_number}
                     onChange={(val) =>
                       void formik.setFieldValue("phone_number", val)
@@ -292,6 +297,7 @@ const UsersConfigDialog = ({
                 <div>
                   <label className={usersStyles.sectionLabel}>
                     Assign Workflow Template
+                    <span className="text-xl text-red-600 ms-1">*</span>
                   </label>
                   <Select
                     value={formik.values.workflow_id}
@@ -365,6 +371,7 @@ const UsersConfigDialog = ({
                 <div className="mt-8">
                   <label className={usersStyles.sectionLabel}>
                     Minimum Hours Between Calls
+                    <span className="text-xl text-red-600 ms-1">*</span>
                   </label>
                   <div className={usersStyles.cooldownGrid}>
                     <TextInput

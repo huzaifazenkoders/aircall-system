@@ -71,6 +71,7 @@ const ResetPasswordForm = ({
           <PasswordInput
             id="new_password"
             label={passwordLabel}
+            required
             value={formik.values.new_password}
             setValue={(val) => formik.setFieldValue("new_password", val)}
             error={
@@ -91,6 +92,7 @@ const ResetPasswordForm = ({
           <PasswordInput
             id="confirm_password"
             label={confirmPasswordLabel}
+            required
             value={formik.values.confirm_password}
             setValue={(val) => formik.setFieldValue("confirm_password", val)}
             error={

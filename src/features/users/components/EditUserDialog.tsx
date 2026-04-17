@@ -117,6 +117,7 @@ const EditUserDialog = ({
               <div className="grid grid-cols-2 gap-4">
                 <TextInput
                   label="First Name"
+                  required
                   value={formik.values.first_name}
                   setValue={(val) =>
                     void formik.setFieldValue("first_name", val)
@@ -128,6 +129,7 @@ const EditUserDialog = ({
                 />
                 <TextInput
                   label="Last Name"
+                  required
                   value={formik.values.last_name}
                   setValue={(val) =>
                     void formik.setFieldValue("last_name", val)
@@ -139,6 +141,7 @@ const EditUserDialog = ({
               <div className="grid grid-cols-2 gap-4">
                 <TextInput
                   label="Email"
+                  required
                   value={formik.values.email}
                   setValue={(val) => void formik.setFieldValue("email", val)}
                   placeholder="eg. james@gmail.com"
@@ -146,6 +149,7 @@ const EditUserDialog = ({
                 />
                 <PhoneInput
                   label="Phone number"
+                  required
                   value={formik.values.phone_number}
                   onChange={(val) =>
                     void formik.setFieldValue("phone_number", val)

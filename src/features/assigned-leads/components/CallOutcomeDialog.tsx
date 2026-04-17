@@ -103,7 +103,7 @@ const CallOutcomeDialog = ({
         {/* Form body */}
         <div className="px-8 py-6 flex flex-col gap-5">
           {/* Disposition */}
-          <LabelContainer label="Disposition">
+          <LabelContainer label="Disposition" required>
             <Select value={disposition} onValueChange={setDisposition}>
               <SelectTrigger className="w-full h-11 text-base border-border-primary">
                 <SelectValue
@@ -143,7 +143,7 @@ const CallOutcomeDialog = ({
           {/* Date & Time — only shown for Callback Scheduled */}
           {isCallback && (
             <div className="grid grid-cols-2 gap-4">
-              <LabelContainer label="Date">
+              <LabelContainer label="Date" required>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="h-11 w-full rounded-lg border border-border-primary bg-input px-3 py-2 text-base text-left flex items-center justify-between">
                     <span
@@ -167,7 +167,7 @@ const CallOutcomeDialog = ({
                 </DropdownMenu>
               </LabelContainer>
 
-              <LabelContainer label="Time">
+              <LabelContainer label="Time" required>
                 <TimeSelector
                   value={callbackTime}
                   setValue={setCallbackTime}

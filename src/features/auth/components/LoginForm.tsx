@@ -69,6 +69,7 @@ const LoginForm = () => {
           <TextInput
             id="email"
             label="Email address"
+            required
             value={formik.values.email}
             setValue={(val) => formik.setFieldValue("email", val)}
             placeholder="Enter email"
@@ -104,6 +105,7 @@ const LoginForm = () => {
             <PasswordInput
               id="password"
               label="Password"
+              required
               value={formik.values.password}
               setValue={(val) => formik.setFieldValue("password", val)}
               error={

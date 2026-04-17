@@ -71,6 +71,7 @@ const DialerAuthLoginForm = () => {
           <TextInput
             id="dialer-auth-email"
             label="Email address"
+            required
             value={formik.values.email}
             setValue={(val) => formik.setFieldValue("email", val)}
             placeholder="john.doe@email.com"
@@ -86,6 +87,7 @@ const DialerAuthLoginForm = () => {
             <PasswordInput
               id="dialer-auth-password"
               label="Password"
+              required
               value={formik.values.password}
               setValue={(val) => formik.setFieldValue("password", val)}
               error={
