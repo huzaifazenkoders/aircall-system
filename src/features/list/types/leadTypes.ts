@@ -12,7 +12,6 @@ export interface LeadAssignedRep {
   first_name?: string;
   last_name?: string;
   email?: string;
-  name?: string;
 }
 
 export interface LeadDisposition {
@@ -49,15 +48,10 @@ export interface Lead {
   referred_by: string;
   timezone: string;
   updated_at: string;
-  status?: LeadDisplayStatus;
   lead_status?: LeadDisplayStatus;
   activity_status?: LeadDisplayStatus;
   disposition?: string;
-  last_disposition?: string;
-  attempt?: number;
-  attempts?: number;
   days_to_expiry?: number;
-  assigned_rep?: LeadAssignedRep | null;
   lead_activities?: {
     id: string;
     last_disposition_type: string;

@@ -99,10 +99,10 @@ const CallHistoryTable = ({
               </TableCell>
               <TableCell className="flex-1 pl-2 pr-4 py-3.5">
                 <Badge
-                  variant={callStatusVariantMap[row.call_status] as never}
+                  variant={row.resulting_lead_status as never}
                   className={callHistoryStyles.statusBadge}
                 >
-                  {callStatusLabelMap[row.call_status] ?? row.call_status}
+                  {row.resulting_lead_status}
                 </Badge>
               </TableCell>
               <TableCell className={callHistoryStyles.arrowCell}>

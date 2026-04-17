@@ -29,16 +29,23 @@ export function useGetCallLogs({
   lead_id,
   list_id,
   assigned_to,
-  call_status,
+  call_status
 }: GetCallLogsReq) {
   return useQuery({
-    queryKey: callLogKeys.list({ page, limit, lead_id, list_id, assigned_to, call_status }),
+    queryKey: callLogKeys.list({
+      page,
+      limit,
+      lead_id,
+      list_id,
+      assigned_to,
+      call_status
+    }),
     queryFn: async () => {
-      const res = await axiosInstance.get("/api/call-logs", {
-        params: { page, limit, lead_id, list_id, assigned_to, call_status },
+      const res = await axiosInstance.get("/call-logs", {
+        params: { page, limit, lead_id, list_id, assigned_to, call_status }
       });
       return res.data as GetCallLogsRes;
-    },
+    }
   });
 }
 
@@ -53,11 +60,11 @@ export function useGetCallLogById(id: string) {
   return useQuery({
     queryKey: callLogKeys.detail(id),
     queryFn: async () => {
-      const res = await axiosInstance.get("/api/call-logs/detail", {
-        params: { id },
+      const res = await axiosInstance.get("/call-logs/detail", {
+        params: { id }
       });
       return res.data as GetCallLogByIdRes;
     },
-    enabled: Boolean(id),
+    enabled: Boolean(id)
   });
 }

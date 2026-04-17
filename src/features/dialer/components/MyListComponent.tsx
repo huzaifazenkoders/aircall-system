@@ -32,8 +32,7 @@ import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
 import {
-  leadStatusOptions,
-  type LeadStatus
+  leadStatusOptions
 } from "@/features/dialer/data/dialerData";
 import { myListStyles } from "@/features/dialer/styles/dialerStyles";
 import Toggle from "@/components/ui/toggle";
@@ -45,20 +44,15 @@ import {
   type MyList
 } from "@/features/list/services/listService";
 import { useGetLeads } from "@/features/list/services/listService";
+import {
+  getLeadStatus,
+  LeadStatusBadge
+} from "@/features/list/components/LeadStatusBadge";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { useQueryClient } from "@tanstack/react-query";
 import { listKeys } from "@/features/list/query-keys";
 import toast from "react-hot-toast";
-
-const leadStatusStyle: Record<LeadStatus, string> = {
-  Pending: "bg-amber-50 text-amber-500",
-  Cooldown: "bg-cyan-50 text-cyan-500",
-  Completed: "bg-teal-100 text-teal-600",
-  Scheduled: "bg-indigo-50 text-indigo-600",
-  Invalid: "bg-gray-100 text-gray-500",
-  "Ban Contact": "bg-gray-100 text-gray-500"
-};
 
 const LIMIT = 20;
 const LEADS_LIMIT = 10;
@@ -405,18 +399,27 @@ const MyListComponent = () => {
                       </div>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      <span className="px-2 py-1 rounded-lg text-xs font-medium leading-4 tracking-tight bg-gray-100 text-gray-500">
-                        N/A
-                      </span>
+                      <LeadStatusBadge status={getLeadStatus(lead)} />
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      <div className="text-sm text-gray-800 leading-5">N/A</div>
+                      <div className="text-sm text-gray-800 leading-5">
+                        {lead.lead_activities?.[0]?.assigned_user?.first_name +
+                          " " +
+                          lead.lead_activities?.[0]?.assigned_user?.last_name}
+                      </div>
                     </TableCell>
                     <TableCell className={myListStyles.cell}>
-                      <div className="text-sm text-gray-800 leading-5">N/A</div>
+                      <div className="text-sm text-gray-800 leading-5 capitalize">
+                        {lead.lead_activities?.[0]?.last_disposition_type
+                          ? lead.lead_activities?.[0]?.last_disposition_type?.replaceAll(
+                              "_",
+                              " "
+                            )
+                          : "- "}
+                      </div>
                     </TableCell>
                     <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
-                      N/A
+                      {lead.lead_activities?.[0]?.attempt_count}
                     </TableCell>
                   </TableRow>
                 ))}

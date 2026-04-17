@@ -312,7 +312,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
         />
       )}
 
-      <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">
+      {/* <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl border border-border bg-background shadow-lg px-5 py-4">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Aircall Event Tester (Only for testing purpose for now, will be
           removed later)
@@ -340,7 +340,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

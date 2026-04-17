@@ -17,6 +17,10 @@ import {
 import { cn } from "@/lib/utils";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { Lead } from "@/features/list/types/leadTypes";
+import {
+  getLeadStatus,
+  LeadStatusBadge
+} from "@/features/list/components/LeadStatusBadge";
 import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
 
 const LeadDetailsContent = ({
@@ -110,8 +114,8 @@ const LeadDetailsContent = ({
               <div className="text-sm text-muted-foreground">
                 Current Status
               </div>
-              <div className="mt-3 inline-flex capitalize rounded-lg bg-muted px-4 py-1 text-xs font-medium text-muted-foreground">
-                {lead.lead_activities?.[0]?.status}
+              <div className="mt-3">
+                <LeadStatusBadge status={getLeadStatus(lead)} />
               </div>
             </div>
             <Info label="Lead Owner" value={lead.lead_owner} />

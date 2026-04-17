@@ -57,7 +57,7 @@ export const callHistoryStyles = {
   cell: cn("px-4 py-3.5 text-sm text-gray-800 leading-5"),
   row: cn("cursor-pointer border-zinc-200 hover:bg-[#FBFCFD] h-16"),
   statusBadge: cn(
-    "rounded-lg px-2 py-1 text-xs font-medium leading-4 tracking-tight"
+    "rounded-lg px-2 py-1 text-xs font-medium leading-4 uppercase tracking-tight"
   ),
   arrowCell: cn("w-20 py-3.5"),
   arrowButton: cn(

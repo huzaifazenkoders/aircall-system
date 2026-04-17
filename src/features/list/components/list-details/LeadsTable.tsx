@@ -9,7 +9,6 @@ import {
   SearchIcon
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -36,11 +35,11 @@ import {
 import { cn } from "@/lib/utils";
 import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
 import { useGetLeads } from "@/features/list/services/listService";
+import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
 import {
-  Lead,
-  LeadActivityStatus,
-  LeadDisplayStatus
-} from "@/features/list/types/leadTypes";
+  getLeadStatus,
+  LeadStatusBadge
+} from "@/features/list/components/LeadStatusBadge";
 import Image from "next/image";
 import NoImage from "@/../public/assets/list/no-leads.png";
 import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
@@ -453,42 +452,6 @@ const formatLeadDate = (value?: string | null) => {
     day: "2-digit",
     year: "numeric"
   });
-};
-
-const formatLeadStatus = (status: LeadDisplayStatus) =>
-  status
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-
-const getLeadStatus = (lead: Lead): LeadDisplayStatus =>
-  (lead.lead_activities?.[0]?.status as LeadDisplayStatus) || "N/A";
-
-const LeadStatusBadge = ({ status }: { status: LeadDisplayStatus }) => {
-  const classes =
-    status === LeadActivityStatus.Pending
-      ? "bg-status-pending-bg text-status-pending-fg"
-      : status === LeadActivityStatus.Cooldown
-        ? "bg-status-cooldown-bg text-status-cooldown-fg"
-        : status === LeadActivityStatus.Completed
-          ? "bg-status-completed-bg text-status-completed-fg"
-          : status === LeadActivityStatus.Scheduled
-            ? "bg-status-scheduled-bg text-status-scheduled-fg"
-            : status === LeadActivityStatus.InProgress
-              ? "bg-status-active-bg text-status-active-fg"
-              : status === "invalid"
-                ? "bg-muted text-muted-foreground"
-                : status === "banned"
-                  ? "bg-muted text-muted-foreground"
-                  : status === "expired"
-                    ? "bg-red-100 text-red-500"
-                    : "bg-status-no-answer-bg text-status-no-answer-fg";
-
-  return (
-    <Badge className={cn("rounded-md px-3 py-3 text-sm font-medium", classes)}>
-      {formatLeadStatus(status)}
-    </Badge>
-  );
 };
 
 export default LeadsTable;

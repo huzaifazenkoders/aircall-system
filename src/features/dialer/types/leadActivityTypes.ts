@@ -138,6 +138,7 @@ export interface CallHistory {
   user_name: string;
   disposition_type: string;
   call_time: string;
+  resulting_lead_status: string;
   attempt_number: number;
   call_status: string;
 }
