@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useFormik } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -26,6 +27,14 @@ const OtpVerificationForm = () => {
   const { mutate: verifyOtp, isPending } = useVerifyOtp();
   const { mutate: resendOtp, isPending: isResending } = useResendOtp();
 
+  const [countdown, setCountdown] = React.useState(60);
+
+  React.useEffect(() => {
+    if (countdown === 0) return;
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
   const formik = useFormik({
     initialValues: { code: "" },
     validationSchema,
@@ -49,7 +58,10 @@ const OtpVerificationForm = () => {
     resendOtp(
       { payload: { email } },
       {
-        onSuccess: () => toast.success("OTP resent"),
+        onSuccess: () => {
+          toast.success("OTP resent");
+          setCountdown(60);
+        },
         onError: handleMutationError
       }
     );
@@ -92,10 +104,14 @@ const OtpVerificationForm = () => {
             <button
               type="button"
               onClick={handleResend}
-              disabled={isResending}
+              disabled={isResending || countdown > 0}
               className={authStyles.otpResend}
             >
-              {isResending ? "Resending..." : "Resend"}
+              {isResending
+                ? "Resending..."
+                : countdown > 0
+                  ? `Resend in ${countdown}s`
+                  : "Resend"}
             </button>
           </p>
         </div>

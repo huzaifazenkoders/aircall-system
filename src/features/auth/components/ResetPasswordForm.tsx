@@ -85,6 +85,7 @@ const ResetPasswordForm = ({
                 aria-hidden="true"
               />
             }
+            placeholder="Enter Password"
           />
 
           <PasswordInput
@@ -104,6 +105,7 @@ const ResetPasswordForm = ({
                 aria-hidden="true"
               />
             }
+            placeholder="Retype Password"
           />
         </div>
       </div>

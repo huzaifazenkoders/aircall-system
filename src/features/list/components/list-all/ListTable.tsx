@@ -195,7 +195,9 @@ const ListTable = ({
                         <TableRow className="bg-background">
                           <TableHead className="min-w-60">ID</TableHead>
                           <TableHead className="min-w-60">Name</TableHead>
-                          <TableHead className="w-24">Priority</TableHead>
+                          {tab === "shared" && (
+                            <TableHead className="w-24">Priority</TableHead>
+                          )}
                           <TableHead className="w-32">Cooldown (hrs)</TableHead>
                           <TableHead className="w-24">In Cooldown</TableHead>
                           <TableHead className="w-24">Avail to Call</TableHead>
@@ -213,7 +215,7 @@ const ListTable = ({
                             key={r?.id}
                             row={r!}
                             setEditList={setEditList}
-                            donotShow={tab === "idv" ? true : false}
+                            tab={tab}
                           />
                         ))}
                       </TableBody>
@@ -258,11 +260,11 @@ const ListTable = ({
 const ListRow = ({
   row,
   setEditList,
-  donotShow
+  tab
 }: {
   row: List;
   setEditList: ReactDispatch<ListDetail | null>;
-  donotShow?: boolean;
+  tab: string;
 }) => {
   const [fetchEdit, setFetchEdit] = React.useState(false);
   const { data, isFetching } = useGetListById(fetchEdit ? row.id : "");
@@ -273,8 +275,6 @@ const ListRow = ({
       setFetchEdit(false);
     }
   }, [data, fetchEdit, setEditList]);
-
-  console.log("row", row);
 
   const assignedToLabel =
     row.assign_type === "individual"
@@ -292,7 +292,7 @@ const ListRow = ({
           {row.name}
         </Link>
       </TableCell>
-      <TableCell>{row.priority}</TableCell>
+      {tab === "shared" && <TableCell>{row.priority}</TableCell>}
       <TableCell>{row.cooldown_minimum_hours ?? "-"}</TableCell>
       <TableCell>{row.cooldown_leads ?? "-"}</TableCell>
       <TableCell>{row.available_leads ?? "-"}</TableCell>
@@ -324,7 +324,7 @@ const ListRow = ({
                 View
               </Link>
             </DropdownMenuItem>
-            {!donotShow && (
+            {tab !== "idv" && (
               <DropdownMenuItem
                 onClick={() => setFetchEdit(true)}
                 disabled={isFetching}

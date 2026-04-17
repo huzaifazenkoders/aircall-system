@@ -92,6 +92,7 @@ const DialerAuthLoginForm = () => {
                 formik.touched.password ? formik.errors.password : undefined
               }
               startIcon={<LockKeyhole aria-hidden="true" />}
+              placeholder="Enter password"
             />
 
             <div className={dialerAuthStyles.helperRow}>

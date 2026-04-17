@@ -2,12 +2,16 @@
 
 import React from "react";
 import { Loader2Icon } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import CallbackScheduleDetailsDialog from "@/features/dialer/components/CallbackScheduleDetailsDialog";
 import CallbackSchedulesEmptyState from "@/features/dialer/components/CallbackSchedulesEmptyState";
 import CallbackSchedulesFilters from "@/features/dialer/components/CallbackSchedulesFilters";
 import CallbackSchedulesTable from "@/features/dialer/components/CallbackSchedulesTable";
-import { callbackStyles, dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import {
+  callbackStyles,
+  dialerShellStyles
+} from "@/features/dialer/styles/dialerStyles";
 import { useGetScheduledCooldown } from "@/features/dialer/services/leadActivityService";
 import { LeadActivityStatus } from "@/features/dialer/types/leadActivityTypes";
 
@@ -16,12 +20,14 @@ const LIMIT = 10;
 const statusMap: Record<string, LeadActivityStatus | undefined> = {
   "All Status": undefined,
   Scheduled: "scheduled",
-  Cooldown: "cooldown",
+  Cooldown: "cooldown"
 };
 
 const CallbackSchedulesView = () => {
   const [page, setPage] = React.useState(1);
   const [statusValue, setStatusValue] = React.useState("All Status");
+  const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedActivityId, setSelectedActivityId] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
 
@@ -29,6 +35,7 @@ const CallbackSchedulesView = () => {
     page,
     limit: LIMIT,
     status: statusMap[statusValue],
+    search: debouncedSearch
   });
 
   const rows = data?.data?.data ?? [];
@@ -50,8 +57,11 @@ const CallbackSchedulesView = () => {
         ) : (
           <>
             <CallbackSchedulesFilters
-              searchValue=""
-              onSearchChange={() => {}}
+              searchValue={searchValue}
+              onSearchChange={(val) => {
+                setSearchValue(val);
+                setPage(1);
+              }}
               statusValue={statusValue}
               onStatusChange={(val) => {
                 setStatusValue(val);

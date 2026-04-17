@@ -99,7 +99,7 @@ const DialerAuthResetPasswordForm = ({
             }
             showToggle={false}
             startIcon={<LockKeyhole aria-hidden="true" />}
-            placeholder="Re-enter Password"
+            placeholder="Retype Password"
           />
         </div>
       </div>
