@@ -91,7 +91,7 @@ const AppTopbar = () => {
         toast.success(
           isUnavailable ? "You are now available" : "You are now unavailable"
         );
-        queryClient.invalidateQueries({ queryKey: authKeys.me });
+        queryClient.invalidateQueries();
         setConfirmDialogOpen(false);
       },
       onError: handleMutationError
