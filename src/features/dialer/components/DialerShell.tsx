@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import DialerSidebar from "@/features/dialer/components/DialerSidebar";
