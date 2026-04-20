@@ -114,7 +114,7 @@ const EditUserDialog = ({
         <form onSubmit={formik.handleSubmit}>
           <DialogBody className={usersStyles.modalBody}>
             <div className="grid gap-5">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
                   label="First Name"
                   required
@@ -138,7 +138,7 @@ const EditUserDialog = ({
                   error={t.last_name && e.last_name ? e.last_name : undefined}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <TextInput
                   label="Email"
                   required

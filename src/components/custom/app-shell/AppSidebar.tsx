@@ -97,6 +97,7 @@ const AppSidebar = ({
             <Link
               key={item.key}
               href={item.href}
+              onClick={onClose}
               className={cn(
                 "flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-medium text-text-inverse-muted transition-colors hover:bg-white/10 hover:text-white",
                 isActive && "bg-white text-primary"

@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon
-} from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +36,8 @@ const CallHistoryTable = ({
   limit,
   total,
   totalPages,
-  onPageChange
+  onPageChange,
+  onLimitChange
 }: {
   rows: CallHistory[];
   onSelect: (row: CallHistory) => void;
@@ -49,9 +46,11 @@ const CallHistoryTable = ({
   total: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
 }) => {
   return (
     <>
+      <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
@@ -122,44 +121,20 @@ const CallHistoryTable = ({
           ))}
         </TableBody>
       </Table>
-
-      <div className={callHistoryStyles.pagination}>
-        <div className="flex items-center gap-2">
-          <span className={callHistoryStyles.paginationText}>
-            Rows per page:
-          </span>
-          <button
-            type="button"
-            className="flex items-center gap-2 text-xs text-gray-800 leading-5"
-          >
-            {limit}
-            <ChevronDownIcon className="size-4 text-gray-500" />
-          </button>
-        </div>
-        <span className="text-xs text-gray-800 leading-5">
-          {(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}
-        </span>
-        <div className="flex items-start">
-          <Button
-            variant="ghost"
-            size="icon"
-            className={callHistoryStyles.paginationButton}
-            onClick={() => onPageChange(page - 1)}
-            disabled={page <= 1}
-          >
-            <ChevronLeftIcon className="size-6" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className={callHistoryStyles.paginationButton}
-            onClick={() => onPageChange(page + 1)}
-            disabled={page >= totalPages}
-          >
-            <ChevronRightIcon className="size-6" />
-          </Button>
-        </div>
       </div>
+
+      <TablePagination
+        from={total === 0 ? 0 : (page - 1) * limit + 1}
+        to={Math.min(page * limit, total)}
+        total={total}
+        limit={limit}
+        onLimitChange={onLimitChange}
+        prevDisabled={page <= 1}
+        nextDisabled={page >= totalPages}
+        onPrev={() => onPageChange(page - 1)}
+        onNext={() => onPageChange(page + 1)}
+        className={callHistoryStyles.pagination}
+      />
     </>
   );
 };

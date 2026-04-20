@@ -31,16 +31,16 @@ const CallHistoryFilters = ({
         value={searchValue}
         setValue={onSearchChange}
         placeholder="Search by name, phone number"
-        className="md:w-[500px]"
+        className="w-full md:w-125"
         startIcon={<SearchIcon className="size-5 text-text-secondary" />}
       />
 
-      <div className="flex flex-1 items-center justify-end gap-4">
+      <div className="flex w-full flex-wrap items-center justify-end gap-3 md:w-auto">
         <Select
           value={statusValue}
           onValueChange={(value) => onStatusChange(value ?? "All Status")}
         >
-          <SelectTrigger className={callHistoryStyles.filterTrigger}>
+          <SelectTrigger className={`${callHistoryStyles.filterTrigger} w-full md:w-auto`}>
             <SelectValue>{statusValue.replaceAll("_", " ")}</SelectValue>
           </SelectTrigger>
           <SelectContent

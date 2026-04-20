@@ -21,10 +21,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
-const LIMIT = 10;
-
 const CallHistoryView = () => {
   const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
   const [searchValue, setSearchValue] = React.useState("");
   const [statusValue, setStatusValue] = React.useState("");
   const [selectedDate, setSelectedDate] = React.useState<string | undefined>();
@@ -33,7 +32,7 @@ const CallHistoryView = () => {
 
   const { data, isPending, isError } = useGetMyCallLogs({
     page,
-    limit: LIMIT,
+    limit,
     call_status: (statusValue as MyCallStatus) || undefined,
     date: selectedDate
   });
@@ -98,10 +97,11 @@ const CallHistoryView = () => {
               <CallHistoryTable
                 rows={rows}
                 page={page}
-                limit={LIMIT}
+                limit={limit}
                 total={meta?.total ?? 0}
                 totalPages={meta?.totalPages ?? 1}
                 onPageChange={setPage}
+                onLimitChange={(l) => { setLimit(l); setPage(1); }}
                 onSelect={(row) => {
                   setSelectedId(row.id);
                   setSheetOpen(true);

@@ -52,9 +52,9 @@ function DialogContent({
           className={cn(
             "relative w-full overflow-hidden bg-card text-card-foreground shadow-lg ring-1 ring-foreground/10 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
             position === "center" &&
-              "max-w-2xl rounded-2xl data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+              "max-w-2xl rounded-lg data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
             position === "right" &&
-              "h-full max-w-[698px] rounded-[30px] data-[state=closed]:slide-out-to-right-4 data-[state=open]:slide-in-from-right-4",
+              "h-full max-w-[698px] rounded-lg data-[state=closed]:slide-out-to-right-4 data-[state=open]:slide-in-from-right-4",
             className
           )}
           {...props}

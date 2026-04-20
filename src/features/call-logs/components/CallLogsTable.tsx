@@ -1,12 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon
-} from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import { DispositionBadge } from "@/features/workflows/components/DispositionBadge";
 import { DispositionType } from "@/features/workflows/types/workflowTypes";
@@ -42,6 +38,7 @@ type CallLogsTableProps = {
   total: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
   onRowSelect: (callLog: CallLog) => void;
 };
 
@@ -52,6 +49,7 @@ const CallLogsTable = ({
   total,
   totalPages,
   onPageChange,
+  onLimitChange,
   onRowSelect
 }: CallLogsTableProps) => {
   const from = total === 0 ? 0 : (page - 1) * limit + 1;
@@ -129,44 +127,18 @@ const CallLogsTable = ({
         </TableBody>
       </Table>
 
-      <div className={callLogsStyles.pagination}>
-        <div className="flex items-center gap-2">
-          <span className={callLogsStyles.paginationText}>Rows per page:</span>
-          <button
-            type="button"
-            className="flex items-center gap-2 text-[16px] text-text-primary"
-          >
-            10
-            <ChevronDownIcon className="size-4 text-panel-muted" />
-          </button>
-        </div>
-
-        <div className="flex items-center gap-10">
-          <span className={callLogsStyles.paginationText}>
-            {from}-{to} of {total}
-          </span>
-          <div className={callLogsStyles.paginationActions}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={callLogsStyles.paginationButton}
-              disabled={page <= 1}
-              onClick={() => onPageChange(page - 1)}
-            >
-              <ChevronLeftIcon className="size-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={callLogsStyles.paginationButton}
-              disabled={page >= totalPages}
-              onClick={() => onPageChange(page + 1)}
-            >
-              <ChevronRightIcon className="size-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <TablePagination
+        from={from}
+        to={to}
+        total={total}
+        limit={limit}
+        onLimitChange={onLimitChange}
+        prevDisabled={page <= 1}
+        nextDisabled={page >= totalPages}
+        onPrev={() => onPageChange(page - 1)}
+        onNext={() => onPageChange(page + 1)}
+        className={callLogsStyles.pagination}
+      />
     </>
   );
 };

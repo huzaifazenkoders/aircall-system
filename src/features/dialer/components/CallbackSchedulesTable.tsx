@@ -1,11 +1,7 @@
 "use client";
 
-import {
-  ArrowRightIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon
-} from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,25 +15,27 @@ import {
 import { callbackStyles } from "@/features/dialer/styles/dialerStyles";
 import { LeadActivity } from "@/features/dialer/types/leadActivityTypes";
 
-const LIMIT = 10;
-
 const CallbackSchedulesTable = ({
   rows,
   page,
+  limit,
   total,
   totalPages,
   onPageChange,
+  onLimitChange,
   onSelect
 }: {
   rows: LeadActivity[];
   page: number;
+  limit: number;
   total: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onLimitChange: (limit: number) => void;
   onSelect: (row: LeadActivity) => void;
 }) => {
-  const from = total === 0 ? 0 : (page - 1) * LIMIT + 1;
-  const to = Math.min(page * LIMIT, total);
+  const from = total === 0 ? 0 : (page - 1) * limit + 1;
+  const to = Math.min(page * limit, total);
 
   return (
     <>
@@ -108,40 +106,18 @@ const CallbackSchedulesTable = ({
         </TableBody>
       </Table>
 
-      <div className={callbackStyles.pagination}>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 leading-5">
-            Rows per page:
-          </span>
-          <span className="flex items-center gap-2 text-xs text-gray-800 leading-5">
-            {LIMIT}
-            <ChevronDownIcon className="size-4 text-gray-500" />
-          </span>
-        </div>
-        <span className="text-xs text-gray-800 leading-5">
-          {from}-{to} of {total}
-        </span>
-        <div className="flex items-start">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-2 rounded-lg"
-            disabled={page <= 1}
-            onClick={() => onPageChange(page - 1)}
-          >
-            <ChevronLeftIcon className="size-6 text-gray-500" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="p-2 rounded-lg"
-            disabled={page >= totalPages}
-            onClick={() => onPageChange(page + 1)}
-          >
-            <ChevronRightIcon className="size-6 text-gray-500" />
-          </Button>
-        </div>
-      </div>
+      <TablePagination
+        from={from}
+        to={to}
+        total={total}
+        limit={limit}
+        onLimitChange={onLimitChange}
+        prevDisabled={page <= 1}
+        nextDisabled={page >= totalPages}
+        onPrev={() => onPageChange(page - 1)}
+        onNext={() => onPageChange(page + 1)}
+        className={callbackStyles.pagination}
+      />
     </>
   );
 };

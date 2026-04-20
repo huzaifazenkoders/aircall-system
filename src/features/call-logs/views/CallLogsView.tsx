@@ -14,8 +14,6 @@ import {
 } from "@/features/call-logs/services/callLogService";
 import { CallStatus } from "@/features/call-logs/types/callLogTypes";
 
-const LIMIT = 10;
-
 const callLogStatusOptions = [
   { label: "All Status", value: "" },
   { label: "Completed", value: "completed" },
@@ -25,6 +23,7 @@ const callLogStatusOptions = [
 
 const CallLogsView = () => {
   const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
   const [selectedListId, setSelectedListId] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState("");
   const [selectedCallLogId, setSelectedCallLogId] = React.useState("");
@@ -32,7 +31,7 @@ const CallLogsView = () => {
 
   const { data, isPending, isError } = useGetCallLogs({
     page,
-    limit: LIMIT,
+    limit,
     list_id: selectedListId || undefined,
     call_status: (selectedStatus as CallStatus) || undefined
   });
@@ -79,10 +78,11 @@ const CallLogsView = () => {
               <CallLogsTable
                 rows={rows}
                 page={page}
-                limit={LIMIT}
+                limit={limit}
                 total={meta?.total ?? 0}
                 totalPages={meta?.totalPages ?? 1}
                 onPageChange={setPage}
+                onLimitChange={(l) => { setLimit(l); setPage(1); }}
                 onRowSelect={(callLog) => {
                   setSelectedCallLogId(callLog.id);
                   setIsDialogOpen(true);

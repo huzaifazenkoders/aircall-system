@@ -1,13 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  Loader2Icon,
-  MoreVerticalIcon,
-  SearchIcon
-} from "lucide-react";
+import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -48,7 +43,6 @@ import DateRangeSelector from "@/components/ui/date-range-selector";
 import { ReactDispatch } from "@/types/common";
 import { ListStats } from "../../types/listTypes";
 
-const PAGE_SIZE = 10;
 
 const statusOptions = [
   { label: "All Status", value: "all" },
@@ -71,6 +65,7 @@ const LeadsTable = ({
 }) => {
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
   const [statusFilter, setStatusFilter] = React.useState<string>("all");
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
@@ -81,7 +76,7 @@ const LeadsTable = ({
 
   const { data, isPending, isError } = useGetLeads({
     page,
-    limit: PAGE_SIZE,
+    limit,
     list_id: listId,
     search: query || undefined,
     status:
@@ -95,12 +90,12 @@ const LeadsTable = ({
   const total = Number(meta?.total ?? 0);
   const totalPages = Math.max(1, Number(meta?.totalPages ?? 1));
   const currentPage = Number(meta?.page ?? page);
-  const start = total === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
-  const end = total === 0 ? 0 : Math.min(currentPage * PAGE_SIZE, total);
+  const start = total === 0 ? 0 : (currentPage - 1) * limit + 1;
+  const end = total === 0 ? 0 : Math.min(currentPage * limit, total);
 
   React.useEffect(() => {
     setPage(1);
-  }, [query, statusFilter, startDate, endDate]);
+  }, [query, statusFilter, startDate, endDate, limit]);
 
   React.useEffect(() => {
     if (data && data?.data?.lead_stats) setListStats(data?.data?.lead_stats);
@@ -373,29 +368,18 @@ const LeadsTable = ({
       </div>
 
       {leads.length ? (
-        <div className="flex items-center justify-end gap-6 border-t border-border px-6 py-4">
-          <span className="text-sm text-muted-foreground">
-            {start}-{end} of {total}
-          </span>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={currentPage <= 1}
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            >
-              <ChevronLeftIcon className="size-4 text-muted-foreground" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              disabled={currentPage >= totalPages}
-              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-            >
-              <ChevronRightIcon className="size-4 text-muted-foreground" />
-            </Button>
-          </div>
-        </div>
+        <TablePagination
+          from={start}
+          to={end}
+          total={total}
+          limit={limit}
+          onLimitChange={(l) => setLimit(l)}
+          prevDisabled={currentPage <= 1}
+          nextDisabled={currentPage >= totalPages}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+          className="border-t border-border"
+        />
       ) : null}
 
       <LeadDetailsDialog

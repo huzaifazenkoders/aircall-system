@@ -180,7 +180,7 @@ const ScheduleListClearDialog = ({
         <DialogBody className="space-y-6 px-6 py-6">
           <div>
             <p className={fieldLabelClassName}>Schedule Type</p>
-            <div className="grid gap-5 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <RadioSelector
                 checked={form.scheduleType === "one_time"}
                 label="One-Time Clear"
@@ -297,7 +297,7 @@ const ScheduleListClearDialog = ({
               </div>
 
               {isWeekly ? (
-                <div className="grid gap-3 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
                     <p className={fieldLabelClassName}>Day of the Week</p>
                     <Select
@@ -349,7 +349,7 @@ const ScheduleListClearDialog = ({
               ) : null}
 
               {isMonthly ? (
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   <div>
                     <p className={fieldLabelClassName}>Week of the Month</p>
                     <Select

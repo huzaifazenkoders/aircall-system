@@ -100,16 +100,18 @@ const AppTopbar = ({ openSidebar }: { openSidebar: VoidFunction }) => {
 
   return (
     <div className="w-full flex items-center justify-between lg:justify-end border-b border-border">
-      <div className="flex items-center justify-center gap-2 lg:hidden pb-3">
-        <button
-          type="button"
-          aria-label="Open sidebar"
-          onClick={openSidebar}
-          className="rounded-lg p-2 hover:bg-muted"
-        >
-          <MenuIcon className="size-6" />
-        </button>
-      </div>
+      {data?.data?.role !== "sales_person" ? (
+        <div className="flex items-center justify-center gap-2 lg:hidden pb-3">
+          <button
+            type="button"
+            aria-label="Open sidebar"
+            onClick={openSidebar}
+            className="rounded-lg p-2 hover:bg-muted"
+          >
+            <MenuIcon className="size-6" />
+          </button>
+        </div>
+      ) : null}
       <header className="flex items-center justify-end gap-2 px-3 md:px-5 pb-3">
         {data.data.role === "sales_person" ? (
           <div className="flex items-center gap-2 ml-auto">

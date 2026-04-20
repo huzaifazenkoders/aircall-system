@@ -85,9 +85,9 @@ const CallOutcomeDialog = ({
 
   return (
     <Dialog open={open}>
-      <DialogContent className="max-w-[588px] rounded-[20px] p-0 gap-0">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-147 rounded-[20px] p-0 gap-0">
         {/* Header */}
-        <div className="px-8 pt-8 pb-6 flex justify-between items-start">
+        <div className="px-4 pt-6 pb-5 flex justify-between items-start sm:px-8 sm:pt-8 sm:pb-6">
           <div className="flex flex-col gap-1">
             <h2 className="text-2xl font-semibold text-text-primary leading-8">
               Call Outcome
@@ -101,7 +101,7 @@ const CallOutcomeDialog = ({
         <div className="border-t border-border" />
 
         {/* Form body */}
-        <div className="px-8 py-6 flex flex-col gap-5">
+        <div className="px-4 py-5 flex flex-col gap-5 sm:px-8 sm:py-6">
           {/* Disposition */}
           <LabelContainer label="Disposition" required>
             <Select value={disposition} onValueChange={setDisposition}>
@@ -142,7 +142,7 @@ const CallOutcomeDialog = ({
 
           {/* Date & Time — only shown for Callback Scheduled */}
           {isCallback && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <LabelContainer label="Date" required>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="h-11 w-full rounded-lg border border-border-primary bg-input px-3 py-2 text-base text-left flex items-center justify-between">
@@ -209,7 +209,7 @@ const CallOutcomeDialog = ({
 
         <div className="border-t border-border" />
 
-        <DialogFooter className="px-8 py-5 flex-col items-end gap-2">
+        <DialogFooter className="px-4 py-4 flex-col items-end gap-2 sm:px-8 sm:py-5">
           <Button
             size="lg"
             onClick={handleSubmit}

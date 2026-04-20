@@ -2,18 +2,18 @@ import { cn } from "@/lib/utils";
 
 export const workflowsStyles = {
   page: cn("flex min-h-[calc(100vh-150px)] flex-1 flex-col px-4 md:px-6 py-6"),
-  pageHeader: cn("flex items-center gap-6"),
+  pageHeader: cn("flex flex-wrap items-center gap-4"),
   pageTitle: cn("flex-1 text-[24px] font-medium text-gray-800"),
   pageActions: cn("flex items-center gap-3"),
   filterTrigger: cn(
     "h-11 min-w-[110px] capitalize rounded-lg border-zinc-200 bg-white px-4 text-sm text-gray-800 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
   ),
-  createButton: cn("h-11 gap-2 rounded-lg px-6 text-base font-medium"),
-  cardGrid: cn("mt-6 grid gap-6 xl:grid-cols-2"),
+  createButton: cn("h-11 gap-2 rounded-lg md:px-6 text-base font-medium"),
+  cardGrid: cn("mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2"),
   summaryCard: cn(
     "flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-zinc-200"
   ),
-  summaryHero: cn("flex items-start justify-between gap-2 px-8 py-6"),
+  summaryHero: cn("flex items-start justify-between gap-2 px-4 py-6 sm:px-8"),
   summaryHeroMint: cn("bg-[#F1FCFB]"),
   summaryHeroLilac: cn("bg-[#ECF0FF]"),
   summaryHeroCream: cn("bg-[#FFFAEA]"),
@@ -25,7 +25,9 @@ export const workflowsStyles = {
   defaultBadge: cn(
     "inline-flex items-center rounded-md bg-teal-200 px-3 py-2 text-xs font-medium text-teal-900"
   ),
-  summaryStats: cn("flex justify-between px-8 py-4"),
+  summaryStats: cn(
+    "grid grid-cols-2 gap-4 px-4 py-4 sm:flex sm:justify-between sm:px-8"
+  ),
   summaryStat: cn("flex flex-col"),
   summaryStatLabel: cn("text-sm leading-5 text-gray-500"),
   summaryStatValue: cn("text-sm font-medium leading-5 text-gray-800"),
@@ -57,7 +59,7 @@ export const workflowsStyles = {
   ),
   addRuleIcon: cn("size-8 text-[#0891A1] shrink-0"),
   addRuleText: cn("text-[14px] font-medium text-secondary"),
-  rulesGrid: cn("mt-8 grid gap-6 xl:grid-cols-3"),
+  rulesGrid: cn("mt-8 grid grid-cols-1 gap-6 xl:grid-cols-3"),
   ruleCard: cn(
     "overflow-visible rounded-[18px] border border-border bg-white shadow-xs"
   ),
@@ -68,7 +70,7 @@ export const workflowsStyles = {
   menuTrigger: cn(
     "grid size-8 place-items-center rounded-[10px] border border-transparent text-text-primary transition-colors hover:border-border hover:bg-muted"
   ),
-  ruleBody: cn("grid gap-6 p-4 md:grid-cols-2"),
+  ruleBody: cn("grid grid-cols-1 gap-6 p-4 md:grid-cols-2"),
   ruleStat: cn("flex flex-col"),
   ruleStatLabel: cn("text-[12px] leading-5 text-text-secondary"),
   ruleStatValue: cn("text-[13px] font-medium text-text-primary capitalize"),
@@ -78,14 +80,16 @@ export const workflowsStyles = {
   menuItem: cn("gap-3 px-3 py-1 text-sm text-text-primary cursor-pointer"),
   dialogContent: cn("max-w-[586px] rounded-[22px] p-0"),
   wideDialogContent: cn("max-w-[586px] rounded-[22px] p-0 lg:max-w-[586px]"),
-  formDialogContent: cn("max-w-[586px] rounded-[22px] p-0 lg:max-w-[586px]"),
+  formDialogContent: cn(
+    "max-w-[586px] rounded-[22px] p-0 lg:max-w-[586px] max-h-[95dvh] overflow-y-auto"
+  ),
   dialogHeader: cn("items-start px-6 pt-7 pb-4"),
   dialogTitle: cn("text-[24px] font-medium text-text-primary"),
   dialogDescription: cn("mt-0 text-[14px] text-text-secondary"),
   dialogBody: cn("border-t border-border px-6 py-5 flex flex-col gap-5"),
   dialogFooter: cn("justify-end gap-2 px-6 pt-0 pb-6"),
   fieldStack: cn("flex flex-col gap-5"),
-  fieldGrid: cn("grid gap-5 md:grid-cols-2"),
+  fieldGrid: cn("grid grid-cols-1 gap-5 md:grid-cols-2"),
   field: cn("flex flex-col gap-2"),
   fieldLabel: cn("text-sm font-medium text-text-secondary"),
   selectTrigger: cn(
@@ -97,7 +101,7 @@ export const workflowsStyles = {
   selectItem: cn(
     "cursor-pointer rounded-none px-3 py-2 text-text-primary text-sm capitalize"
   ),
-  radioGrid: cn("grid gap-5 md:grid-cols-2"),
+  radioGrid: cn("grid grid-cols-1 gap-5 md:grid-cols-2"),
   radioCard: cn(
     "flex h-11 items-center gap-0 overflow-hidden rounded-lg border px-4 py-4 transition-colors data-[checked=true]:border-[#073031] data-[checked=true]:bg-[#ECFAFA] data-[checked=false]:border-zinc-200 data-[checked=false]:bg-white data-[checked=false]:shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)]"
   ),

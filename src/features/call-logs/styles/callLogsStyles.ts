@@ -33,7 +33,7 @@ export const callLogsStyles = {
     "grid size-11 place-items-center rounded-full text-[#667085] transition-colors hover:bg-muted hover:text-text-primary"
   ),
   pagination: cn(
-    "flex flex-col gap-4 border-t border-border px-5 py-5 text-panel-muted md:flex-row md:items-center md:justify-end md:px-6"
+    "flex gap-4 border-t border-border px-5 py-5 text-panel-muted md:flex-row md:items-center md:justify-end md:px-6"
   ),
   paginationText: cn("text-sm"),
   paginationActions: cn("flex items-center gap-1 self-end md:self-auto"),

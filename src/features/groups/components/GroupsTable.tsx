@@ -3,9 +3,6 @@
 import React from "react";
 import {
   CalendarDaysIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   CircleCheckBigIcon,
   EyeIcon,
   ListChecksIcon,
@@ -15,6 +12,7 @@ import {
   UsersRoundIcon,
   X
 } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import {
   DropdownMenu,
@@ -51,7 +49,10 @@ const GroupsTable = ({
   isPending,
   emptyState,
   date,
-  setDate
+  setDate,
+  total,
+  limit,
+  onLimitChange
 }: {
   groups: Group[];
   searchValue: string;
@@ -65,7 +66,18 @@ const GroupsTable = ({
   onAddMember: (groupId: string) => void;
   isPending: boolean;
   emptyState: React.ReactNode;
+  total: number;
+  limit: number;
+  onLimitChange: (limit: number) => void;
 }) => {
+  const [page, setPage] = React.useState(1);
+  React.useEffect(() => { setPage(1); }, [limit, searchValue, statusFilter, date]);
+
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const paginatedGroups = groups.slice((page - 1) * limit, page * limit);
+  const from = groups.length === 0 ? 0 : (page - 1) * limit + 1;
+  const to = Math.min(page * limit, total);
+
   const isDefaultState =
     searchValue.trim() === "" && statusFilter === "All Status" && !date;
   const shouldShowEmptyStateOnly =
@@ -156,7 +168,7 @@ const GroupsTable = ({
             </TableHeader>
 
             <TableBody>
-              {groups.map((group) => (
+              {paginatedGroups.map((group) => (
                 <TableRow
                   key={group.id}
                   className="h-16 border-zinc-200 hover:bg-gray-50"
@@ -235,24 +247,18 @@ const GroupsTable = ({
       </div>
 
       {groups.length ? (
-        <div className={groupsStyles.footer}>
-          <div className={groupsStyles.footerMeta}>
-            <span>Rows per page:</span>
-            <span className="text-gray-800">10</span>
-            <ChevronDownIcon className="size-4 text-gray-500" />
-          </div>
-          <span className="text-xs text-gray-800">
-            1–{Math.min(10, groups.length)} of {groups.length}
-          </span>
-          <div className="flex items-center">
-            <button type="button" className={groupsStyles.pagerButton}>
-              <ChevronLeftIcon className="size-4" />
-            </button>
-            <button type="button" className={groupsStyles.pagerButton}>
-              <ChevronRightIcon className="size-4" />
-            </button>
-          </div>
-        </div>
+        <TablePagination
+          from={from}
+          to={to}
+          total={total}
+          limit={limit}
+          onLimitChange={onLimitChange}
+          prevDisabled={page <= 1}
+          nextDisabled={page >= totalPages}
+          onPrev={() => setPage((p) => p - 1)}
+          onNext={() => setPage((p) => p + 1)}
+          className={groupsStyles.footer}
+        />
       ) : null}
     </div>
   );

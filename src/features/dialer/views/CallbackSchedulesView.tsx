@@ -15,8 +15,6 @@ import {
 import { useGetScheduledCooldown } from "@/features/dialer/services/leadActivityService";
 import { LeadActivityStatus } from "@/features/dialer/types/leadActivityTypes";
 
-const LIMIT = 10;
-
 const statusMap: Record<string, LeadActivityStatus | undefined> = {
   "All Status": undefined,
   Scheduled: "scheduled",
@@ -25,6 +23,7 @@ const statusMap: Record<string, LeadActivityStatus | undefined> = {
 
 const CallbackSchedulesView = () => {
   const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
   const [statusValue, setStatusValue] = React.useState("All Status");
   const [searchValue, setSearchValue] = React.useState("");
   const [debouncedSearch] = useDebounce(searchValue, 400);
@@ -33,7 +32,7 @@ const CallbackSchedulesView = () => {
 
   const { data, isPending, isError } = useGetScheduledCooldown({
     page,
-    limit: LIMIT,
+    limit,
     status: statusMap[statusValue],
     search: debouncedSearch
   });
@@ -79,9 +78,11 @@ const CallbackSchedulesView = () => {
               <CallbackSchedulesTable
                 rows={rows}
                 page={page}
+                limit={limit}
                 total={meta?.total ?? 0}
                 totalPages={meta?.totalPages ?? 1}
                 onPageChange={setPage}
+                onLimitChange={(l) => { setLimit(l); setPage(1); }}
                 onSelect={(row) => {
                   setSelectedActivityId(row.id);
                   setDialogOpen(true);

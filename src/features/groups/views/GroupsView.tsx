@@ -73,8 +73,10 @@ const GroupsView = () => {
   const isActiveFilter =
     statusFilter === "All Status" ? undefined : statusFilter === "Active";
 
+  const [limit, setLimit] = React.useState(10);
+
   const { data, isPending } = useGetGroups({
-    limit: 10,
+    limit,
     search: searchValueDebounced || undefined,
     is_active: isActiveFilter,
     from: date?.toISOString(),
@@ -85,6 +87,7 @@ const GroupsView = () => {
   );
 
   const groups: Group[] = transformInfiniteData(data, "data");
+  const groupsTotal = data?.pages[0]?.data?.meta?.total ?? groups.length;
   const existingMemberIds = React.useMemo(
     () =>
       selectedGroupInfoData?.data.user_groups.map((entry) => entry.user.id) ??
@@ -279,6 +282,9 @@ const GroupsView = () => {
           isPending={isPending}
           date={date}
           setDate={setDate}
+          total={groupsTotal}
+          limit={limit}
+          onLimitChange={(l) => setLimit(l)}
           emptyState={
             <div className="flex items-center justify-center py-20">
               <GroupsEmptyState onCreate={() => setCreateOpen(true)} />

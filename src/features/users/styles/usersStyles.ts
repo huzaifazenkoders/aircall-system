@@ -28,11 +28,11 @@ export const usersStyles = {
   iconButton: cn(
     "grid size-10 place-items-center rounded-lg border border-border bg-white text-secondary shadow-xs transition-colors hover:bg-muted"
   ),
-  statsGrid: cn("grid grid-cols-2 gap-3 px-6 pt-6"),
+  statsGrid: cn("grid grid-cols-1 sm:grid-cols-2 gap-3 px-6 pt-6"),
   statCard: cn("rounded-lg bg-stat-card-bg px-5 py-4"),
   statLabel: cn("text-[14px] text-[#219D9D]"),
   statValue: cn("mt-3 text-[24px] font-medium leading-none text-[#15706D]"),
-  contactGrid: cn("grid grid-cols-2 gap-6 border-b border-border px-6 py-6"),
+  contactGrid: cn("grid grid-cols-1 sm:grid-cols-2 gap-6 border-b border-border px-6 py-6"),
   contactItem: cn("flex gap-4"),
   contactLabel: cn("text-sm text-panel-muted"),
   contactValue: cn("mt-0 text-base text-text-primary"),
@@ -57,13 +57,15 @@ export const usersStyles = {
   assignmentTitle: cn("text-sm font-medium text-text-primary"),
   assignmentMeta: cn("ms-1 text-sm text-panel-muted"),
   footer: cn(
-    "mt-auto grid grid-cols-2 gap-5 border-t border-transparent px-6 py-6"
+    "mt-auto grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-transparent px-6 py-6"
   ),
   menuContent: cn(
     "w-auto min-w-[200px] rounded-lg border border-border bg-white py-2 px-0 shadow-[0_20px_50px_rgba(15,23,42,0.12)]"
   ),
   menuItem: cn("gap-3 px-3 py-2 text-sm text-text-primary"),
-  modalContent: cn("max-w-[790px] rounded-lg p-0"),
+  modalContent: cn(
+    "max-w-[790px] rounded-lg p-0 overflow-y-auto max-h-[95dvh]"
+  ),
   modalHeader: cn("items-start p-6"),
   modalTitle: cn("text-2xl font-medium text-text-primary"),
   modalSubtitle: cn("text-sm text-panel-muted"),

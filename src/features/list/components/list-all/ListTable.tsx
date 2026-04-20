@@ -1,13 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  SearchIcon,
-  MoreVerticalIcon,
-  ChevronLeft,
-  ChevronRight,
-  Loader2Icon
-} from "lucide-react";
+import { SearchIcon, MoreVerticalIcon, Loader2Icon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -42,7 +37,6 @@ import { List, ListDetail, ListStatus } from "@/features/list/types/listTypes";
 import ListEmptyState from "./ListEmptyState";
 import { ReactDispatch } from "@/types/common";
 
-const LIMIT = 10;
 
 const ListTable = ({
   setCreateOpen,
@@ -52,6 +46,7 @@ const ListTable = ({
   setEditList: ReactDispatch<ListDetail | null>;
 }) => {
   const [query, setQuery] = React.useState("");
+  const [limit, setLimit] = React.useState(10);
   const [tabs, setTabs] = useState<"shared" | "idv">("shared");
   const [dateRange, setDateRange] = React.useState<{
     startDate: Date | null;
@@ -66,7 +61,7 @@ const ListTable = ({
     : undefined;
 
   const sharedQuery = useGetLists({
-    limit: LIMIT,
+    limit,
     search: query || undefined,
     list_type: "shared",
     startDate: startDateStr,
@@ -74,7 +69,7 @@ const ListTable = ({
   });
 
   const idvQuery = useGetLists({
-    limit: LIMIT,
+    limit,
     search: query || undefined,
     list_type: "individual",
     startDate: startDateStr,
@@ -158,13 +153,14 @@ const ListTable = ({
                 aria-hidden="true"
               />
             }
-            className="bg-transparent  w-100"
+            className="bg-transparent md:w-100"
           />
 
           <DateRangeSelector
             value={dateRange}
             setValue={setDateRange}
             placeholder="Date"
+            triggerClassName="w-full md:w-fit"
           />
         </div>
 
@@ -222,31 +218,17 @@ const ListTable = ({
                     </Table>
                   </div>
 
-                  <div className="flex items-center justify-end gap-5 px-6 py-4 text-sm text-muted-foreground">
-                    <span>Rows per page: {LIMIT}</span>
-                    <span className="text-foreground">
-                      1-{lists.length} of {total}
-                    </span>
-                    <button
-                      type="button"
-                      className="grid size-9 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
-                      disabled={!q.hasPreviousPage}
-                    >
-                      <ChevronLeft />
-                    </button>
-                    <button
-                      type="button"
-                      className="grid size-9 place-items-center rounded-lg hover:bg-muted disabled:opacity-40"
-                      onClick={() => q.fetchNextPage()}
-                      disabled={!q.hasNextPage || q.isFetchingNextPage}
-                    >
-                      {q.isFetchingNextPage ? (
-                        <Loader2Icon className="size-4 animate-spin" />
-                      ) : (
-                        <ChevronRight />
-                      )}
-                    </button>
-                  </div>
+                  <TablePagination
+                    from={1}
+                    to={lists.length}
+                    total={total}
+                    limit={limit}
+                    onLimitChange={(l) => setLimit(l)}
+                    prevDisabled={!q.hasPreviousPage}
+                    nextDisabled={!q.hasNextPage || q.isFetchingNextPage}
+                    onPrev={() => {}}
+                    onNext={() => q.fetchNextPage()}
+                  />
                 </>
               )}
             </TabsContent>

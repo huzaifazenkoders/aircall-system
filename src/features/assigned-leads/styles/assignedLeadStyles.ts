@@ -14,7 +14,7 @@ export const assignedLeadStyles = {
   dialerFrameInner: cn("h-[640px] w-full"),
 
   callBar: cn(
-    "flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-aircall-callbar px-8 py-6 text-white"
+    "flex flex-wrap items-center justify-between gap-6 rounded-2xl bg-aircall-callbar px-4 py-5 text-white sm:px-8 sm:py-6"
   ),
   callBarLeft: cn("flex min-w-0 items-center gap-4"),
   callAvatar: cn(
@@ -38,14 +38,14 @@ export const assignedLeadStyles = {
     "overflow-hidden rounded-[32px] bg-card shadow-[0_16px_60px_rgba(15,23,42,0.08)] ring-1 ring-slate-200/80"
   ),
   cardHeader: cn(
-    "flex flex-wrap items-center justify-between gap-4 border-b border-border px-8 py-7 lg:px-10"
+    "flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-5 sm:px-8 sm:py-7 lg:px-10"
   ),
   cardTitle: cn("text-2xl font-semibold tracking-tight text-foreground"),
   cardLink: cn(
     "inline-flex items-center gap-2 text-sm font-semibold text-secondary"
   ),
 
-  contentGrid: cn("grid gap-10 px-8 py-8 lg:px-10 grid-cols-1"),
+  contentGrid: cn("grid gap-10 px-4 py-6 grid-cols-1 sm:px-8 sm:py-8 lg:px-10"),
 
   sectionTitle: cn("text-xs font-semibold tracking-wider text-foreground"),
   infoGrid3: cn(
@@ -65,7 +65,7 @@ export const assignedLeadStyles = {
     "mt-12 overflow-hidden rounded-[24px] bg-muted/30 shadow-sm ring-1 ring-border"
   ),
   purchaseHeader: cn(
-    "flex items-center justify-between gap-4 border-b border-border px-6 py-5"
+    "flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-4 sm:px-6 sm:py-5"
   ),
   purchaseTitle: cn("text-lg font-semibold tracking-tight text-foreground"),
   purchaseTotal: cn("text-sm font-semibold text-muted-foreground"),
@@ -73,7 +73,7 @@ export const assignedLeadStyles = {
 
   timelineTitle: cn("text-xs font-semibold tracking-wider text-foreground"),
   timelineWrap: cn(
-    "mt-6 rounded-[24px] border border-border/70 bg-white/70 p-6"
+    "mt-6 rounded-[24px] border border-border/70 bg-white/70 p-4 sm:p-6"
   ),
   timelineList: cn("relative pl-10"),
   timelineLine: cn("absolute bottom-0 left-4.5 top-0 w-px bg-border"),

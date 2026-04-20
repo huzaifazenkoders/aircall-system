@@ -41,8 +41,7 @@ const CallHistoryDetailsSheet = ({
   const { data: detailResponse, isLoading } = useGetMyCallLogDetail(id);
   const record = detailResponse?.data;
 
-  console.log("detailResponse", detailResponse);
-  const leadName = record?.lead_name;
+const leadName = record?.lead_name;
   const assignedName = record?.user_name;
   const assignedInitials = `${record?.user_name[0]}${record?.user_name[record?.user_name.length - 1]}`;
 
@@ -77,26 +76,26 @@ const CallHistoryDetailsSheet = ({
             <section className={callLogsStyles.section}>
               <h3 className={callLogsStyles.sectionTitle}>Lead Information</h3>
               <div className={callLogsStyles.detailsGrid}>
-                <div className="inline-flex gap-0">
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-0">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Name</p>
                     <p className={callLogsStyles.detailValue}>{leadName}</p>
                   </div>
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Email</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.lead?.email ?? "—"}
                     </p>
                   </div>
                 </div>
-                <div className="inline-flex gap-0">
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-0">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Phone</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.lead?.phone ?? "—"}
                     </p>
                   </div>
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Timezone</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.lead?.timezone ?? "—"}
@@ -109,8 +108,8 @@ const CallHistoryDetailsSheet = ({
             <section className={callLogsStyles.section}>
               <h3 className={callLogsStyles.sectionTitle}>Call Summary</h3>
               <div className={callLogsStyles.summaryGrid}>
-                <div className="inline-flex gap-0">
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-0">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Representative</p>
                     <div className={callLogsStyles.representative}>
                       <span className={callLogsStyles.avatar}>
@@ -121,7 +120,7 @@ const CallHistoryDetailsSheet = ({
                       </span>
                     </div>
                   </div>
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Status</p>
                     <Badge
                       variant={
@@ -134,28 +133,28 @@ const CallHistoryDetailsSheet = ({
                     </Badge>
                   </div>
                 </div>
-                <div className="inline-flex gap-0">
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-0">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Call Time</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.created_at ?? "—"}
                     </p>
                   </div>
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>List</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.list_name ?? "—"}
                     </p>
                   </div>
                 </div>
-                <div className="inline-flex gap-0">
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-0">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Event Date</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.lead?.event_date ?? "—"}
                     </p>
                   </div>
-                  <div className="flex-1 h-12 inline-flex flex-col justify-center gap-0.5">
+                  <div className="flex-1 inline-flex flex-col justify-center gap-0.5">
                     <p className={callLogsStyles.detailLabel}>Attempt</p>
                     <p className={callLogsStyles.detailValue}>
                       {record?.attempt_number ?? "—"}

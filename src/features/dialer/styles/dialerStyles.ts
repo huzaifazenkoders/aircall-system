@@ -1,20 +1,27 @@
 import { cn } from "@/lib/utils";
 
 export const dialerShellStyles = {
-  shell: cn("min-h-screen bg-background p-4 lg:p-5"),
+  shell: cn("min-h-screen bg-background p-4 pb-24 lg:p-5"),
   frame: cn(
-    "grid min-h-[calc(100vh-2rem)] grid-cols-1 gap-4 rounded-[2rem] bg-background lg:grid-cols-[6.5rem_minmax(0,1fr)] lg:gap-8"
+    "min-h-[calc(100vh-2rem)] rounded-[2rem] bg-background lg:grid lg:grid-cols-[6.5rem_minmax(0,1fr)] lg:gap-8"
   ),
   sidebar: cn(
-    "w-24 self-stretch px-4 py-8 bg-primary rounded-2xl outline outline-1 outline-offset-[-1px] inline-flex flex-col items-center gap-10"
+    "fixed bottom-4 left-4 right-4 z-50 flex flex-row items-center justify-around rounded-2xl bg-primary px-2 py-3 outline outline-1 outline-offset-[-1px]",
+    "lg:static lg:bottom-auto lg:left-auto lg:right-auto lg:w-24 lg:self-stretch lg:flex-col lg:items-center lg:justify-start lg:gap-10 lg:px-4 lg:py-8"
   ),
-  logoWrap: cn("inline-flex items-center gap-2"),
-  nav: cn("self-stretch flex flex-col items-start gap-4"),
+  logoWrap: cn("hidden lg:inline-flex items-center gap-2"),
+  nav: cn(
+    "flex flex-row items-center justify-around w-full gap-1",
+    "lg:self-stretch lg:flex-col lg:items-start lg:gap-4"
+  ),
   navItem: cn(
-    "self-stretch py-2 rounded-lg flex flex-col justify-center items-center gap-1.5 overflow-hidden transition-colors hover:bg-brand-900/60"
+    "flex flex-col items-center justify-center gap-1 rounded-lg px-3 py-1.5 overflow-hidden transition-colors hover:bg-brand-900/60",
+    "lg:self-stretch lg:py-2 lg:gap-1.5"
   ),
   navItemActive: cn("bg-brand-900"),
-  navLabel: cn("text-xs font-normal leading-5 text-white"),
+  navLabel: cn(
+    "text-[10px] font-normal leading-4 text-white lg:text-xs lg:leading-5"
+  ),
   content: cn("flex min-w-0 flex-col"),
   topbar: cn(
     "flex items-center justify-end border-b border-border px-2 pb-4 lg:pb-5"
@@ -32,17 +39,19 @@ export const dialerShellStyles = {
 
 export const callHistoryStyles = {
   statsCard: cn(
-    "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] inline-flex items-center p-6 gap-4"
+    "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] grid grid-cols-1 gap-y-6 gap-x-4 p-6 sm:grid-cols-3 lg:flex lg:items-center lg:gap-4"
   ),
-  statItem: cn("flex-1 inline-flex flex-col justify-center items-start gap-2"),
+  statItem: cn(
+    "inline-flex flex-col justify-center items-start gap-2 lg:flex-1"
+  ),
   statLabel: cn("text-base text-gray-500 leading-6"),
   statValue: cn("text-4xl font-medium text-Brand-700 leading-10"),
-  statDivider: cn("w-px self-stretch border border-zinc-200"),
+  statDivider: cn("hidden lg:block w-px self-stretch border border-zinc-200"),
   tableCard: cn(
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "border-b border-zinc-200 px-6 py-4 inline-flex items-center w-full"
+    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center gap-3 w-full"
   ),
   searchField: cn(
     "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-11 px-3 py-1.5"
@@ -78,7 +87,7 @@ export const callHistoryStyles = {
   sheetSectionTitle: cn(
     "text-[1.125rem] font-semibold tracking-wide text-text-primary"
   ),
-  detailGrid: cn("mt-8 grid gap-x-10 gap-y-7 md:grid-cols-2"),
+  detailGrid: cn("mt-8 grid grid-cols-1 gap-x-10 gap-y-7 md:grid-cols-2"),
   detailLabel: cn("text-[1rem] text-[#6B7A99]"),
   detailValue: cn("mt-1.5 text-[1.125rem] text-text-primary lg:text-[1.25rem]"),
   link: cn(
@@ -106,9 +115,9 @@ export const callHistoryStyles = {
 };
 
 export const myListStyles = {
-  layout: cn("mt-8 flex gap-6 items-start"),
+  layout: cn("mt-8 flex flex-col gap-6 xl:flex-row xl:items-start"),
   sidebar: cn(
-    "w-96 shrink-0 bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
+    "w-full xl:w-96 shrink-0 bg-white rounded-2xl shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
   ),
   sidebarHeader: cn(
     "px-4 py-4 border-b border-zinc-200 flex items-center gap-2 w-full"
@@ -136,10 +145,11 @@ export const myListStyles = {
   listCardMetaLabel: cn("text-sm font-medium text-gray-400 leading-5"),
   listCardMetaValue: cn("text-sm text-gray-800 leading-5"),
   tablePanel: cn(
-    "flex-1 bg-white rounded-[20px] shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
+    "w-full flex-1 bg-white rounded-[20px] shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
   ),
-  toolbar: cn("p-4 border-b border-zinc-200 flex items-center gap-4"),
-  toolbarRight: cn("flex flex-1 items-center justify-end gap-4"),
+  tableWrap: cn("overflow-x-auto"),
+  toolbar: cn("p-4 border-b border-zinc-200 flex flex-wrap items-center gap-3"),
+  toolbarRight: cn("flex flex-wrap items-center justify-end gap-3"),
   tableHead: cn("p-4 text-sm font-medium text-gray-500 leading-4"),
   cell: cn("px-3 py-3.5 text-sm text-gray-800 leading-5"),
   row: cn("cursor-pointer border-zinc-200 hover:bg-[#FBFCFD] h-16"),
@@ -161,9 +171,9 @@ export const callbackStyles = {
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "border-b border-zinc-200 px-6 py-4 inline-flex items-center justify-between w-full"
+    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center gap-3 w-full"
   ),
-  toolbarRight: cn("flex flex-1 items-center justify-end gap-4"),
+  toolbarRight: cn("flex flex-wrap items-center gap-3"),
   searchField: cn(
     "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-9 px-3 py-1.5"
   ),
@@ -196,11 +206,11 @@ export const callbackStyles = {
   sectionTitle: cn(
     "text-xs font-semibold tracking-wide text-text-secondary uppercase"
   ),
-  infoGrid: cn("mt-4 grid gap-x-6 gap-y-4 md:grid-cols-3"),
+  infoGrid: cn("mt-4 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3"),
   detailLabel: cn("text-xs text-[#6B7A99]"),
   detailValue: cn("mt-0.5 text-sm text-text-primary"),
   divider: cn("my-4 border-t border-border"),
-  statusGrid: cn("mt-4 grid gap-x-6 gap-y-4 md:grid-cols-3"),
+  statusGrid: cn("mt-4 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-3"),
   pill: cn(
     "inline-flex h-6 items-center rounded-lg bg-status-cooldown-bg px-3 text-xs font-medium text-status-cooldown-fg"
   ),

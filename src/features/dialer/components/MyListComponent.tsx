@@ -1,13 +1,8 @@
 "use client";
 
 import React from "react";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  Loader2Icon,
-  SearchIcon
-} from "lucide-react";
+import { Loader2Icon, SearchIcon } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { cn } from "@/lib/utils";
@@ -27,7 +22,6 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
@@ -53,7 +47,6 @@ import { listKeys } from "@/features/list/query-keys";
 import toast from "react-hot-toast";
 
 const LIMIT = 20;
-const LEADS_LIMIT = 10;
 
 const MyListComponent = () => {
   const queryClient = useQueryClient();
@@ -71,6 +64,7 @@ const MyListComponent = () => {
   const [leadSearch, setLeadSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("All Status");
   const [leadsPage, setLeadsPage] = React.useState(1);
+  const [leadsLimit, setLeadsLimit] = React.useState(10);
 
   // ── My Lists (infinite scroll) ──────────────────────────────────────────────
   const {
@@ -102,7 +96,7 @@ const MyListComponent = () => {
   // ── Leads ───────────────────────────────────────────────────────────────────
   const { data: leadsData, isPending: leadsLoading } = useGetLeads({
     page: leadsPage,
-    limit: LEADS_LIMIT,
+    limit: leadsLimit,
     list_id: selectedList?.id ?? "",
     search: leadSearch,
     status:
@@ -232,7 +226,7 @@ const MyListComponent = () => {
             id="my-lists-scroll"
             className={cn(
               myListStyles.sidebarList,
-              "overflow-y-auto max-h-[calc(100vh-16rem)]"
+              "overflow-y-auto max-h-[45vh] xl:max-h-[calc(100vh-16rem)]"
             )}
           >
             <InfiniteScroll
@@ -331,7 +325,7 @@ const MyListComponent = () => {
               value={leadSearch}
               startIcon={<SearchIcon className="size-5 text-gray-500" />}
               placeholder="Search..."
-              className="h-9 w-72 text-base"
+              className="h-9 w-full md:w-72 text-base"
             />
             <div className={myListStyles.toolbarRight}>
               <Select
@@ -367,102 +361,93 @@ const MyListComponent = () => {
               <Loader2Icon className="size-8 animate-spin text-gray-400" />
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
-                  <TableHead className={myListStyles.tableHead}>Name</TableHead>
-                  <TableHead className={myListStyles.tableHead}>
-                    Lead Status
-                  </TableHead>
-                  <TableHead className={myListStyles.tableHead}>
-                    Assigned Rep
-                  </TableHead>
-                  <TableHead className={myListStyles.tableHead}>
-                    Last Disposition
-                  </TableHead>
-                  <TableHead className={myListStyles.tableHead}>
-                    Attempt
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {leads.map((lead) => (
-                  <TableRow key={lead.id} className={myListStyles.row}>
-                    <TableCell className="pl-4 py-3.5">
-                      <div className="text-sm font-medium text-gray-800 leading-5">
-                        {lead.first_name} {lead.last_name}
-                      </div>
-                      <div className="text-sm text-gray-500 leading-5">
-                        {lead.phone}
-                      </div>
-                    </TableCell>
-                    <TableCell className={myListStyles.cell}>
-                      <LeadStatusBadge status={getLeadStatus(lead)} />
-                    </TableCell>
-                    <TableCell className={myListStyles.cell}>
-                      <div className="text-sm text-gray-800 leading-5">
-                        {lead.lead_activities?.[0]?.assigned_user?.first_name +
-                          " " +
-                          lead.lead_activities?.[0]?.assigned_user?.last_name}
-                      </div>
-                    </TableCell>
-                    <TableCell className={myListStyles.cell}>
-                      <div className="text-sm text-gray-800 leading-5 capitalize">
-                        {lead.lead_activities?.[0]?.last_disposition_type
-                          ? lead.lead_activities?.[0]?.last_disposition_type?.replaceAll(
-                              "_",
-                              " "
-                            )
-                          : "- "}
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
-                      {lead.lead_activities?.[0]?.attempt_count}
-                    </TableCell>
+            <div className={myListStyles.tableWrap}>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-b border-zinc-200 hover:bg-gray-50">
+                    <TableHead className={myListStyles.tableHead}>
+                      Name
+                    </TableHead>
+                    <TableHead className={myListStyles.tableHead}>
+                      Lead Status
+                    </TableHead>
+                    <TableHead className={myListStyles.tableHead}>
+                      Assigned Rep
+                    </TableHead>
+                    <TableHead className={myListStyles.tableHead}>
+                      Last Disposition
+                    </TableHead>
+                    <TableHead className={myListStyles.tableHead}>
+                      Attempt
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {leads.map((lead) => (
+                    <TableRow key={lead.id} className={myListStyles.row}>
+                      <TableCell className="pl-4 py-3.5">
+                        <div className="text-sm font-medium text-gray-800 leading-5">
+                          {lead.first_name} {lead.last_name}
+                        </div>
+                        <div className="text-sm text-gray-500 leading-5">
+                          {lead.phone}
+                        </div>
+                      </TableCell>
+                      <TableCell className={myListStyles.cell}>
+                        <LeadStatusBadge status={getLeadStatus(lead)} />
+                      </TableCell>
+                      <TableCell className={myListStyles.cell}>
+                        <div className="text-sm text-gray-800 leading-5">
+                          {lead.lead_activities?.[0]?.assigned_user
+                            ? lead.lead_activities?.[0]?.assigned_user
+                                ?.first_name +
+                              " " +
+                              lead.lead_activities?.[0]?.assigned_user
+                                ?.last_name
+                            : "-"}
+                        </div>
+                      </TableCell>
+                      <TableCell className={myListStyles.cell}>
+                        <div className="text-sm text-gray-800 leading-5 capitalize">
+                          {lead.lead_activities?.[0]?.last_disposition_type
+                            ? lead.lead_activities?.[0]?.last_disposition_type?.replaceAll(
+                                "_",
+                                " "
+                              )
+                            : "- "}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-3 py-3.5 text-center text-sm font-medium text-gray-800 leading-5">
+                        {lead.lead_activities?.[0]?.attempt_count}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
 
-          <div className={myListStyles.pagination}>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 leading-5">
-                Rows per page:
-              </span>
-              <span className="flex items-center gap-2 text-xs text-gray-800 leading-5">
-                {LEADS_LIMIT}
-                <ChevronDownIcon className="size-4 text-gray-500" />
-              </span>
-            </div>
-            {leadsMeta && (
-              <span className="text-xs text-gray-800 leading-5">
-                {(leadsPage - 1) * LEADS_LIMIT + 1}-
-                {Math.min(leadsPage * LEADS_LIMIT, leadsMeta.total)} of{" "}
-                {leadsMeta.total}
-              </span>
-            )}
-            <div className="flex items-start">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="p-2 rounded-lg"
-                disabled={leadsPage <= 1}
-                onClick={() => setLeadsPage((p) => p - 1)}
-              >
-                <ChevronLeftIcon className="size-6 text-gray-500" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="p-2 rounded-lg"
-                disabled={!leadsMeta?.hasNextPage}
-                onClick={() => setLeadsPage((p) => p + 1)}
-              >
-                <ChevronRightIcon className="size-6 text-gray-500" />
-              </Button>
-            </div>
-          </div>
+          <TablePagination
+            from={
+              leadsMeta && leadsMeta.total > 0
+                ? (leadsPage - 1) * leadsLimit + 1
+                : 0
+            }
+            to={
+              leadsMeta ? Math.min(leadsPage * leadsLimit, leadsMeta.total) : 0
+            }
+            total={leadsMeta?.total ?? 0}
+            limit={leadsLimit}
+            onLimitChange={(l) => {
+              setLeadsLimit(l);
+              setLeadsPage(1);
+            }}
+            prevDisabled={leadsPage <= 1}
+            nextDisabled={!leadsMeta?.hasNextPage}
+            onPrev={() => setLeadsPage((p) => p - 1)}
+            onNext={() => setLeadsPage((p) => p + 1)}
+            className={myListStyles.pagination}
+          />
         </div>
       </div>
 

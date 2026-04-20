@@ -55,7 +55,7 @@ const DialerSidebar = () => {
                 isActive && dialerShellStyles.navItemActive
               )}
             >
-              <Icon className="size-6 text-white" strokeWidth={1.5} />
+              <Icon className="size-5 text-white lg:size-6" strokeWidth={1.5} />
               <span className={dialerShellStyles.navLabel}>{item.label}</span>
             </Link>
           );

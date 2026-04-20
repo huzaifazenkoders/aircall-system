@@ -20,8 +20,8 @@ export const groupsStyles = {
   tableCard: cn(
     "overflow-hidden rounded-lg bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
-  toolbar: cn("flex items-center border-b border-zinc-200 px-6 py-4"),
-  filterRow: cn("flex flex-1 items-center justify-end gap-4"),
+  toolbar: cn("flex flex-wrap items-center gap-3 border-b border-zinc-200 px-6 py-4"),
+  filterRow: cn("flex flex-wrap items-center gap-3"),
   filterButton: cn(
     "flex min-h-11 items-center gap-4 rounded-lg bg-white px-4 py-1.5 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] outline outline-1 outline-offset-[-1px] outline-zinc-200 text-sm text-gray-800"
   ),
@@ -88,7 +88,7 @@ export const groupsStyles = {
   assignmentTitle: cn("font-medium text-text-primary"),
   assignmentMeta: cn("mt-0 text-sm text-panel-muted"),
   memberMetaRow: cn("flex items-center gap-4"),
-  footerActions: cn("mt-auto grid grid-cols-2 gap-5 py-6 px-6"),
+  footerActions: cn("mt-auto grid grid-cols-1 sm:grid-cols-2 gap-5 py-6 px-6"),
   dialogContent: cn("max-w-[790px] rounded-lg p-0"),
   selectionDialogContent: cn("max-w-[790px] rounded-lg p-0"),
   dialogHeader: cn("items-start p-4 px-6"),

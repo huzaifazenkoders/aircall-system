@@ -7,12 +7,10 @@ import {
   EyeIcon,
   ListIcon,
   UsersIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
   PlusIcon,
   Loader2Icon
 } from "lucide-react";
+import TablePagination from "@/components/ui/table-pagination";
 
 import {
   Table,
@@ -41,7 +39,6 @@ import { User } from "@/features/users/types/userTypes";
 import { ReactDispatch } from "@/types/common";
 import UsersEmptyState from "./UsersEmptyState";
 
-const PAGE_SIZE = 10;
 
 const statusBadge = (status: User["status"]) => {
   if (status === "active")
@@ -95,15 +92,16 @@ const UsersManagementTable = ({
   error: boolean;
 }) => {
   const [page, setPage] = React.useState(1);
+  const [limit, setLimit] = React.useState(10);
 
-  const totalPages = Math.max(1, Math.ceil(users.length / PAGE_SIZE));
-  const paginated = users.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const start = users.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
-  const end = Math.min(page * PAGE_SIZE, users.length);
+  const totalPages = Math.max(1, Math.ceil(users.length / limit));
+  const paginated = users.slice((page - 1) * limit, page * limit);
+  const start = users.length === 0 ? 0 : (page - 1) * limit + 1;
+  const end = Math.min(page * limit, users.length);
 
   React.useEffect(() => {
     setPage(1);
-  }, [searchValue, statusFilter]);
+  }, [searchValue, statusFilter, limit]);
 
   if (users.length === 0 && !isPending && !error) {
     return (
@@ -132,15 +130,15 @@ const UsersManagementTable = ({
           <div className="w-full overflow-hidden rounded-lg bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]">
             <>
               {/* Toolbar */}
-              <div className="flex items-center gap-4 border-b border-zinc-200 px-6 py-6">
+              <div className="flex flex-col md:flex-row items-center gap-4 border-b border-zinc-200 px-6 py-6">
                 <TextInput
                   setValue={onSearchChange}
                   value={searchValue}
                   placeholder="Search by name, email, or phone"
-                  className="w-96 text-sm"
+                  className="md:w-96 text-sm"
                   startIcon={<SearchIcon className="size-4 text-gray-500" />}
                 />
-                <div className="flex flex-1 justify-end">
+                <div className="flex flex-1 w-full md:w-fit justify-end">
                   <Select
                     value={statusFilter}
                     onValueChange={(val) =>
@@ -177,141 +175,120 @@ const UsersManagementTable = ({
                   showButton={statusFilter === "All Status" ? true : false}
                 />
               ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="border-zinc-200 bg-gray-50 hover:bg-gray-50">
-                        <TableHead className="w-44 px-4 py-4 text-sm font-medium text-gray-500">
-                          Name
-                        </TableHead>
-                        <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
-                          Email
-                        </TableHead>
-                        <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
-                          Phone Number
-                        </TableHead>
-                        <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
-                          Assigned Group
-                        </TableHead>
-                        <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
-                          Assigned Lists
-                        </TableHead>
-                        <TableHead className="w-32 px-4 py-4 text-sm font-medium text-gray-500">
-                          Status
-                        </TableHead>
-                        <TableHead className="w-12 px-4 py-4 text-sm font-medium text-gray-500 opacity-0">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginated.map((user) => (
-                        <TableRow
-                          key={user.id}
-                          className="h-16 cursor-pointer border-zinc-200 hover:bg-gray-50 data-[state=selected]:bg-gray-50"
-                          data-state={
-                            user.id === selectedUserId ? "selected" : undefined
-                          }
-                          onClick={() => onSelectUser(user.id)}
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-zinc-200 bg-gray-50 hover:bg-gray-50">
+                      <TableHead className="w-44 px-4 py-4 text-sm font-medium text-gray-500">
+                        Name
+                      </TableHead>
+                      <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
+                        Email
+                      </TableHead>
+                      <TableHead className="w-48 px-4 py-4 text-sm font-medium text-gray-500">
+                        Phone Number
+                      </TableHead>
+                      <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
+                        Assigned Group
+                      </TableHead>
+                      <TableHead className="w-40 px-4 py-4 text-sm font-medium text-gray-500">
+                        Assigned Lists
+                      </TableHead>
+                      <TableHead className="w-32 px-4 py-4 text-sm font-medium text-gray-500">
+                        Status
+                      </TableHead>
+                      <TableHead className="w-12 px-4 py-4 text-sm font-medium text-gray-500 opacity-0">
+                        Actions
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {paginated.map((user) => (
+                      <TableRow
+                        key={user.id}
+                        className="h-16 cursor-pointer border-zinc-200 hover:bg-gray-50 data-[state=selected]:bg-gray-50"
+                        data-state={
+                          user.id === selectedUserId ? "selected" : undefined
+                        }
+                        onClick={() => onSelectUser(user.id)}
+                      >
+                        <TableCell className="w-44 px-4 text-sm text-gray-800">
+                          {user.first_name} {user.last_name}
+                        </TableCell>
+                        <TableCell className="w-48 px-4 text-sm text-gray-800">
+                          {user.email}
+                        </TableCell>
+                        <TableCell className="w-48 px-4 text-sm text-gray-800">
+                          {user.phone_number ?? "—"}
+                        </TableCell>
+                        <TableCell className="w-40 px-4 text-sm text-gray-800">
+                          {user.total_groups ?? 0}
+                        </TableCell>
+                        <TableCell className="w-40 px-4 text-sm text-gray-800">
+                          {user.total_lists ?? 0}
+                        </TableCell>
+                        <TableCell className="w-32 px-4">
+                          {statusBadge(user.status)}
+                        </TableCell>
+                        <TableCell
+                          className="w-12 px-2"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <TableCell className="w-44 px-4 text-sm text-gray-800">
-                            {user.first_name} {user.last_name}
-                          </TableCell>
-                          <TableCell className="w-48 px-4 text-sm text-gray-800">
-                            {user.email}
-                          </TableCell>
-                          <TableCell className="w-48 px-4 text-sm text-gray-800">
-                            {user.phone_number ?? "—"}
-                          </TableCell>
-                          <TableCell className="w-40 px-4 text-sm text-gray-800">
-                            {user.total_groups ?? 0}
-                          </TableCell>
-                          <TableCell className="w-40 px-4 text-sm text-gray-800">
-                            {user.total_lists ?? 0}
-                          </TableCell>
-                          <TableCell className="w-32 px-4">
-                            {statusBadge(user.status)}
-                          </TableCell>
-                          <TableCell
-                            className="w-12 px-2"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <DropdownMenu>
-                              <DropdownMenuTrigger>
-                                <Button
-                                  variant="outline"
-                                  size="icon-sm"
-                                  className="size-8 border-gray-800/20"
-                                >
-                                  <MoreHorizontalIcon className="size-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent
-                                align="end"
-                                className="w-40 rounded-xl py-2 px-0"
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <Button
+                                variant="outline"
+                                size="icon-sm"
+                                className="size-8 border-gray-800/20"
                               >
-                                <DropdownMenuItem
-                                  className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                                  onClick={() => onViewDetails?.(user.id)}
-                                >
-                                  <EyeIcon className="size-4 text-gray-500" />
-                                  View Details
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                                  onClick={() => onAssignList?.(user.id)}
-                                >
-                                  <ListIcon className="size-4 text-gray-500" />
-                                  Assign List
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
-                                  onClick={() => onAddToGroup?.(user.id)}
-                                >
-                                  <UsersIcon className="size-4 text-gray-500" />
-                                  Add to Group
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                                <MoreHorizontalIcon className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-40 rounded-xl py-2 px-0"
+                            >
+                              <DropdownMenuItem
+                                className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                                onClick={() => onViewDetails?.(user.id)}
+                              >
+                                <EyeIcon className="size-4 text-gray-500" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                                onClick={() => onAssignList?.(user.id)}
+                              >
+                                <ListIcon className="size-4 text-gray-500" />
+                                Assign List
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="gap-3 rounded-none px-2 py-1.5 text-sm cursor-pointer text-gray-800"
+                                onClick={() => onAddToGroup?.(user.id)}
+                              >
+                                <UsersIcon className="size-4 text-gray-500" />
+                                Add to Group
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
 
-                {/* Pagination */}
-                <div className="flex items-center justify-end gap-6 py-2 pr-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">
-                      Rows per page:
-                    </span>
-                    <span className="text-xs text-gray-800">{PAGE_SIZE}</span>
-                    <ChevronDownIcon className="size-4 text-gray-500" />
-                  </div>
-                  <span className="text-xs text-gray-800">
-                    {start}-{end} of {users.length}
-                  </span>
-                  <div className="flex items-center">
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      disabled={page === 1}
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    >
-                      <ChevronLeftIcon className="size-4 text-gray-500" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      disabled={page === totalPages}
-                      onClick={() =>
-                        setPage((p) => Math.min(totalPages, p + 1))
-                      }
-                    >
-                      <ChevronRightIcon className="size-4 text-gray-500" />
-                    </Button>
-                  </div>
-                </div>
+              {/* Pagination */}
+              <TablePagination
+                from={start}
+                to={end}
+                total={users.length}
+                limit={limit}
+                onLimitChange={(l) => setLimit(l)}
+                prevDisabled={page === 1}
+                nextDisabled={page === totalPages}
+                onPrev={() => setPage((p) => Math.max(1, p - 1))}
+                onNext={() => setPage((p) => Math.min(totalPages, p + 1))}
+              />
             </>
           </div>
         </div>
