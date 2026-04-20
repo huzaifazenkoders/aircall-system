@@ -1,21 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { SearchIcon, MoreVerticalIcon, Loader2Icon } from "lucide-react";
 import TablePagination from "@/components/ui/table-pagination";
+import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
+import React, { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
-import TextInput from "@/components/ui/text-input";
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -24,19 +22,19 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import { listStyles } from "@/features/list/styles/listStyles";
-import DateRangeSelector from "@/components/ui/date-range-selector";
-import moment from "moment";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TextInput from "@/components/ui/text-input";
 import {
   useGetListById,
   useGetLists
 } from "@/features/list/services/listService";
-import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { listStyles } from "@/features/list/styles/listStyles";
 import { List, ListDetail, ListStatus } from "@/features/list/types/listTypes";
-import ListEmptyState from "./ListEmptyState";
+import { cn } from "@/lib/utils";
 import { ReactDispatch } from "@/types/common";
-
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import moment from "moment";
+import ListEmptyState from "./ListEmptyState";
 
 const ListTable = ({
   setCreateOpen,
@@ -82,8 +80,6 @@ const ListTable = ({
   const sharedTotal = sharedQuery.data?.pages[0]?.data?.meta?.total ?? 0;
   const idvTotal = idvQuery.data?.pages[0]?.data?.meta?.total ?? 0;
 
-  const activeQuery = tabs === "shared" ? sharedQuery : idvQuery;
-  const activeLists = tabs === "shared" ? sharedLists : idvLists;
   const isDefaultState =
     query.trim() === "" && !dateRange.startDate && !dateRange.endDate;
   const hasAnyLists = sharedLists.length > 0 || idvLists.length > 0;

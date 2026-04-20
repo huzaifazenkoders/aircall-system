@@ -1,18 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Logo from "@/../public/assets/dialer-auth/logo.svg";
 import {
-  HexagonIcon,
   HistoryIcon,
   HomeIcon,
   PhoneCallIcon,
   PhoneForwardedIcon
 } from "lucide-react";
-import Logo from "@/../public/assets/dialer-auth/logo.svg";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { cn } from "@/lib/utils";
 import { dialerShellStyles } from "@/features/dialer/styles/dialerStyles";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 const navItems = [
@@ -23,7 +22,12 @@ const navItems = [
     icon: PhoneForwardedIcon,
     key: "callbacks"
   },
-  { href: "/dialer/my-list", label: "My Lists", icon: PhoneCallIcon, key: "lists" },
+  {
+    href: "/dialer/my-list",
+    label: "My Lists",
+    icon: PhoneCallIcon,
+    key: "lists"
+  },
   {
     href: "/dialer/call-history",
     label: "History",

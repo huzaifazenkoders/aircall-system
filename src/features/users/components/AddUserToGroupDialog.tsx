@@ -60,13 +60,7 @@ const AddUserToGroupDialog = ({
   const [searchValue, setSearchValue] = React.useState("");
   const [selectedGroups, setSelectedGroups] = React.useState<string[]>([]);
 
-  const {
-    data,
-    isPending,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage
-  } = useGetGroups({
+  const { data, isPending, hasNextPage, fetchNextPage } = useGetGroups({
     limit: 20,
     search: searchValue || undefined
   });
@@ -267,7 +261,9 @@ const AddUserToGroupDialog = ({
             Cancel
           </Button>
           <Button
-            disabled={!userId || newlySelectedGroupIds.length === 0 || isAddingGroups}
+            disabled={
+              !userId || newlySelectedGroupIds.length === 0 || isAddingGroups
+            }
             onClick={handleSubmit}
           >
             {isAddingGroups ? (

@@ -1,11 +1,10 @@
 "use client";
 
 import React from "react";
-import { MenuIcon, XIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
 import AppSidebar from "@/components/custom/app-shell/AppSidebar";
 import AppTopbar from "@/components/custom/app-shell/AppTopbar";
+import { cn } from "@/lib/utils";
 
 const AppShell = ({
   children,

@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   ArrowLeftIcon,
   EllipsisVerticalIcon,
@@ -19,8 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GroupAvatar from "@/features/groups/components/GroupAvatar";
-import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { useGetGroupInfo } from "@/features/groups/services/groupService";
+import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { GroupInfo, GroupUser } from "@/features/groups/types/groupTypes";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
@@ -37,7 +36,7 @@ const GroupDetailsSheet = ({
   onUnassignList,
   onDeactivate,
   onDelete,
-  onEdit,
+  onEdit
 }: {
   groupId: string | null;
   open: boolean;
@@ -84,7 +83,10 @@ const GroupDetailsSheet = ({
                   align="end"
                   sideOffset={12}
                 >
-                  <DropdownMenuItem className={groupsStyles.menuItem} onClick={onEdit}>
+                  <DropdownMenuItem
+                    className={groupsStyles.menuItem}
+                    onClick={onEdit}
+                  >
                     <PencilIcon className="size-5 text-panel-muted" />
                     Edit
                   </DropdownMenuItem>
@@ -210,7 +212,7 @@ const GroupDetailsSheet = ({
                       className={groupsStyles.assignmentList}
                     >
                       {group.list_assignments.length ? (
-                        group.list_assignments.map((assignedList, i) => (
+                        group.list_assignments.map((assignedList) => (
                           <div
                             key={assignedList.id}
                             className={groupsStyles.assignmentRow}

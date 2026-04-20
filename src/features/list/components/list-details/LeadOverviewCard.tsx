@@ -42,13 +42,4 @@ const LeadOverviewCard = ({
   );
 };
 
-const getMetric = (source: Record<string, unknown>, keys: string[]) => {
-  for (const key of keys) {
-    const value = source[key];
-    if (typeof value === "number") return value;
-  }
-
-  return "N/A";
-};
-
 export default LeadOverviewCard;

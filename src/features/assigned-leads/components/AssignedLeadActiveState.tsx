@@ -63,7 +63,7 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
   const { mutate: createCallLog, isPending } = useCreateCallLog();
   const { mutate: startCall } = useStartCall();
 
-  const { dial, isReady, triggerEvent } = useAircall({
+  const { dial, isReady } = useAircall({
     containerId: "#phone-container",
     onCallInitiated: () => {
       startCall(lead.id);

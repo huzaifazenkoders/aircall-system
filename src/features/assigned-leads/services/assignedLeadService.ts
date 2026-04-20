@@ -1,8 +1,7 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "@/services/axios";
 import { assignedLeadKeys } from "@/features/assigned-leads/query-keys";
 import { CurrentLead } from "@/features/assigned-leads/types/assignedLeadTypes";
-import { CallStatus } from "@/features/call-logs/types/callLogTypes";
+import { axiosInstance } from "@/services/axios";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 // ─── Fetch Current Lead ───────────────────────────────────────────────────────
 

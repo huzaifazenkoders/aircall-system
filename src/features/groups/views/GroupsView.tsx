@@ -1,43 +1,42 @@
 "use client";
 
-import React, { useState } from "react";
-import { Loader2Icon } from "lucide-react";
-import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
-import GroupConfirmDialog from "@/features/groups/components/GroupConfirmDialog";
 import CreateGroupDialog from "@/features/groups/components/CreateGroupDialog";
 import EditGroupDialog from "@/features/groups/components/EditGroupDialog";
+import GroupConfirmDialog from "@/features/groups/components/GroupConfirmDialog";
 import GroupDetailsSheet from "@/features/groups/components/GroupDetailsSheet";
 import GroupSelectionDialog from "@/features/groups/components/GroupSelectionDialog";
 import GroupsEmptyState from "@/features/groups/components/GroupsEmptyState";
 import GroupsTable, {
   GroupsCreatedBanner
 } from "@/features/groups/components/GroupsTable";
-import { groupsStyles } from "@/features/groups/styles/groupsStyles";
-import {
-  useGetGroups,
-  useGetGroupInfo,
-  useAddUsersToGroup,
-  useRemoveUserFromGroup,
-  useUpdateGroupStatus,
-  useActivateGroup,
-  useDeleteGroup
-} from "@/features/groups/services/groupService";
 import { groupKeys } from "@/features/groups/query-keys";
-import { handleMutationError } from "@/utils/handleMutationError";
+import {
+  useActivateGroup,
+  useAddUsersToGroup,
+  useDeleteGroup,
+  useGetGroupInfo,
+  useGetGroups,
+  useRemoveUserFromGroup,
+  useUpdateGroupStatus
+} from "@/features/groups/services/groupService";
+import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import {
   Group,
   GroupInfo,
   GroupStatus,
   GroupUser
 } from "@/features/groups/types/groupTypes";
-import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import {
-  useUnassignList,
-  useAssignList
+  useAssignList,
+  useUnassignList
 } from "@/features/list/services/listService";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { useDebounce } from "use-debounce";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
@@ -109,7 +108,7 @@ const GroupsView = () => {
   const { mutate: updateStatus, isPending: isDeactivating } =
     useUpdateGroupStatus();
   const { mutate: activateGroup, isPending: isActivating } = useActivateGroup();
-  const { mutate: unassignList, isPending: isUnassigning } = useUnassignList();
+  const { mutate: unassignList } = useUnassignList();
   const { mutate: assignList, isPending: isAssigningList } = useAssignList();
   const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
 

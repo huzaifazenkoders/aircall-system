@@ -1,16 +1,25 @@
 "use client";
 
-import React from "react";
-import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
 import TablePagination from "@/components/ui/table-pagination";
+import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
+import React from "react";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import NoImage from "@/../public/assets/list/no-leads.png";
+import { buttonVariants } from "@/components/ui/button";
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -21,28 +30,18 @@ import {
 } from "@/components/ui/table";
 import TextInput from "@/components/ui/text-input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
-import { useGetLeads } from "@/features/list/services/listService";
-import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
-import {
   getLeadStatus,
   LeadStatusBadge
 } from "@/features/list/components/LeadStatusBadge";
-import Image from "next/image";
-import NoImage from "@/../public/assets/list/no-leads.png";
-import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
 import LeadDetailsDialog from "@/features/list/components/list-details/LeadDetailsDialog";
-import DateRangeSelector from "@/components/ui/date-range-selector";
+import MoveLeadDialog from "@/features/list/components/list-details/MoveLeadDialog";
+import { useGetLeads } from "@/features/list/services/listService";
+import { listDetailsStyles } from "@/features/list/styles/listDetailsStyles";
+import { Lead, LeadActivityStatus } from "@/features/list/types/leadTypes";
+import { cn } from "@/lib/utils";
 import { ReactDispatch } from "@/types/common";
+import Image from "next/image";
 import { ListStats } from "../../types/listTypes";
-
 
 const statusOptions = [
   { label: "All Status", value: "all" },

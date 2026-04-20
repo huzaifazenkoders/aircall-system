@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, PlayIcon } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 
 import PhoneList from "@/../public/assets/call-logs/PhoneList.svg";
@@ -14,7 +14,6 @@ import {
   DialogTitle
 } from "@/components/ui/dialog";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
-import { CallHistory } from "@/features/dialer/types/leadActivityTypes";
 import { useGetMyCallLogDetail } from "@/features/dialer/services/leadActivityService";
 
 const callStatusVariantMap: Record<string, string> = {
@@ -41,7 +40,7 @@ const CallHistoryDetailsSheet = ({
   const { data: detailResponse, isLoading } = useGetMyCallLogDetail(id);
   const record = detailResponse?.data;
 
-const leadName = record?.lead_name;
+  const leadName = record?.lead_name;
   const assignedName = record?.user_name;
   const assignedInitials = `${record?.user_name[0]}${record?.user_name[record?.user_name.length - 1]}`;
 

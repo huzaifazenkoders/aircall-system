@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -9,6 +8,7 @@ import {
   SearchIcon,
   UsersRoundIcon
 } from "lucide-react";
+import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import TextInput from "@/components/ui/text-input";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
-import { useGetUsers } from "@/features/users/services/userService";
 import { useGetLists } from "@/features/list/services/listService";
+import { useGetUsers } from "@/features/users/services/userService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 type SelectionItem = {
@@ -124,7 +124,6 @@ const GroupSelectionDialog = ({
     search: usesListQuery ? query || undefined : undefined
   });
 
-  const hasNextPage = usesUserQuery ? usersHasNextPage : listsHasNextPage;
   const fetchNextPage = usesUserQuery ? usersFetchNextPage : listsFetchNextPage;
 
   React.useEffect(() => {

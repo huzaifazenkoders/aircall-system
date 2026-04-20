@@ -1,19 +1,19 @@
 "use client";
 
-import React from "react";
+import TablePagination from "@/components/ui/table-pagination";
 import {
-  CalendarDaysIcon,
+  ChevronDownIcon,
   CircleCheckBigIcon,
   EyeIcon,
   ListChecksIcon,
   Loader2Icon,
   MoreHorizontalIcon,
   SearchIcon,
-  UsersRoundIcon,
-  X
+  UsersRoundIcon
 } from "lucide-react";
-import TablePagination from "@/components/ui/table-pagination";
+import React from "react";
 
+import DateSelector from "@/components/custom/date-selector.component";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,10 +28,9 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Group } from "@/features/groups/types/groupTypes";
-import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import TextInput from "@/components/ui/text-input";
-import DateSelector from "@/components/custom/date-selector.component";
+import { groupsStyles } from "@/features/groups/styles/groupsStyles";
+import { Group } from "@/features/groups/types/groupTypes";
 import { ReactDispatch } from "@/types/common";
 import moment from "moment";
 
@@ -71,7 +70,9 @@ const GroupsTable = ({
   onLimitChange: (limit: number) => void;
 }) => {
   const [page, setPage] = React.useState(1);
-  React.useEffect(() => { setPage(1); }, [limit, searchValue, statusFilter, date]);
+  React.useEffect(() => {
+    setPage(1);
+  }, [limit, searchValue, statusFilter, date]);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
   const paginatedGroups = groups.slice((page - 1) * limit, page * limit);

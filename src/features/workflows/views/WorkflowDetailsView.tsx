@@ -1,34 +1,33 @@
 "use client";
 
-import Link from "next/link";
-import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeftIcon,
-  BookOpenIcon,
   Loader2Icon,
   PencilLineIcon,
   PlusCircleIcon
 } from "lucide-react";
+import Link from "next/link";
+import React from "react";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import DispositionRuleDialog from "@/features/workflows/components/DispositionRuleDialog";
 import WorkflowConfirmDialog from "@/features/workflows/components/WorkflowConfirmDialog";
 import WorkflowRuleCard from "@/features/workflows/components/WorkflowRuleCard";
-import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
+import { workflowKeys } from "@/features/workflows/query-keys";
 import {
   useGetDispositions,
   useGetRemainingDispositionTypes
 } from "@/features/workflows/services/dispositionService";
 import { useUpdateWorkflowStatus } from "@/features/workflows/services/workflowService";
-import { workflowKeys } from "@/features/workflows/query-keys";
-import { handleMutationError } from "@/utils/handleMutationError";
-import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
 import {
   Disposition,
   WorkflowStatus
 } from "@/features/workflows/types/workflowTypes";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
 const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
   const queryClient = useQueryClient();
@@ -198,7 +197,9 @@ const WorkflowDetailsView = ({ workflowId }: { workflowId: string }) => {
               }}
             >
               <PlusCircleIcon className={workflowsStyles.addRuleIcon} />
-              <span className={workflowsStyles.addRuleText}>Add Disposition</span>
+              <span className={workflowsStyles.addRuleText}>
+                Add Disposition
+              </span>
             </button>
           )}
         </div>

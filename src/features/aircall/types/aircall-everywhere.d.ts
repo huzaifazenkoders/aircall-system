@@ -1,3 +1,4 @@
+// eslint-disable
 declare module "aircall-everywhere" {
   interface AircallOptions {
     domToLoadPhone?: string;

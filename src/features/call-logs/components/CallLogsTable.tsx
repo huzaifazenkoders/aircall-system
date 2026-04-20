@@ -1,11 +1,9 @@
 "use client";
 
-import React from "react";
-import { ArrowRightIcon } from "lucide-react";
 import TablePagination from "@/components/ui/table-pagination";
+import { ArrowRightIcon } from "lucide-react";
 
-import { DispositionBadge } from "@/features/workflows/components/DispositionBadge";
-import { DispositionType } from "@/features/workflows/types/workflowTypes";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -14,22 +12,11 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { type CallLog } from "@/features/call-logs/types/callLogTypes";
 import { callLogsStyles } from "@/features/call-logs/styles/callLogsStyles";
-
-const callStatusVariantMap: Record<string, string> = {
-  completed: "connected",
-  failed: "not-interested",
-  no_answer: "no-answer"
-};
-
-const callStatusLabelMap: Record<string, string> = {
-  completed: "Completed",
-  failed: "Failed",
-  no_answer: "No Answer"
-};
+import { type CallLog } from "@/features/call-logs/types/callLogTypes";
+import { DispositionBadge } from "@/features/workflows/components/DispositionBadge";
+import { DispositionType } from "@/features/workflows/types/workflowTypes";
+import { cn } from "@/lib/utils";
 
 type CallLogsTableProps = {
   rows: CallLog[];

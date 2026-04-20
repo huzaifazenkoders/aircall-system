@@ -1,8 +1,7 @@
 "use client";
 
+import { Loader2Icon, PlusIcon } from "lucide-react";
 import React from "react";
-import { PlusIcon, Loader2Icon } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,8 +13,8 @@ import {
 } from "@/components/ui/select";
 import CreateWorkflowDialog from "@/features/workflows/components/CreateWorkflowDialog";
 import WorkflowTemplateCard from "@/features/workflows/components/WorkflowTemplateCard";
-import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
 import { useGetWorkflows } from "@/features/workflows/services/workflowService";
+import { workflowsStyles } from "@/features/workflows/styles/workflowsStyles";
 import { WorkflowStatus } from "@/features/workflows/types/workflowTypes";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 
@@ -28,7 +27,6 @@ const statusOptions: Array<{ label: string; value: StatusFilter }> = [
 ];
 
 const WorkflowsView = () => {
-  const router = useRouter();
   const [createOpen, setCreateOpen] = React.useState(false);
   const [statusFilter, setStatusFilter] = React.useState<StatusFilter>("all");
 

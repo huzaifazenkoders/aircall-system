@@ -1,10 +1,10 @@
 "use client";
 
+import { CalendarIcon } from "lucide-react";
 import React from "react";
-import { CalendarIcon, Clock12Icon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import DateSelector from "@/components/custom/date-selector.component";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogBody,
@@ -26,14 +26,14 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import TimeSelector from "@/components/ui/time-selector";
 import {
   ListCleanupRecurrenceType,
   ListCleanupType
 } from "@/features/list/services/listService";
-import RadioSelector from "../RadioSelector";
-import TimeSelector from "@/components/ui/time-selector";
+import { cn } from "@/lib/utils";
 import moment from "moment";
+import RadioSelector from "../RadioSelector";
 
 type ScheduleListClearDialogProps = {
   open: boolean;

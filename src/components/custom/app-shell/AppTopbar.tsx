@@ -1,28 +1,27 @@
 "use client";
 
-import React, { useEffect } from "react";
 import { LogOutIcon, MenuIcon } from "lucide-react";
+import React, { useEffect } from "react";
 
+import ConfirmDialog from "@/components/ui/confirm-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import Toggle from "@/components/ui/toggle";
+import { myListStyles } from "@/features/dialer/styles/dialerStyles";
 import {
   useMe,
   useToggleAvailability
 } from "@/features/users/services/userService";
+import { cn } from "@/lib/utils";
+import { handleMutationError } from "@/utils/handleMutationError";
+import { useQueryClient } from "@tanstack/react-query";
 import { deleteCookie } from "cookies-next/client";
 import { usePathname, useRouter } from "next/navigation";
-import { myListStyles } from "@/features/dialer/styles/dialerStyles";
-import Toggle from "@/components/ui/toggle";
-import ConfirmDialog from "@/components/ui/confirm-dialog";
-import { handleMutationError } from "@/utils/handleMutationError";
 import toast from "react-hot-toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { authKeys } from "@/features/auth/query-keys";
 
 const UserAvatar = () => {
   return (

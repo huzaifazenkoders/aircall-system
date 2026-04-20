@@ -1,7 +1,7 @@
 import { AuthUser } from "@/features/auth/types/authTypes";
 import { List } from "@/features/list/types/listTypes";
 
-export interface GroupUser extends AuthUser {}
+export type GroupUser = AuthUser;
 
 export interface Group {
   id: string;

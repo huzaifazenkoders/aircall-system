@@ -1,7 +1,8 @@
 "use client";
 
-import { CalendarDaysIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import {
   Select,
   SelectContent,
@@ -9,9 +10,8 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { callbackStyles } from "@/features/dialer/styles/dialerStyles";
 import TextInput from "@/components/ui/text-input";
-import DateRangeSelector from "@/components/ui/date-range-selector";
+import { callbackStyles } from "@/features/dialer/styles/dialerStyles";
 
 const CallbackSchedulesFilters = ({
   searchValue,

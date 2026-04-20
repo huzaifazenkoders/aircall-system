@@ -20,8 +20,7 @@ const WorkflowConfirmDialog = ({
   title,
   content,
   actionLabel,
-  onConfirm,
-  destructive = false
+  onConfirm
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;

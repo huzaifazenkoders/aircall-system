@@ -5,7 +5,6 @@ import {
   LeadActivity,
   LeadActivityDetail,
   LeadActivityStatus,
-  MyCallLogDetail,
   MyCallStatus
 } from "@/features/dialer/types/leadActivityTypes";
 import { axiosInstance } from "@/services/axios";
