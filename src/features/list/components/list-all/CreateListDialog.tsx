@@ -70,7 +70,11 @@ const validationSchema = Yup.object({
     .min(1, "Priority must be at least 1")
     .max(99, "Priority must be at most 99")
     .integer("Priority must be a whole number")
-    .required("Priority is required"),
+    .when("assign_type", {
+      is: "individual",
+      then: (s) => s.optional(),
+      otherwise: (s) => s.required("Priority is required")
+    }),
   cooldown_minimum_hours: Yup.number()
     .min(0, "Hours cannot be negative")
     .max(999, "Hours must be at most 999")
@@ -180,7 +184,9 @@ const CreateListDialog = ({
         description: values.description.trim(),
         call_type: values.call_type,
         workflow_id: values.workflow_id.trim(),
-        priority: values.priority,
+        ...(values.assign_type !== "individual" && {
+          priority: values.priority
+        }),
         cooldown_minimum_hours: values.cooldown_minimum_hours,
         cooldown_minimum_minutes: values.cooldown_minimum_minutes,
         assign_type: values.assign_type,
@@ -300,7 +306,7 @@ const CreateListDialog = ({
               />
             </Field>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Field
                 label="Call Type"
                 required
@@ -358,7 +364,7 @@ const CreateListDialog = ({
               </Field>
             </div>
 
-            {/* <div className="grid grid-cols-2 gap-6"> */}
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> */}
             {/* <Field
                 label="List Type"
                 error={
@@ -384,57 +390,61 @@ const CreateListDialog = ({
                 </Select>
               </Field> */}
 
-            <Field label="Priority Level" required>
-              <div className="flex items-center gap-2">
-                <TextInput
-                  id="priority"
-                  value={String(formik.values.priority)}
-                  setValue={(v) =>
-                    formik.setFieldValue("priority", Number(v) || 1)
-                  }
-                  onBlur={formik.handleBlur}
-                  className="px-4 text-sm bg-transparent w-full"
-                  containerClassName="w-full"
-                  error={
-                    formik.touched.priority ? formik.errors.priority : undefined
-                  }
-                />
-                <div className="grid grid-rows-2 overflow-hidden rounded-xl">
-                  <button
-                    type="button"
-                    className="grid place-items-center text-muted-foreground hover:text-primary"
-                    onClick={() =>
-                      formik.setFieldValue(
-                        "priority",
-                        Math.min(99, formik.values.priority + 1)
-                      )
+            {formik.values.assign_type !== "individual" && (
+              <Field label="Priority Level" required>
+                <div className="flex items-center gap-2">
+                  <TextInput
+                    id="priority"
+                    value={String(formik.values.priority)}
+                    setValue={(v) =>
+                      formik.setFieldValue("priority", Number(v) || 1)
                     }
-                  >
-                    <ChevronUpIcon className="size-5" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    className="grid place-items-center text-muted-foreground hover:text-primary"
-                    onClick={() =>
-                      formik.setFieldValue(
-                        "priority",
-                        Math.max(1, formik.values.priority - 1)
-                      )
+                    onBlur={formik.handleBlur}
+                    className="px-4 text-sm bg-transparent w-full"
+                    containerClassName="w-full"
+                    error={
+                      formik.touched.priority
+                        ? formik.errors.priority
+                        : undefined
                     }
-                  >
-                    <ChevronDownIcon className="size-5" aria-hidden="true" />
-                  </button>
+                  />
+                  <div className="grid grid-rows-2 overflow-hidden rounded-xl">
+                    <button
+                      type="button"
+                      className="grid place-items-center text-muted-foreground hover:text-primary"
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "priority",
+                          Math.min(99, formik.values.priority + 1)
+                        )
+                      }
+                    >
+                      <ChevronUpIcon className="size-5" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      className="grid place-items-center text-muted-foreground hover:text-primary"
+                      onClick={() =>
+                        formik.setFieldValue(
+                          "priority",
+                          Math.max(1, formik.values.priority - 1)
+                        )
+                      }
+                    >
+                      <ChevronDownIcon className="size-5" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <p className="mt-2 text-xs text-muted-foreground">
-                1 is highest priority. Leads will remain in the highest priority
-                list.
-              </p>
-            </Field>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  1 is highest priority. Leads will remain in the highest
+                  priority list.
+                </p>
+              </Field>
+            )}
             {/* </div> */}
 
             <Field label="Minimum Hours Between Calls" required>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <TextInput
                   id="cooldown_minimum_hours"
                   value={String(formik.values.cooldown_minimum_hours)}
@@ -489,7 +499,7 @@ const CreateListDialog = ({
             {initialList && initialList?.list_type === "individual" ? null : (
               <>
                 <Field label="Assignation">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <RadioSelector
                       label="Assign List to Group"
                       checked={formik.values.assign_type === "group"}

@@ -74,7 +74,7 @@ function DialogHeader({
     <div
       data-slot="dialog-header"
       className={cn(
-        "flex items-start justify-between gap-6 border-b border-border px-8 pt-7 pb-6",
+        "flex items-start justify-between gap-3 border-b border-border px-8 pt-7 pb-6",
         className
       )}
       {...props}

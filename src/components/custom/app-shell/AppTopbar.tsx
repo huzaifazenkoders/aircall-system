@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, MenuIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -57,7 +57,7 @@ const UserAvatar = () => {
   );
 };
 
-const AppTopbar = () => {
+const AppTopbar = ({ openSidebar }: { openSidebar: VoidFunction }) => {
   const { data, isPending, isError } = useMe();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -99,8 +99,18 @@ const AppTopbar = () => {
   };
 
   return (
-    <>
-      <header className="flex items-center justify-end border-b gap-2 border-border px-3 md:px-5 pb-5">
+    <div className="w-full flex items-center justify-between lg:justify-end border-b border-border">
+      <div className="flex items-center justify-center gap-2 lg:hidden pb-3">
+        <button
+          type="button"
+          aria-label="Open sidebar"
+          onClick={openSidebar}
+          className="rounded-lg p-2 hover:bg-muted"
+        >
+          <MenuIcon className="size-6" />
+        </button>
+      </div>
+      <header className="flex items-center justify-end gap-2 px-3 md:px-5 pb-3">
         {data.data.role === "sales_person" ? (
           <div className="flex items-center gap-2 ml-auto">
             <span className={myListStyles.listCardToggleLabel}>
@@ -164,7 +174,7 @@ const AppTopbar = () => {
         confirmLabel={isUnavailable ? "Set Available" : "Set Unavailable"}
         onConfirm={handleToggle}
       />
-    </>
+    </div>
   );
 };
 

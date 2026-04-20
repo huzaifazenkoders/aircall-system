@@ -47,17 +47,7 @@ const AppShell = ({
         <AppSidebar activeKey={activeKey} />
 
         <div className="flex min-w-0 flex-col">
-          <div className="flex items-center gap-2 lg:hidden mb-2">
-            <button
-              type="button"
-              aria-label="Open sidebar"
-              onClick={() => setSidebarOpen(true)}
-              className="rounded-lg p-2 hover:bg-muted"
-            >
-              <MenuIcon className="size-6" />
-            </button>
-          </div>
-          <AppTopbar />
+          <AppTopbar openSidebar={() => setSidebarOpen(true)} />
           <main className="flex min-h-0 flex-1 flex-col px-1 pt-2">
             {children}
           </main>

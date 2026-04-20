@@ -148,7 +148,7 @@ interface CreateListReq {
     description: string;
     cooldown_minimum_hours: number;
     cooldown_minimum_minutes: number;
-    priority: number;
+    priority?: number;
     call_type: CallType;
     assign_type: AssignType;
     list_type: ListType;
@@ -170,7 +170,7 @@ interface UpdateListReq {
     description: string;
     cooldown_minimum_hours: number;
     cooldown_minimum_minutes: number;
-    priority: number;
+    priority?: number;
     call_type: CallType;
     assign_type: AssignType;
     list_type: ListType;
