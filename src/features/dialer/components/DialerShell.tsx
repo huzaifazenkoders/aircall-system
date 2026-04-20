@@ -10,7 +10,7 @@ const DialerShell = ({ children }: { children: ReactNode }) => {
       <div className={dialerShellStyles.frame}>
         <DialerSidebar />
         <div className={dialerShellStyles.content}>
-          <AppTopbar />
+          <AppTopbar openSidebar={() => {}} />
           <main className={dialerShellStyles.page}>{children}</main>
         </div>
       </div>
