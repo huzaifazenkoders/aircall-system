@@ -1,7 +1,7 @@
 // eslint-disable
 declare module "aircall-everywhere" {
   interface AircallOptions {
-    domToLoadPhone?: string;
+    domToLoadWorkspace?: string;
     integrationToLoad?: string;
     onLogin?: (settings: any) => void;
     onLogout?: () => void;

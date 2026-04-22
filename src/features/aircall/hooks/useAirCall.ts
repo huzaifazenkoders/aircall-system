@@ -23,21 +23,42 @@ export function useAircall({ containerId, onCallEnded, onCallInitiated }: Props)
   const [isReady, setIsReady] = useState(false);
   // eslint-disable-next-line
   const callbacksRef = useRef<Partial<Record<AircallEvent, (data: any) => void>>>({});
+  const isReadyRef = useRef(false);
   const onCallInitiatedRef = useRef(onCallInitiated);
   const onCallEndedRef = useRef(onCallEnded);
   onCallInitiatedRef.current = onCallInitiated;
   onCallEndedRef.current = onCallEnded;
+  isReadyRef.current = isReady;
+
+  // When OAuth sign-in opens a new tab, the iframe never reloads on return.
+  // Re-trigger it by reloading the iframe src when the user comes back to this tab.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && !isReadyRef.current) {
+        const iframe = document.querySelector<HTMLIFrameElement>(`${containerId} iframe`);
+        if (iframe) {
+          iframe.src = iframe.src;
+          console.log("Aircall iframe reloaded after tab refocus");
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [containerId]);
 
   useEffect(() => {
     if (phoneRef.current) return;
 
     const phone = new AircallPhone({
-      domToLoadPhone: containerId,
+      domToLoadWorkspace: containerId,
       onLogin: () => {
+        isReadyRef.current = true;
         setIsReady(true);
         console.log("Aircall agent logged in");
       },
       onLogout: () => {
+        isReadyRef.current = false;
         setIsReady(false);
         console.log("Aircall agent logged out");
       }
