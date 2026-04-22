@@ -16,9 +16,16 @@ type Props = {
   // eslint-disable-next-line
   onCallEnded?: (data: any) => void;
   onCallInitiated?: () => void;
+  // eslint-disable-next-line
+  onOutgoingCall?: (data: any) => void;
 };
 
-export function useAircall({ containerId, onCallEnded, onCallInitiated }: Props) {
+export function useAircall({
+  containerId,
+  onCallEnded,
+  onCallInitiated,
+  onOutgoingCall
+}: Props) {
   const phoneRef = useRef<AircallPhone | null>(null);
   const [isReady, setIsReady] = useState(false);
   // eslint-disable-next-line
@@ -26,8 +33,10 @@ export function useAircall({ containerId, onCallEnded, onCallInitiated }: Props)
   const isReadyRef = useRef(false);
   const onCallInitiatedRef = useRef(onCallInitiated);
   const onCallEndedRef = useRef(onCallEnded);
+  const onOutgoingCallRef = useRef(onOutgoingCall);
   onCallInitiatedRef.current = onCallInitiated;
   onCallEndedRef.current = onCallEnded;
+  onOutgoingCallRef.current = onOutgoingCall;
   isReadyRef.current = isReady;
 
   // When OAuth sign-in opens a new tab, the iframe never reloads on return.
@@ -69,8 +78,9 @@ export function useAircall({ containerId, onCallEnded, onCallInitiated }: Props)
       phone.on(event, cb);
     };
 
-    register("outgoing_call", () => {
+    register("outgoing_call", (data) => {
       console.log("Call started");
+      onOutgoingCallRef.current?.(data);
       onCallInitiatedRef.current?.();
     });
 

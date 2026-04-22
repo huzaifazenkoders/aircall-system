@@ -54,21 +54,49 @@ const CALL_STATUS_MAP: Record<string, "completed" | "failed" | "no_answer"> = {
   "Ban Contact": "failed"
 };
 
+const normalizePhoneNumber = (value?: string | null) =>
+  (value ?? "").replace(/\D/g, "");
+
 const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
   const queryClient = useQueryClient();
   const [callOutcomeOpen, setCallOutcomeOpen] = React.useState(
     lead.status === "in_progress"
   );
+  const lastDialedNumberRef = React.useRef<string | null>(null);
 
   const { mutate: createCallLog, isPending } = useCreateCallLog();
   const { mutate: startCall } = useStartCall();
 
   const { dial, isReady } = useAircall({
     containerId: "#phone-container",
-    onCallInitiated: () => {
-      startCall(lead.id);
+    onOutgoingCall: (data) => {
+      const dialedNumber = data?.to ?? null;
+      const expectedNumber = normalizePhoneNumber(lead.lead.phone);
+      const normalizedDialedNumber = normalizePhoneNumber(dialedNumber);
+
+      lastDialedNumberRef.current = dialedNumber;
+
+      if (
+        expectedNumber &&
+        normalizedDialedNumber &&
+        expectedNumber === normalizedDialedNumber
+      ) {
+        startCall(lead.id);
+      }
     },
     onCallEnded: () => {
+      const expectedNumber = normalizePhoneNumber(lead.lead.phone);
+      const dialedNumber = normalizePhoneNumber(lastDialedNumberRef.current);
+
+      if (expectedNumber && dialedNumber && expectedNumber !== dialedNumber) {
+        toast.error(
+          "The dialed number did not match this lead's phone number, so disposition was skipped."
+        );
+        lastDialedNumberRef.current = null;
+        return;
+      }
+
+      lastDialedNumberRef.current = null;
       setCallOutcomeOpen(true);
     }
   });
