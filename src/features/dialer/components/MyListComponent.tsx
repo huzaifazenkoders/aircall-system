@@ -246,7 +246,8 @@ const MyListComponent = () => {
                   key={list.id}
                   className={cn(
                     myListStyles.listCard,
-                    list.user_priorities?.[0]?.is_active
+                    !list.user_priorities.length ||
+                      list.user_priorities?.[0]?.is_active
                       ? myListStyles.listCardActive
                       : myListStyles.listCardInactive,
                     selectedList?.id === list.id && "border-3 border-primary"
@@ -259,7 +260,8 @@ const MyListComponent = () => {
                     </span>
                     <div className={myListStyles.listCardToggleWrap}>
                       <span className={myListStyles.listCardToggleLabel}>
-                        {list.user_priorities?.[0]?.is_active
+                        {!list.user_priorities.length ||
+                        list.user_priorities?.[0]?.is_active
                           ? "Active"
                           : "Inactive"}
                       </span>
@@ -272,7 +274,12 @@ const MyListComponent = () => {
                           handleToggleList(list);
                         }}
                       >
-                        <Toggle active={list.user_priorities?.[0]?.is_active} />
+                        <Toggle
+                          active={
+                            !list.user_priorities.length ||
+                            list.user_priorities?.[0]?.is_active
+                          }
+                        />
                       </button>
                     </div>
                   </div>
