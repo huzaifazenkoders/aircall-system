@@ -20,7 +20,7 @@ export const dialerShellStyles = {
   ),
   navItemActive: cn("bg-brand-900"),
   navLabel: cn(
-    "text-[10px] font-normal leading-4 text-white lg:text-xs lg:leading-5"
+    "text-[10px] font-normal text-center whitespace-nowrap leading-4 text-white lg:text-xs lg:leading-5"
   ),
   content: cn("flex min-w-0 flex-col"),
   topbar: cn(

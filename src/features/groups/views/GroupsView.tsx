@@ -37,6 +37,7 @@ import {
 } from "@/features/list/services/listService";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { parseAsString, useQueryState } from "nuqs";
 import { useDebounce } from "use-debounce";
 
 type ListAssignment = GroupInfo["list_assignments"][number];
@@ -51,10 +52,14 @@ const GroupsView = () => {
   const [statusFilter, setStatusFilter] = React.useState<
     "All Status" | GroupStatus
   >("All Status");
-  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(
-    null
+  const [groupIdParam, setGroupIdParam] = useQueryState(
+    "group_id",
+    parseAsString.withOptions({ shallow: true })
   );
-  const [sheetOpen, setSheetOpen] = React.useState(false);
+  const [selectedGroupId, setSelectedGroupId] = React.useState<string | null>(
+    groupIdParam ?? null
+  );
+  const [sheetOpen, setSheetOpen] = React.useState(!!groupIdParam);
   const [activeSheetTab, setActiveSheetTab] = React.useState<
     "members" | "lists"
   >("members");
@@ -213,7 +218,7 @@ const GroupsView = () => {
           toast.success("Group deleted successfully");
           queryClient.invalidateQueries({ queryKey: groupKeys.all });
           setDeleteOpen(false);
-          setSheetOpen(false);
+          closeSheet();
           setSelectedGroupId(null);
         },
         onError: handleMutationError
@@ -243,8 +248,14 @@ const GroupsView = () => {
 
   const openDetails = (groupId: string, tab: "members" | "lists") => {
     setSelectedGroupId(groupId);
+    setGroupIdParam(groupId);
     setActiveSheetTab(tab);
     setSheetOpen(true);
+  };
+
+  const closeSheet = () => {
+    setSheetOpen(false);
+    setGroupIdParam(null);
   };
 
   return (
@@ -305,7 +316,7 @@ const GroupsView = () => {
         open={sheetOpen}
         activeTab={activeSheetTab}
         onTabChange={setActiveSheetTab}
-        onClose={() => setSheetOpen(false)}
+        onClose={closeSheet}
         onAddMembers={() => setAddMembersOpen(true)}
         onAssignLists={() => setAssignListsOpen(true)}
         onRemoveMember={setMemberToRemove}

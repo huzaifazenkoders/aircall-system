@@ -202,12 +202,12 @@ const AssignedLeadActiveState = ({ lead }: { lead: CurrentLead }) => {
                       value={lead.lead.event_name || "N/A"}
                     />
                     <AssignedLeadInfo
-                      label="Event Date"
-                      value={lead.lead.event_date || "N/A"}
-                    />
-                    <AssignedLeadInfo
                       label="Location"
                       value={lead.lead.event_location}
+                    />
+                    <AssignedLeadInfo
+                      label="Event Date"
+                      value={lead.lead.event_date || "N/A"}
                     />
                     <AssignedLeadInfo
                       label="Referral"

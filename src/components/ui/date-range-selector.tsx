@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import moment from "moment";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ReactDispatch } from "@/types/common";
@@ -376,7 +376,22 @@ const DateRangeSelector = ({
           )}
         >
           {triggerLabel}
-          <Calendar className="size-5 absolute right-3" />
+          {hasDates ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                const cleared = { startDate: null, endDate: null };
+                setRange(cleared);
+                setValue?.(cleared);
+              }}
+              className="absolute right-3 flex items-center justify-center rounded-full p-0.5 text-text-secondary hover:bg-border-primary hover:text-text-primary"
+            >
+              <X className="size-4" />
+            </button>
+          ) : (
+            <Calendar className="size-5 absolute right-3" />
+          )}
         </DropdownMenuTrigger>
       )}
 

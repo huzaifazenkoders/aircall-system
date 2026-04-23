@@ -2,6 +2,7 @@
 
 import TablePagination from "@/components/ui/table-pagination";
 import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
+import { parseAsString, useQueryState } from "nuqs";
 import React from "react";
 
 import NoImage from "@/../public/assets/list/no-leads.png";
@@ -65,7 +66,10 @@ const LeadsTable = ({
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
-  const [statusFilter, setStatusFilter] = React.useState<string>("all");
+  const [statusFilter, setStatusFilter] = useQueryState(
+    "lead_status",
+    parseAsString.withDefault("all").withOptions({ shallow: true })
+  );
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
   const [leadDetailsOpen, setLeadDetailsOpen] = React.useState(false);
