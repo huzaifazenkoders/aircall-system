@@ -51,7 +51,7 @@ export const callHistoryStyles = {
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center gap-3 w-full"
+    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3 w-full"
   ),
   searchField: cn(
     "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-11 px-3 py-1.5"

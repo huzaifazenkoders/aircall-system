@@ -73,6 +73,7 @@ export function useGetLeadActivityDetail(id: string) {
 interface GetMyCallLogsReq {
   page: number;
   limit: number;
+  search?: string;
   lead_id?: string;
   list_id?: string;
   assigned_to?: string;
@@ -98,6 +99,7 @@ interface GetMyCallLogsRes {
 export function useGetMyCallLogs({
   page,
   limit,
+  search,
   lead_id,
   list_id,
   assigned_to,
@@ -108,6 +110,7 @@ export function useGetMyCallLogs({
     queryKey: dialerKeys.myLogs({
       page,
       limit,
+      search,
       lead_id,
       list_id,
       assigned_to,
@@ -119,6 +122,7 @@ export function useGetMyCallLogs({
         params: {
           page,
           limit,
+          search: search || undefined,
           lead_id,
           list_id,
           assigned_to,

@@ -1,6 +1,7 @@
 "use client";
 import axios from "axios";
 import { deleteCookie, getCookie } from "cookies-next/client";
+import toast from "react-hot-toast";
 
 // ----------------|| Base Url ||-------------------
 
@@ -26,6 +27,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      toast.error("Unauthorized, logging you out pleas wait.");
       deleteCookie("token");
       window.location.href = "/auth/sign-in";
     }

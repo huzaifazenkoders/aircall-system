@@ -2,6 +2,7 @@
 
 import React from "react";
 import { CalendarIcon, Loader2Icon } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import CallHistoryDetailsSheet from "@/features/dialer/components/CallHistoryDetailsSheet";
 import CallHistoryEmptyState from "@/features/dialer/components/CallHistoryEmptyState";
@@ -25,6 +26,7 @@ const CallHistoryView = () => {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [statusValue, setStatusValue] = React.useState("");
   const [selectedDate, setSelectedDate] = React.useState<string | undefined>();
   const [selectedId, setSelectedId] = React.useState("");
@@ -33,13 +35,14 @@ const CallHistoryView = () => {
   const { data, isPending, isError } = useGetMyCallLogs({
     page,
     limit,
+    search: debouncedSearch || undefined,
     call_status: (statusValue as MyCallStatus) || undefined,
     date: selectedDate
   });
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
-  const isDefaultState = !statusValue;
+  const isDefaultState = !debouncedSearch && !statusValue && !selectedDate;
   const shouldShowEmptyStateOnly =
     !isPending && !isError && rows.length === 0 && isDefaultState;
 
@@ -65,9 +68,7 @@ const CallHistoryView = () => {
         </DropdownMenu>
       </div>
 
-      {data?.data?.my_stats && (
-        <CallHistoryStats myStats={data?.data?.my_stats} />
-      )}
+      <CallHistoryStats myStats={data?.data?.my_stats} isPending={isPending} />
 
       <>
         {shouldShowEmptyStateOnly ? (

@@ -17,6 +17,8 @@ import TextInput from "@/components/ui/text-input";
 type StatusOption = { label: string; value: string };
 
 type CallLogFiltersProps = {
+  searchValue: string;
+  onSearchChange: (value: string) => void;
   selectedList: string;
   onListChange: (value: string) => void;
   selectedStatus: string;
@@ -28,6 +30,8 @@ type CallLogFiltersProps = {
 };
 
 const CallLogFilters = ({
+  searchValue,
+  onSearchChange,
   selectedStatus,
   onStatusChange,
   statusOptions,
@@ -38,7 +42,8 @@ const CallLogFilters = ({
   return (
     <div className={callLogsStyles.toolbar}>
       <TextInput
-        setValue={() => {}}
+        value={searchValue}
+        setValue={onSearchChange}
         startIcon={
           <SearchIcon className="size-5 text-[#667085]" aria-hidden="true" />
         }
