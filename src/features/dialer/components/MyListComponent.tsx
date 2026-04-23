@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import FocusModeDialog from "@/features/dialer/components/FocusModeDialog";
 import ResumeAllListsDialog from "@/features/dialer/components/ResumeAllListsDialog";
 import ActivateListDialog from "@/features/dialer/components/ActivateListDialog";
@@ -63,6 +64,8 @@ const MyListComponent = () => {
   const [selectedList, setSelectedList] = React.useState<MyList | null>(null);
   const [leadSearch, setLeadSearch] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("All Status");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
   const [leadsPage, setLeadsPage] = React.useState(1);
   const [leadsLimit, setLeadsLimit] = React.useState(10);
 
@@ -102,7 +105,9 @@ const MyListComponent = () => {
     status:
       statusFilter !== "All Status"
         ? (statusFilter.toLowerCase() as never)
-        : undefined
+        : undefined,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined
   });
 
   const leads = leadsData?.data?.data ?? [];
@@ -360,6 +365,27 @@ const MyListComponent = () => {
                   ))}
                 </SelectContent>
               </Select>
+
+              <DateRangeSelector
+                triggerClassName="h-9 text-sm text-gray-800 border-zinc-200"
+                value={{
+                  startDate: startDate ? new Date(startDate) : null,
+                  endDate: endDate ? new Date(endDate) : null
+                }}
+                setValue={(range) => {
+                  setStartDate(
+                    range.startDate
+                      ? range.startDate.toISOString().slice(0, 10)
+                      : ""
+                  );
+                  setEndDate(
+                    range.endDate
+                      ? range.endDate.toISOString().slice(0, 10)
+                      : ""
+                  );
+                  setLeadsPage(1);
+                }}
+              />
             </div>
           </div>
 

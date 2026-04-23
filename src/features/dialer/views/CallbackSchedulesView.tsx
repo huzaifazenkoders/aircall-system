@@ -39,7 +39,7 @@ const CallbackSchedulesView = () => {
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
-  const isDefaultState = statusValue === "All Status";
+  const isDefaultState = statusValue === "All Status" && debouncedSearch === "";
   const shouldShowEmptyStateOnly =
     !isPending && !isError && rows.length === 0 && isDefaultState;
 
@@ -82,7 +82,10 @@ const CallbackSchedulesView = () => {
                 total={meta?.total ?? 0}
                 totalPages={meta?.totalPages ?? 1}
                 onPageChange={setPage}
-                onLimitChange={(l) => { setLimit(l); setPage(1); }}
+                onLimitChange={(l) => {
+                  setLimit(l);
+                  setPage(1);
+                }}
                 onSelect={(row) => {
                   setSelectedActivityId(row.id);
                   setDialogOpen(true);

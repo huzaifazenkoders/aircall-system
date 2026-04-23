@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditUserDialog from "@/features/users/components/EditUserDialog";
+import ToggleUserStatusDialog from "@/features/users/components/ToggleUserStatusDialog";
 import UnassignUserListDialog from "@/features/users/components/UnassignUserListDialog";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import {
@@ -32,6 +33,7 @@ import {
 } from "@/features/users/services/userService";
 import { userKeys } from "@/features/users/query-keys";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { cn } from "@/lib/utils";
 
 const stats = [
   { key: "total_calls_made" as const, label: "Total Calls Made" },
@@ -63,6 +65,7 @@ const UserDetailsSheet = ({
     "groups"
   );
   const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [isToggleStatusOpen, setIsToggleStatusOpen] = React.useState(false);
   const [isUnassignListOpen, setIsUnassignListOpen] = React.useState(false);
   const [selectedList, setSelectedList] = React.useState<{
     id: string;
@@ -82,6 +85,7 @@ const UserDetailsSheet = ({
   React.useEffect(() => {
     if (!open) {
       setIsEditOpen(false);
+      setIsToggleStatusOpen(false);
       setIsUnassignListOpen(false);
       setSelectedList(null);
     }
@@ -101,6 +105,7 @@ const UserDetailsSheet = ({
                 ? "User activated successfully"
                 : "User deactivated successfully")
           );
+          setIsToggleStatusOpen(false);
           void queryClient.invalidateQueries({ queryKey: userKeys.all });
           void queryClient.invalidateQueries({
             queryKey: userKeys.detail(userId)
@@ -134,8 +139,15 @@ const UserDetailsSheet = ({
                       {user ? `${user.first_name} ${user.last_name}` : "—"}
                     </h2>
                     {user && (
-                      <span className={usersStyles.statusPill}>
-                        {user.status}
+                      <span
+                        className={cn(
+                          usersStyles.statusPill,
+                          user.status === "suspend"
+                            ? "bg-[#DCDFE4] text-[#565E73]"
+                            : ""
+                        )}
+                      >
+                        {user.status === "suspend" ? "Inactive" : "Active"}
                       </span>
                     )}
                   </div>
@@ -171,10 +183,10 @@ const UserDetailsSheet = ({
                   <DropdownMenuItem
                     className={usersStyles.menuItem}
                     disabled={isDeactivating || isActivating}
-                    onClick={handleToggleStatus}
+                    onClick={() => setIsToggleStatusOpen(true)}
                   >
                     <RotateCcwIcon className="size-5 text-panel-muted" />
-                    {user?.status === "suspend" ? "Active" : "Inactive"}
+                    {user?.status === "suspend" ? "Activate" : "Deactivate"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -367,6 +379,14 @@ const UserDetailsSheet = ({
           )}
         </section>
       </aside>
+
+      <ToggleUserStatusDialog
+        open={isToggleStatusOpen}
+        onOpenChange={setIsToggleStatusOpen}
+        isActive={user?.status !== "suspend"}
+        isPending={isDeactivating || isActivating}
+        onConfirm={handleToggleStatus}
+      />
 
       <EditUserDialog
         open={isEditOpen}

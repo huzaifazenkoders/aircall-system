@@ -39,7 +39,6 @@ import { User } from "@/features/users/types/userTypes";
 import { ReactDispatch } from "@/types/common";
 import UsersEmptyState from "./UsersEmptyState";
 
-
 const statusBadge = (status: User["status"]) => {
   if (status === "active")
     return (
@@ -103,9 +102,10 @@ const UsersManagementTable = ({
     setPage(1);
   }, [searchValue, statusFilter, limit]);
 
+  // if (true) {
   if (users.length === 0 && !isPending && !error) {
     return (
-      <div className="flex center h-full w-full -mt-20">
+      <div className="flex center h-full w-full -mt-10">
         <UsersEmptyState onAddUser={onAddUser} showButton={true} />
       </div>
     );

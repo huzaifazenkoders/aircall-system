@@ -17,7 +17,7 @@ export const callLogsStyles = {
   ),
   filterRow: cn("flex flex-wrap items-center gap-3 lg:justify-end"),
   filterTrigger: cn(
-    "h-11 min-w-[132px] rounded-lg border-border-primary bg-input px-3 text-base text-text-primary placeholder:text-text-secondary shadow-xs"
+    "h-11 rounded-lg border-border-primary bg-input px-3 text-base text-text-primary placeholder:text-text-secondary shadow-xs"
   ),
   dateTrigger: cn("min-w-[170px]"),
   selectContent: cn(

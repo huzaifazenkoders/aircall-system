@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import { getCookie } from "cookies-next/client";
+import { deleteCookie, getCookie } from "cookies-next/client";
 
 // ----------------|| Base Url ||-------------------
 
@@ -21,3 +21,14 @@ axiosInstance.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      deleteCookie("token");
+      window.location.href = "/auth/sign-in";
+    }
+    return Promise.reject(error);
+  }
+);

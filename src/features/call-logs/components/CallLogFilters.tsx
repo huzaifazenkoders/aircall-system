@@ -3,6 +3,7 @@
 import React from "react";
 import { SearchIcon } from "lucide-react";
 
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import {
   Select,
   SelectContent,
@@ -21,12 +22,18 @@ type CallLogFiltersProps = {
   selectedStatus: string;
   onStatusChange: (value: string | null) => void;
   statusOptions: StatusOption[];
+  startDate: string;
+  endDate: string;
+  onDateChange: (startDate: string, endDate: string) => void;
 };
 
 const CallLogFilters = ({
   selectedStatus,
   onStatusChange,
-  statusOptions
+  statusOptions,
+  startDate,
+  endDate,
+  onDateChange
 }: CallLogFiltersProps) => {
   return (
     <div className={callLogsStyles.toolbar}>
@@ -55,6 +62,19 @@ const CallLogFilters = ({
             ))}
           </SelectContent>
         </Select>
+
+        <DateRangeSelector
+          value={{
+            startDate: startDate ? new Date(startDate) : null,
+            endDate: endDate ? new Date(endDate) : null
+          }}
+          setValue={(range) => {
+            onDateChange(
+              range.startDate ? range.startDate.toISOString().slice(0, 10) : "",
+              range.endDate ? range.endDate.toISOString().slice(0, 10) : ""
+            );
+          }}
+        />
       </div>
     </div>
   );

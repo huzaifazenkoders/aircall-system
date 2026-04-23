@@ -13,6 +13,8 @@ interface GetCallLogsReq {
   list_id?: string;
   assigned_to?: string;
   call_status?: CallStatus;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface GetCallLogsRes {
@@ -29,7 +31,9 @@ export function useGetCallLogs({
   lead_id,
   list_id,
   assigned_to,
-  call_status
+  call_status,
+  startDate,
+  endDate
 }: GetCallLogsReq) {
   return useQuery({
     queryKey: callLogKeys.list({
@@ -38,11 +42,13 @@ export function useGetCallLogs({
       lead_id,
       list_id,
       assigned_to,
-      call_status
+      call_status,
+      startDate,
+      endDate
     }),
     queryFn: async () => {
       const res = await axiosInstance.get("/call-logs", {
-        params: { page, limit, lead_id, list_id, assigned_to, call_status }
+        params: { page, limit, lead_id, list_id, assigned_to, call_status, startDate, endDate }
       });
       return res.data as GetCallLogsRes;
     }

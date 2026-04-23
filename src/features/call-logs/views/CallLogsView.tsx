@@ -26,6 +26,8 @@ const CallLogsView = () => {
   const [limit, setLimit] = React.useState(10);
   const [selectedListId, setSelectedListId] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState("");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
   const [selectedCallLogId, setSelectedCallLogId] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
@@ -33,7 +35,9 @@ const CallLogsView = () => {
     page,
     limit,
     list_id: selectedListId || undefined,
-    call_status: (selectedStatus as CallStatus) || undefined
+    call_status: (selectedStatus as CallStatus) || undefined,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined
   });
 
   const { data: detailData, isPending: isDetailPending } =
@@ -41,7 +45,7 @@ const CallLogsView = () => {
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
-  const isDefaultState = !selectedListId && !selectedStatus;
+  const isDefaultState = !selectedListId && !selectedStatus && !startDate && !endDate;
   const shouldShowEmptyStateOnly =
     !isPending && !isError && rows.length === 0 && isDefaultState;
 
@@ -64,6 +68,13 @@ const CallLogsView = () => {
               selectedList={selectedListId}
               onListChange={(val) => {
                 setSelectedListId(val);
+                setPage(1);
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
                 setPage(1);
               }}
             />
