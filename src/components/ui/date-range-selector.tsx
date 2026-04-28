@@ -494,12 +494,28 @@ const DateRangeSelector = ({
 
         {/* Footer hint */}
         {view === "date" && (
-          <div className="mt-3 text-xs text-text-secondary">
-            {!range.startDate
-              ? "Click to select start date"
-              : !range.endDate
-                ? "Click to select end date"
-                : `${moment(range.startDate).format("DD MMM YYYY")} – ${moment(range.endDate).format("DD MMM YYYY")}`}
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="text-xs text-text-secondary">
+              {!range.startDate
+                ? "Click to select start date"
+                : !range.endDate
+                  ? "Click to select end date"
+                  : `${moment(range.startDate).format("DD MMM YYYY")} – ${moment(range.endDate).format("DD MMM YYYY")}`}
+            </div>
+            {hasDates && (
+              <button
+                type="button"
+                onClick={() => {
+                  const cleared = { startDate: null, endDate: null };
+                  setRange(cleared);
+                  setValue?.(cleared);
+                  setHoverDate(null);
+                }}
+                className="flex items-center gap-1 rounded-md border border-primary px-2 py-1 text-xs font-medium text-primary hover:bg-primary/5 hover:text-primary cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
           </div>
         )}
       </DropdownMenuContent>
