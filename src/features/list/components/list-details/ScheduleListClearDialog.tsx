@@ -54,8 +54,8 @@ type ScheduleType = ListCleanupType;
 
 type ScheduleFormState = {
   scheduleType: ScheduleType;
-  runDate: string;
-  runTime: string;
+  runDate: string | null;
+  runTime: string | null;
   recurrenceType: "" | ListCleanupRecurrenceType;
   dayOfWeek: string;
   weekOfMonth: string;
@@ -146,7 +146,10 @@ const ScheduleListClearDialog = ({
 
     onSubmit({
       cleanup_type: form.scheduleType,
-      run_date: form.scheduleType === "one_time" ? form.runDate : undefined,
+      run_date:
+        form.scheduleType === "one_time"
+          ? form.runDate || undefined
+          : undefined,
       run_time: moment(form.runTime, "HH:mm", true).format("hh:mm A"),
       day_of_week: isRecurring ? Number(form.dayOfWeek) : undefined,
       week_of_month:
