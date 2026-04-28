@@ -49,7 +49,7 @@ const statusBadge = (status: User["status"]) => {
   if (status === "suspend")
     return (
       <span className="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500">
-        Suspended
+        Inactive
       </span>
     );
   return (
@@ -92,6 +92,7 @@ const UsersManagementTable = ({
 }) => {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
+  const hasLoadedDataRef = React.useRef(false);
 
   const totalPages = Math.max(1, Math.ceil(users.length / limit));
   const paginated = users.slice((page - 1) * limit, page * limit);
@@ -102,8 +103,17 @@ const UsersManagementTable = ({
     setPage(1);
   }, [searchValue, statusFilter, limit]);
 
-  // if (true) {
-  if (users.length === 0 && !isPending && !error) {
+  if (users.length > 0) hasLoadedDataRef.current = true;
+
+  const hasActiveFilters = !!searchValue || statusFilter !== "All Status";
+
+  if (
+    users.length === 0 &&
+    !isPending &&
+    !error &&
+    !hasActiveFilters &&
+    !hasLoadedDataRef.current
+  ) {
     return (
       <div className="flex center h-full w-full -mt-10">
         <UsersEmptyState onAddUser={onAddUser} showButton={true} />
@@ -154,7 +164,7 @@ const UsersManagementTable = ({
                       <SelectItem value="All Status">All Status</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="invited">Invited</SelectItem>
-                      <SelectItem value="suspend">Suspended</SelectItem>
+                      <SelectItem value="suspend">Inactive</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

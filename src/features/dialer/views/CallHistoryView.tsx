@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { CalendarIcon, Loader2Icon } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useDebounce } from "use-debounce";
 
 import CallHistoryDetailsSheet from "@/features/dialer/components/CallHistoryDetailsSheet";
@@ -16,11 +16,6 @@ import {
 import { useGetMyCallLogs } from "@/features/dialer/services/leadActivityService";
 import { MyCallStatus } from "@/features/dialer/types/leadActivityTypes";
 import DateSelector from "@/components/custom/date-selector.component";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 
 const CallHistoryView = () => {
   const [page, setPage] = React.useState(1);
@@ -50,22 +45,13 @@ const CallHistoryView = () => {
     <>
       <div className={dialerShellStyles.titleRow}>
         <h1 className={dialerShellStyles.title}>Call History</h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="outline-transparent">
-              <span>Date</span>
-              <CalendarIcon
-                className="ml-2 size-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DateSelector
-            setValue={(date) =>
-              setSelectedDate(date.toISOString().split("T")[0])
-            }
-          />
-        </DropdownMenu>
+        <DateSelector
+          value={selectedDate ? new Date(selectedDate) : undefined}
+          setValue={(date) => setSelectedDate(date.toISOString().split("T")[0])}
+          onClear={() => setSelectedDate(undefined)}
+          placeholder="Date"
+          triggerClassName="bg-white"
+        />
       </div>
 
       <CallHistoryStats myStats={data?.data?.my_stats} isPending={isPending} />
@@ -102,7 +88,10 @@ const CallHistoryView = () => {
                 total={meta?.total ?? 0}
                 totalPages={meta?.totalPages ?? 1}
                 onPageChange={setPage}
-                onLimitChange={(l) => { setLimit(l); setPage(1); }}
+                onLimitChange={(l) => {
+                  setLimit(l);
+                  setPage(1);
+                }}
                 onSelect={(row) => {
                   setSelectedId(row.id);
                   setSheetOpen(true);

@@ -17,12 +17,18 @@ const CallbackSchedulesFilters = ({
   searchValue,
   onSearchChange,
   statusValue,
-  onStatusChange
+  onStatusChange,
+  startDate,
+  endDate,
+  onDateChange
 }: {
   searchValue: string;
   onSearchChange: (value: string) => void;
   statusValue: string;
   onStatusChange: (value: string) => void;
+  startDate: string;
+  endDate: string;
+  onDateChange: (startDate: string, endDate: string) => void;
 }) => {
   return (
     <div className={callbackStyles.toolbar}>
@@ -58,7 +64,18 @@ const CallbackSchedulesFilters = ({
         </Select>
 
         <div className="">
-          <DateRangeSelector />
+          <DateRangeSelector
+            value={{
+              startDate: startDate ? new Date(startDate) : null,
+              endDate: endDate ? new Date(endDate) : null
+            }}
+            setValue={(range) => {
+              onDateChange(
+                range.startDate ? range.startDate.toISOString().slice(0, 10) : "",
+                range.endDate ? range.endDate.toISOString().slice(0, 10) : ""
+              );
+            }}
+          />
         </div>
       </div>
     </div>

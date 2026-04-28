@@ -26,6 +26,8 @@ const CallbackSchedulesView = () => {
   const [limit, setLimit] = React.useState(10);
   const [statusValue, setStatusValue] = React.useState("All Status");
   const [searchValue, setSearchValue] = React.useState("");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
   const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedActivityId, setSelectedActivityId] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -34,12 +36,18 @@ const CallbackSchedulesView = () => {
     page,
     limit,
     status: statusMap[statusValue],
-    search: debouncedSearch
+    search: debouncedSearch,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined
   });
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
-  const isDefaultState = statusValue === "All Status" && debouncedSearch === "";
+  const isDefaultState =
+    statusValue === "All Status" &&
+    debouncedSearch === "" &&
+    !startDate &&
+    !endDate;
   const shouldShowEmptyStateOnly =
     !isPending && !isError && rows.length === 0 && isDefaultState;
 
@@ -64,6 +72,13 @@ const CallbackSchedulesView = () => {
               statusValue={statusValue}
               onStatusChange={(val) => {
                 setStatusValue(val);
+                setPage(1);
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(nextStartDate, nextEndDate) => {
+                setStartDate(nextStartDate);
+                setEndDate(nextEndDate);
                 setPage(1);
               }}
             />

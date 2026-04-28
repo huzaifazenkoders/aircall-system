@@ -230,12 +230,16 @@ const ScheduleListClearDialog = ({
                     }
                   />
                   <DateSelector
+                    hideTrigger
                     value={form.runDate ? new Date(form.runDate) : undefined}
                     setValue={(date) =>
                       setForm((prev) => ({
                         ...prev,
                         runDate: date.toISOString().slice(0, 10)
                       }))
+                    }
+                    onClear={() =>
+                      setForm((prev) => ({ ...prev, runDate: null }))
                     }
                     onOpenChange={setIsDateOpen}
                     minDate={new Date()}

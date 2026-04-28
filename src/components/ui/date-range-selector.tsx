@@ -376,36 +376,36 @@ const DateRangeSelector = ({
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       {!hideTrigger && (
-        <DropdownMenuTrigger
-          className={cn(
-            "bg-background-secondary px-3 py-2 pr-10 relative",
-            "text-base rounded-lg whitespace-nowrap cursor-pointer",
-            "flex items-center justify-between gap-2",
-            "h-11 border border-border-primary",
-            hasDates ? "text-text-primary" : "text-text-secondary",
-            triggerClassName
-          )}
-        >
-          {triggerLabel}
-          {hasDates ? (
+        <div className="relative inline-flex">
+          <DropdownMenuTrigger
+            className={cn(
+              "bg-background-secondary px-3 py-2 pr-10 relative w-full",
+              "text-base rounded-lg whitespace-nowrap cursor-pointer",
+              "flex items-center justify-between gap-2",
+              "h-11 border border-border-primary",
+              hasDates ? "text-text-primary" : "text-text-secondary",
+              triggerClassName
+            )}
+          >
+            {triggerLabel}
+            {!hasDates && (
+              <Calendar className="size-5 absolute right-3 pointer-events-none" />
+            )}
+          </DropdownMenuTrigger>
+          {hasDates && (
             <button
               type="button"
-              onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
+              onClick={() => {
                 const cleared = { startDate: null, endDate: null };
                 setRange(cleared);
                 setValue?.(cleared);
               }}
-              className="absolute right-3 flex items-center justify-center rounded-full p-0.5 text-text-secondary hover:bg-border-primary hover:text-text-primary"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center rounded-full p-0.5 text-text-secondary hover:bg-border-primary hover:text-text-primary cursor-pointer"
             >
               <X className="size-4" />
             </button>
-          ) : (
-            <Calendar className="size-5 absolute right-3" />
           )}
-        </DropdownMenuTrigger>
+        </div>
       )}
 
       <DropdownMenuContent

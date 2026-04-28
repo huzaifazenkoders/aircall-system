@@ -4,7 +4,7 @@ import Logo from "@/../public/assets/dialer-auth/logo.svg";
 import {
   HistoryIcon,
   HomeIcon,
-  PhoneCallIcon,
+  ListIcon,
   PhoneForwardedIcon
 } from "lucide-react";
 import Link from "next/link";
@@ -25,7 +25,7 @@ const navItems = [
   {
     href: "/dialer/my-list",
     label: "My Lists",
-    icon: PhoneCallIcon,
+    icon: ListIcon,
     key: "lists"
   },
   {

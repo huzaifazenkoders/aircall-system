@@ -160,8 +160,10 @@ const CallOutcomeDialog = ({
                     <CalendarIcon className="size-5 text-text-secondary shrink-0" />
                   </DropdownMenuTrigger>
                   <DateSelector
+                    hideTrigger
                     value={callbackDate ?? undefined}
                     setValue={setCallbackDate}
+                    onClear={() => setCallbackDate(null)}
                     minDate={new Date()}
                   />
                 </DropdownMenu>

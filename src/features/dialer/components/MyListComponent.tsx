@@ -337,7 +337,7 @@ const MyListComponent = () => {
               value={leadSearch}
               startIcon={<SearchIcon className="size-5 text-gray-500" />}
               placeholder="Search..."
-              className="h-9 w-full md:w-72 text-base"
+              className="h-9 w-full md:w-84 text-base"
             />
             <div className={myListStyles.toolbarRight}>
               <Select

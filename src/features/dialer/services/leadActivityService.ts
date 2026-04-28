@@ -18,6 +18,8 @@ interface GetScheduledCooldownReq {
   limit: number;
   status?: LeadActivityStatus;
   search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface GetScheduledCooldownRes {
@@ -32,15 +34,31 @@ export function useGetScheduledCooldown({
   page,
   limit,
   status,
-  search
+  search,
+  startDate,
+  endDate
 }: GetScheduledCooldownReq) {
   return useQuery({
-    queryKey: dialerKeys.scheduledCooldown({ page, limit, status, search }),
+    queryKey: dialerKeys.scheduledCooldown({
+      page,
+      limit,
+      status,
+      search,
+      startDate,
+      endDate
+    }),
     queryFn: async () => {
       const res = await axiosInstance.get(
         "/lead-activities/scheduled-cooldown",
         {
-          params: { page, limit, status, search: search || undefined }
+          params: {
+            page,
+            limit,
+            status,
+            search: search || undefined,
+            startDate,
+            endDate
+          }
         }
       );
       return res.data as GetScheduledCooldownRes;
