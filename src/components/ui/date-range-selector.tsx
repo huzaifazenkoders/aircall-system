@@ -316,17 +316,13 @@ const DateRangeSelector = ({
   const handleSelectDate = (date: Date) => {
     // If no start, or both already set, start fresh
     if (!range.startDate || (range.startDate && range.endDate)) {
-      const next = { startDate: date, endDate: null };
-      setRange(next);
-      setValue?.(next);
+      setRange({ startDate: date, endDate: null });
       return;
     }
 
     // Start is set, no end — pick end (or swap if before start)
     if (moment(date).isBefore(range.startDate, "day")) {
-      const next = { startDate: date, endDate: null };
-      setRange(next);
-      setValue?.(next);
+      setRange({ startDate: date, endDate: null });
       return;
     }
 
@@ -335,6 +331,21 @@ const DateRangeSelector = ({
     setValue?.(next);
     setHoverDate(null);
     onOpenChange?.(false);
+  };
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      const committed = {
+        startDate: value?.startDate ?? null,
+        endDate: value?.endDate ?? null
+      };
+      // If closed mid-selection (start without end), revert to last committed value
+      if (!range.startDate || !range.endDate) {
+        setRange(committed);
+        setHoverDate(null);
+      }
+    }
+    onOpenChange?.(next);
   };
 
   const goNext = () => {
@@ -363,7 +374,7 @@ const DateRangeSelector = ({
   const hasDates = !!(range.startDate || range.endDate);
 
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       {!hideTrigger && (
         <DropdownMenuTrigger
           className={cn(
@@ -379,7 +390,9 @@ const DateRangeSelector = ({
           {hasDates ? (
             <button
               type="button"
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 const cleared = { startDate: null, endDate: null };
                 setRange(cleared);
