@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import moment from "moment";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { ReactDispatch } from "@/types/common";
@@ -316,17 +316,13 @@ const DateRangeSelector = ({
   const handleSelectDate = (date: Date) => {
     // If no start, or both already set, start fresh
     if (!range.startDate || (range.startDate && range.endDate)) {
-      const next = { startDate: date, endDate: null };
-      setRange(next);
-      setValue?.(next);
+      setRange({ startDate: date, endDate: null });
       return;
     }
 
     // Start is set, no end — pick end (or swap if before start)
     if (moment(date).isBefore(range.startDate, "day")) {
-      const next = { startDate: date, endDate: null };
-      setRange(next);
-      setValue?.(next);
+      setRange({ startDate: date, endDate: null });
       return;
     }
 
@@ -335,6 +331,21 @@ const DateRangeSelector = ({
     setValue?.(next);
     setHoverDate(null);
     onOpenChange?.(false);
+  };
+
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      const committed = {
+        startDate: value?.startDate ?? null,
+        endDate: value?.endDate ?? null
+      };
+      // If closed mid-selection (start without end), revert to last committed value
+      if (!range.startDate || !range.endDate) {
+        setRange(committed);
+        setHoverDate(null);
+      }
+    }
+    onOpenChange?.(next);
   };
 
   const goNext = () => {
@@ -363,21 +374,38 @@ const DateRangeSelector = ({
   const hasDates = !!(range.startDate || range.endDate);
 
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange}>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       {!hideTrigger && (
-        <DropdownMenuTrigger
-          className={cn(
-            "bg-background-secondary px-3 py-2 pr-10 relative",
-            "text-base rounded-lg whitespace-nowrap cursor-pointer",
-            "flex items-center justify-between gap-2",
-            "h-11 border border-border-primary",
-            hasDates ? "text-text-primary" : "text-text-secondary",
-            triggerClassName
+        <div className="relative inline-flex">
+          <DropdownMenuTrigger
+            className={cn(
+              "bg-background-secondary px-3 py-2 pr-10 relative w-full",
+              "text-base rounded-lg whitespace-nowrap cursor-pointer",
+              "flex items-center justify-between gap-2",
+              "h-11 border border-border-primary",
+              hasDates ? "text-text-primary" : "text-text-secondary",
+              triggerClassName
+            )}
+          >
+            {triggerLabel}
+            {!hasDates && (
+              <Calendar className="size-5 absolute right-3 pointer-events-none" />
+            )}
+          </DropdownMenuTrigger>
+          {hasDates && (
+            <button
+              type="button"
+              onClick={() => {
+                const cleared = { startDate: null, endDate: null };
+                setRange(cleared);
+                setValue?.(cleared);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center rounded-full p-0.5 text-text-secondary hover:bg-border-primary hover:text-text-primary cursor-pointer"
+            >
+              <X className="size-4" />
+            </button>
           )}
-        >
-          {triggerLabel}
-          <Calendar className="size-5 absolute right-3" />
-        </DropdownMenuTrigger>
+        </div>
       )}
 
       <DropdownMenuContent
@@ -479,12 +507,28 @@ const DateRangeSelector = ({
 
         {/* Footer hint */}
         {view === "date" && (
-          <div className="mt-3 text-xs text-text-secondary">
-            {!range.startDate
-              ? "Click to select start date"
-              : !range.endDate
-                ? "Click to select end date"
-                : `${moment(range.startDate).format("DD MMM YYYY")} – ${moment(range.endDate).format("DD MMM YYYY")}`}
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="text-xs text-text-secondary">
+              {!range.startDate
+                ? "Click to select start date"
+                : !range.endDate
+                  ? "Click to select end date"
+                  : `${moment(range.startDate).format("DD MMM YYYY")} – ${moment(range.endDate).format("DD MMM YYYY")}`}
+            </div>
+            {hasDates && (
+              <button
+                type="button"
+                onClick={() => {
+                  const cleared = { startDate: null, endDate: null };
+                  setRange(cleared);
+                  setValue?.(cleared);
+                  setHoverDate(null);
+                }}
+                className="flex items-center gap-1 rounded-md border border-primary px-2 py-1 text-xs font-medium text-primary hover:bg-primary/5 hover:text-primary cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
           </div>
         )}
       </DropdownMenuContent>

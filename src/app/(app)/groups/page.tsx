@@ -1,9 +1,13 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import GroupsView from "@/features/groups/views/GroupsView";
 
 const page = () => {
-  return <GroupsView />;
+  return (
+    <Suspense>
+      <GroupsView />
+    </Suspense>
+  );
 };
 
 export default page;

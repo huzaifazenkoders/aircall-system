@@ -65,8 +65,11 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (token && isTokenExpired) {
-    return clearTokenAndRedirect(request, `${ADMIN_AUTH_PREFIX}/sign-in`);
+  if (token && (!tokenPayload || isTokenExpired)) {
+    const authPath = isDialerAppRoute
+      ? `${DIALER_AUTH_PREFIX}/sign-in`
+      : `${ADMIN_AUTH_PREFIX}/sign-in`;
+    return clearTokenAndRedirect(request, authPath);
   }
 
   if (!token) {

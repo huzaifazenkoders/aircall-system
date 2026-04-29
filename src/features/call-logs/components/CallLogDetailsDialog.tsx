@@ -110,11 +110,8 @@ const CallLogDetailsDialog = ({
                         Representative
                       </p>
                       <div className={callLogsStyles.representative}>
-                        <span className={callLogsStyles.avatar} />
                         <span className={callLogsStyles.detailValue}>
-                          {callLog.assigned_to
-                            ? `${callLog.assigned_to.first_name} ${callLog.assigned_to.last_name}`
-                            : "—"}
+                          {callLog.user_name || "—"}
                         </span>
                       </div>
                     </div>

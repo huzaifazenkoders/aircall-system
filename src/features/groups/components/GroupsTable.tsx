@@ -32,7 +32,6 @@ import TextInput from "@/components/ui/text-input";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { Group } from "@/features/groups/types/groupTypes";
 import { ReactDispatch } from "@/types/common";
-import moment from "moment";
 
 const statusOptions: string[] = ["All Status", "Active", "Inactive"];
 
@@ -120,19 +119,13 @@ const GroupsTable = ({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <div className={`${groupsStyles.filterButton} cursor-pointer`}>
-                  <span>
-                    {date ? moment(date).format("dd MMM yyyy") : "Date"}
-                  </span>
-                  <ChevronDownIcon className="size-4 text-gray-800" />
-                </div>
-              }
-            />
-            <DateSelector value={date || undefined} setValue={setDate} />
-          </DropdownMenu>
+          <DateSelector
+            value={date || undefined}
+            setValue={setDate}
+            onClear={() => setDate(null)}
+            placeholder="Date"
+            triggerClassName={`${groupsStyles.filterButton} cursor-pointer`}
+          />
         </div>
       </div>
 

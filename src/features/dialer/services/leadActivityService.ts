@@ -18,6 +18,8 @@ interface GetScheduledCooldownReq {
   limit: number;
   status?: LeadActivityStatus;
   search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface GetScheduledCooldownRes {
@@ -32,15 +34,31 @@ export function useGetScheduledCooldown({
   page,
   limit,
   status,
-  search
+  search,
+  startDate,
+  endDate
 }: GetScheduledCooldownReq) {
   return useQuery({
-    queryKey: dialerKeys.scheduledCooldown({ page, limit, status, search }),
+    queryKey: dialerKeys.scheduledCooldown({
+      page,
+      limit,
+      status,
+      search,
+      startDate,
+      endDate
+    }),
     queryFn: async () => {
       const res = await axiosInstance.get(
         "/lead-activities/scheduled-cooldown",
         {
-          params: { page, limit, status, search: search || undefined }
+          params: {
+            page,
+            limit,
+            status,
+            search: search || undefined,
+            startDate,
+            endDate
+          }
         }
       );
       return res.data as GetScheduledCooldownRes;
@@ -73,6 +91,7 @@ export function useGetLeadActivityDetail(id: string) {
 interface GetMyCallLogsReq {
   page: number;
   limit: number;
+  search?: string;
   lead_id?: string;
   list_id?: string;
   assigned_to?: string;
@@ -98,6 +117,7 @@ interface GetMyCallLogsRes {
 export function useGetMyCallLogs({
   page,
   limit,
+  search,
   lead_id,
   list_id,
   assigned_to,
@@ -108,6 +128,7 @@ export function useGetMyCallLogs({
     queryKey: dialerKeys.myLogs({
       page,
       limit,
+      search,
       lead_id,
       list_id,
       assigned_to,
@@ -119,6 +140,7 @@ export function useGetMyCallLogs({
         params: {
           page,
           limit,
+          search: search || undefined,
           lead_id,
           list_id,
           assigned_to,

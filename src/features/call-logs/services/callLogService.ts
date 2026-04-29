@@ -9,10 +9,13 @@ import { CallLog, CallLogDetail, CallStatus } from "../types/callLogTypes";
 interface GetCallLogsReq {
   page: number;
   limit: number;
+  search?: string;
   lead_id?: string;
   list_id?: string;
   assigned_to?: string;
   call_status?: CallStatus;
+  startDate?: string;
+  endDate?: string;
 }
 
 interface GetCallLogsRes {
@@ -26,23 +29,29 @@ interface GetCallLogsRes {
 export function useGetCallLogs({
   page,
   limit,
+  search,
   lead_id,
   list_id,
   assigned_to,
-  call_status
+  call_status,
+  startDate,
+  endDate
 }: GetCallLogsReq) {
   return useQuery({
     queryKey: callLogKeys.list({
       page,
       limit,
+      search,
       lead_id,
       list_id,
       assigned_to,
-      call_status
+      call_status,
+      startDate,
+      endDate
     }),
     queryFn: async () => {
       const res = await axiosInstance.get("/call-logs", {
-        params: { page, limit, lead_id, list_id, assigned_to, call_status }
+        params: { page, limit, search: search || undefined, lead_id, list_id, assigned_to, call_status, startDate, endDate }
       });
       return res.data as GetCallLogsRes;
     }

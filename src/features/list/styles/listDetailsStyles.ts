@@ -58,6 +58,6 @@ export const listDetailsStyles = {
   ),
   leadFilters: cn("flex flex-wrap items-center gap-3"),
   filterTrigger: cn(
-    "h-11 rounded-lg border border-border-primary bg-white px-4 text-sm font-medium text-foreground shadow-xs"
+    "h-11 rounded-lg border border-border-primary bg-white text-sm font-medium text-foreground shadow-xs"
   )
 };

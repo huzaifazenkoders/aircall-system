@@ -1,9 +1,13 @@
-import React from "react";
+import React, { Suspense } from "react";
 
 import ListManagementView from "@/features/list/views/ListManagementView";
 
 const page = () => {
-  return <ListManagementView />;
+  return (
+    <Suspense>
+      <ListManagementView />
+    </Suspense>
+  );
 };
 
 export default page;

@@ -258,6 +258,10 @@ const ListRow = ({
     row.assign_type === "individual"
       ? `${row.assignments.length} Individuals`
       : row.assignments?.[0]?.group?.name;
+  const groupId =
+    row.assign_type !== "individual"
+      ? row.assignments?.[0]?.group?.id
+      : null;
 
   return (
     <TableRow className="h-15.5">
@@ -272,13 +276,56 @@ const ListRow = ({
       </TableCell>
       {tab === "shared" && <TableCell>{row.priority}</TableCell>}
       <TableCell>{row.cooldown_minimum_hours ?? "-"}</TableCell>
-      <TableCell>{row.cooldown_leads ?? "-"}</TableCell>
-      <TableCell>{row.available_leads ?? "-"}</TableCell>
-      <TableCell>{row.total_leads ?? "-"}</TableCell>
+      <TableCell>
+        {row.cooldown_leads != null ? (
+          <Link
+            href={`/list/${row.id}?lead_status=cooldown`}
+            className="hover:underline text-foreground"
+          >
+            {row.cooldown_leads}
+          </Link>
+        ) : (
+          "-"
+        )}
+      </TableCell>
+      <TableCell>
+        {row.available_leads != null ? (
+          <Link
+            href={`/list/${row.id}?lead_status=pending`}
+            className="hover:underline text-foreground"
+          >
+            {row.available_leads}
+          </Link>
+        ) : (
+          "-"
+        )}
+      </TableCell>
+      <TableCell>
+        {row.total_leads != null ? (
+          <Link
+            href={`/list/${row.id}`}
+            className="hover:underline text-foreground"
+          >
+            {row.total_leads}
+          </Link>
+        ) : (
+          "-"
+        )}
+      </TableCell>
       <TableCell className="text-foreground text-sm">
-        <span className="truncate" title={assignedToLabel || ""}>
-          {assignedToLabel}
-        </span>
+        {groupId ? (
+          <Link
+            href={`/groups?group_id=${groupId}`}
+            className="truncate hover:underline"
+            title={assignedToLabel || ""}
+          >
+            {assignedToLabel}
+          </Link>
+        ) : (
+          <span className="truncate" title={assignedToLabel || ""}>
+            {assignedToLabel}
+          </span>
+        )}
       </TableCell>
       <TableCell>
         <StatusBadge status={row.status} />

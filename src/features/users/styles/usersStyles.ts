@@ -22,7 +22,7 @@ export const usersStyles = {
   sheetTitleRow: cn("flex items-start gap-4"),
   sheetTitle: cn("text-[24px] font-medium text-text-primary"),
   statusPill: cn(
-    "capitalize rounded-2xl bg-success-soft px-3 py-1 text-sm text-success-fg"
+    "capitalize rounded-md bg-success-soft px-3 py-1 text-sm text-success-fg"
   ),
   createdText: cn("pl-[52px] mt-0 text-sm text-panel-muted"),
   iconButton: cn(
@@ -32,7 +32,9 @@ export const usersStyles = {
   statCard: cn("rounded-lg bg-stat-card-bg px-5 py-4"),
   statLabel: cn("text-[14px] text-[#219D9D]"),
   statValue: cn("mt-3 text-[24px] font-medium leading-none text-[#15706D]"),
-  contactGrid: cn("grid grid-cols-1 sm:grid-cols-2 gap-6 border-b border-border px-6 py-6"),
+  contactGrid: cn(
+    "grid grid-cols-1 sm:grid-cols-2 gap-6 border-b border-border px-6 py-6"
+  ),
   contactItem: cn("flex gap-4"),
   contactLabel: cn("text-sm text-panel-muted"),
   contactValue: cn("mt-0 text-base text-text-primary"),

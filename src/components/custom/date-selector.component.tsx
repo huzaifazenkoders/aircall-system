@@ -1,9 +1,13 @@
 "use client";
 import moment from "moment";
 import { cn } from "@/lib/utils";
-import { DropdownMenuContent } from "../ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "../ui/dropdown-menu";
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { VoidFunctionWithBooleanArg } from "@/types/common";
 
 // --------------------------------------------------------------
@@ -43,11 +47,16 @@ interface ReturnClassessProps {
 interface Props {
   value?: Date;
   setValue?: (_args: Date) => void;
-  onOpen?: boolean;
+  onClear?: () => void;
+  open?: boolean;
   onOpenChange?: VoidFunctionWithBooleanArg;
   disabledDates?: Date[];
   minDate?: Date;
   maxDate?: Date;
+  placeholder?: string;
+  triggerClassName?: string;
+  /** When true, renders only DropdownMenuContent (caller owns the DropdownMenu + trigger) */
+  hideTrigger?: boolean;
 }
 
 interface ButtonProps {
@@ -84,14 +93,31 @@ const MainBorder = "border-border-primary";
 const DateSelector = ({
   setValue,
   value,
+  onClear,
+  open,
   onOpenChange,
   disabledDates,
   minDate,
-  maxDate
+  maxDate,
+  placeholder = "Select Date",
+  triggerClassName,
+  hideTrigger = false
 }: Props) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open !== undefined ? open : internalOpen;
+
+  const handleOpenChange = (next: boolean) => {
+    setInternalOpen(next);
+    onOpenChange?.(next);
+  };
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(value ?? null);
   const [currentView, setCurrentView] = useState<ViewType>("date");
-  const [viewDate, setViewDate] = useState<Date>(new Date());
+  const [viewDate, setViewDate] = useState<Date>(value ?? new Date());
+
+  React.useEffect(() => {
+    setSelectedDate(value ?? null);
+  }, [value]);
 
   const goNext = () => {
     if (currentView === "date")
@@ -125,12 +151,20 @@ const DateSelector = ({
       setValue(date);
     }
     setCurrentView("date");
-    if (onOpenChange) {
-      onOpenChange(false);
-    }
+    handleOpenChange(false);
   };
 
-  return (
+  const handleClear = () => {
+    setSelectedDate(null);
+    onClear?.();
+  };
+
+  const hasDate = !!value;
+  const triggerLabel = hasDate
+    ? moment(value).format("DD MMM YYYY")
+    : placeholder;
+
+  const dropdownContent = (
     <DropdownMenuContent
       translate="no"
       className={cn("w-[310px] p-3", BackgroundColor, MainBorder)}
@@ -195,7 +229,57 @@ const DateSelector = ({
           maxDate={maxDate}
         />
       )}
+
+      {/* Footer */}
+      {currentView === "date" && hasDate && (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              handleClear();
+              handleOpenChange(false);
+            }}
+            className="flex items-center gap-1 rounded-md border border-primary px-2 py-1 text-xs font-medium text-primary hover:bg-primary/5 hover:text-primary cursor-pointer"
+          >
+            Clear
+          </button>
+        </div>
+      )}
     </DropdownMenuContent>
+  );
+
+  if (hideTrigger) return dropdownContent;
+
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
+      <div className="relative inline-flex">
+        <DropdownMenuTrigger
+          className={cn(
+            "bg-background-secondary px-3 py-2 pe-10 relative w-full",
+            "text-base rounded-lg whitespace-nowrap cursor-pointer",
+            "flex items-center justify-between gap-2",
+            "h-11 border border-border-primary",
+            hasDate ? "text-text-primary" : "text-text-secondary",
+            triggerClassName
+          )}
+        >
+          {triggerLabel}
+          {!hasDate && (
+            <Calendar className="size-5 absolute right-3 pointer-events-none" />
+          )}
+        </DropdownMenuTrigger>
+        {hasDate && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center rounded-full p-0.5 text-text-secondary hover:bg-border-primary hover:text-text-primary cursor-pointer"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+      {dropdownContent}
+    </DropdownMenu>
   );
 };
 

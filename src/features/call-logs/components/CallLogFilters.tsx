@@ -3,6 +3,7 @@
 import React from "react";
 import { SearchIcon } from "lucide-react";
 
+import DateRangeSelector from "@/components/ui/date-range-selector";
 import {
   Select,
   SelectContent,
@@ -16,22 +17,33 @@ import TextInput from "@/components/ui/text-input";
 type StatusOption = { label: string; value: string };
 
 type CallLogFiltersProps = {
+  searchValue: string;
+  onSearchChange: (value: string) => void;
   selectedList: string;
   onListChange: (value: string) => void;
   selectedStatus: string;
   onStatusChange: (value: string | null) => void;
   statusOptions: StatusOption[];
+  startDate: string;
+  endDate: string;
+  onDateChange: (startDate: string, endDate: string) => void;
 };
 
 const CallLogFilters = ({
+  searchValue,
+  onSearchChange,
   selectedStatus,
   onStatusChange,
-  statusOptions
+  statusOptions,
+  startDate,
+  endDate,
+  onDateChange
 }: CallLogFiltersProps) => {
   return (
     <div className={callLogsStyles.toolbar}>
       <TextInput
-        setValue={() => {}}
+        value={searchValue}
+        setValue={onSearchChange}
         startIcon={
           <SearchIcon className="size-5 text-[#667085]" aria-hidden="true" />
         }
@@ -55,6 +67,19 @@ const CallLogFilters = ({
             ))}
           </SelectContent>
         </Select>
+
+        <DateRangeSelector
+          value={{
+            startDate: startDate ? new Date(startDate) : null,
+            endDate: endDate ? new Date(endDate) : null
+          }}
+          setValue={(range) => {
+            onDateChange(
+              range.startDate ? range.startDate.toISOString().slice(0, 10) : "",
+              range.endDate ? range.endDate.toISOString().slice(0, 10) : ""
+            );
+          }}
+        />
       </div>
     </div>
   );

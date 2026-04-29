@@ -20,7 +20,7 @@ export const dialerShellStyles = {
   ),
   navItemActive: cn("bg-brand-900"),
   navLabel: cn(
-    "text-[10px] font-normal leading-4 text-white lg:text-xs lg:leading-5"
+    "text-[10px] font-normal text-center whitespace-nowrap leading-4 text-white lg:text-xs lg:leading-5"
   ),
   content: cn("flex min-w-0 flex-col"),
   topbar: cn(
@@ -51,7 +51,7 @@ export const callHistoryStyles = {
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center gap-3 w-full"
+    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3 w-full"
   ),
   searchField: cn(
     "w-[504px] flex items-center bg-white rounded-lg shadow-[0px_1px_2px_0px_rgba(0,0,0,0.08)] border border-border-primary min-h-11 px-3 py-1.5"
@@ -148,7 +148,9 @@ export const myListStyles = {
     "w-full flex-1 bg-white rounded-[20px] shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden"
   ),
   tableWrap: cn("overflow-x-auto"),
-  toolbar: cn("p-4 border-b border-zinc-200 flex flex-wrap items-center gap-3"),
+  toolbar: cn(
+    "p-4 border-b border-zinc-200 flex flex-wrap items-center justify-between gap-3"
+  ),
   toolbarRight: cn("flex flex-wrap items-center justify-end gap-3"),
   tableHead: cn("p-4 text-sm font-medium text-gray-500 leading-4"),
   cell: cn("px-3 py-3.5 text-sm text-gray-800 leading-5"),
@@ -171,7 +173,7 @@ export const callbackStyles = {
     "mt-8 overflow-hidden rounded-[20px] bg-white shadow-[0px_5px_22px_0px_rgba(0,0,0,0.04),0px_0px_0px_1px_rgba(0,0,0,0.06)]"
   ),
   toolbar: cn(
-    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center gap-3 w-full"
+    "border-b border-zinc-200 px-6 py-4 flex flex-wrap items-center justify-between gap-3 w-full"
   ),
   toolbarRight: cn("flex flex-wrap items-center gap-3"),
   searchField: cn(

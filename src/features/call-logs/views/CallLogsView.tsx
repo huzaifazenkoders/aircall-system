@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Loader2Icon } from "lucide-react";
+import { useDebounce } from "use-debounce";
 
 import CallLogDetailsDialog from "@/features/call-logs/components/CallLogDetailsDialog";
 import CallLogFilters from "@/features/call-logs/components/CallLogFilters";
@@ -24,16 +25,23 @@ const callLogStatusOptions = [
 const CallLogsView = () => {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedListId, setSelectedListId] = React.useState("");
   const [selectedStatus, setSelectedStatus] = React.useState("");
+  const [startDate, setStartDate] = React.useState("");
+  const [endDate, setEndDate] = React.useState("");
   const [selectedCallLogId, setSelectedCallLogId] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   const { data, isPending, isError } = useGetCallLogs({
     page,
     limit,
+    search: debouncedSearch || undefined,
     list_id: selectedListId || undefined,
-    call_status: (selectedStatus as CallStatus) || undefined
+    call_status: (selectedStatus as CallStatus) || undefined,
+    startDate: startDate || undefined,
+    endDate: endDate || undefined
   });
 
   const { data: detailData, isPending: isDetailPending } =
@@ -41,7 +49,7 @@ const CallLogsView = () => {
 
   const rows = data?.data?.data ?? [];
   const meta = data?.data?.meta;
-  const isDefaultState = !selectedListId && !selectedStatus;
+  const isDefaultState = !debouncedSearch && !selectedListId && !selectedStatus && !startDate && !endDate;
   const shouldShowEmptyStateOnly =
     !isPending && !isError && rows.length === 0 && isDefaultState;
 
@@ -55,6 +63,11 @@ const CallLogsView = () => {
         ) : (
           <>
             <CallLogFilters
+              searchValue={searchValue}
+              onSearchChange={(val) => {
+                setSearchValue(val);
+                setPage(1);
+              }}
               selectedStatus={selectedStatus}
               onStatusChange={(val) => {
                 setSelectedStatus(val as string);
@@ -64,6 +77,13 @@ const CallLogsView = () => {
               selectedList={selectedListId}
               onListChange={(val) => {
                 setSelectedListId(val);
+                setPage(1);
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={(start, end) => {
+                setStartDate(start);
+                setEndDate(end);
                 setPage(1);
               }}
             />
