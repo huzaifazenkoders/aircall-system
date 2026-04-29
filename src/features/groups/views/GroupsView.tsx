@@ -141,13 +141,9 @@ const GroupsView = () => {
 
   const handleAddMembers = (memberIds: string[]) => {
     if (!selectedGroupId) return;
-    const newMemberIds = memberIds.filter(
-      (id) => !existingMemberIds.includes(id)
-    );
-    if (!newMemberIds.length) return;
 
     addUsers(
-      { payload: { id: selectedGroupId, user_ids: newMemberIds } },
+      { payload: { id: selectedGroupId, user_ids: memberIds } },
       {
         onSuccess: () => {
           toast.success("Members added successfully");
@@ -336,6 +332,7 @@ const GroupsView = () => {
         emptyDescription="All active users are already part of this group."
         emptyKind="members"
         initialSelectedIds={existingMemberIds}
+        isSubmitting={isAddingUsers}
         onSubmit={handleAddMembers}
       />
 
@@ -352,6 +349,7 @@ const GroupsView = () => {
         emptyDescription="All available lists are already assigned to this group."
         emptyKind="lists"
         initialSelectedIds={existingListIds}
+        isSubmitting={addingListToGroup}
         onSubmit={handleAssignLists}
       />
 

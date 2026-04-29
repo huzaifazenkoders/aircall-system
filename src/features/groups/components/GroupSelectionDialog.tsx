@@ -70,6 +70,7 @@ const GroupSelectionDialog = ({
   emptyKind,
   items = [],
   initialSelectedIds,
+  isSubmitting = false,
   onSubmit,
 }: {
   open: boolean;
@@ -85,6 +86,7 @@ const GroupSelectionDialog = ({
   emptyKind: "members" | "lists";
   items?: SelectionItem[];
   initialSelectedIds?: string[];
+  isSubmitting?: boolean;
   onSubmit: (selectedIds: string[]) => void;
 }) => {
   const [query, setQuery] = React.useState("");
@@ -330,11 +332,11 @@ const GroupSelectionDialog = ({
         </DialogBody>
 
         <DialogFooter className={groupsStyles.dialogFooter}>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" disabled={isSubmitting} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
-            disabled={!newSelectedIds.length}
+            disabled={!newSelectedIds.length || isSubmitting}
             onClick={() => {
               onSubmit(newSelectedIds);
             }}
