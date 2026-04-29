@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Loader2Icon, SearchIcon } from "lucide-react";
+import { useDebounce } from "use-debounce";
 import TablePagination from "@/components/ui/table-pagination";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -61,8 +62,10 @@ const MyListComponent = () => {
   }>({ open: false, list: null });
 
   const [listSearch, setListSearch] = React.useState("");
+  const [debouncedListSearch] = useDebounce(listSearch, 400);
   const [selectedList, setSelectedList] = React.useState<MyList | null>(null);
   const [leadSearch, setLeadSearch] = React.useState("");
+  const [debouncedLeadSearch] = useDebounce(leadSearch, 400);
   const [statusFilter, setStatusFilter] = React.useState("All Status");
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
@@ -75,7 +78,7 @@ const MyListComponent = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useGetMyLists({ limit: LIMIT, search: listSearch.trim() });
+  } = useGetMyLists({ limit: LIMIT, search: debouncedListSearch.trim() });
 
   const myLists = transformInfiniteData(myListsData, "data");
 
@@ -101,7 +104,7 @@ const MyListComponent = () => {
     page: leadsPage,
     limit: leadsLimit,
     list_id: selectedList?.id ?? "",
-    search: leadSearch.trim() || undefined,
+    search: debouncedLeadSearch.trim() || undefined,
     status:
       statusFilter !== "All Status"
         ? (statusFilter.toLowerCase() as never)
@@ -120,7 +123,7 @@ const MyListComponent = () => {
 
   const invalidateMyLists = () =>
     queryClient.invalidateQueries({
-      queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch.trim() })
+      queryKey: listKeys.myLists({ limit: LIMIT, search: debouncedListSearch.trim() })
     });
 
   const handleToggleList = (list: MyList) => {

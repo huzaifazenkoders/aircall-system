@@ -3,6 +3,7 @@
 import TablePagination from "@/components/ui/table-pagination";
 import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
+import { useDebounce } from "use-debounce";
 import React from "react";
 
 import NoImage from "@/../public/assets/list/no-leads.png";
@@ -64,6 +65,7 @@ const LeadsTable = ({
   setListStats: ReactDispatch<ListStats | null>;
 }) => {
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery] = useDebounce(query, 400);
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [statusFilter, setStatusFilter] = useQueryState(
@@ -81,7 +83,7 @@ const LeadsTable = ({
     page,
     limit,
     list_id: listId,
-    search: query?.trim() || undefined,
+    search: debouncedQuery.trim() || undefined,
     status:
       statusFilter === "all" ? undefined : (statusFilter as LeadActivityStatus),
     startDate: startDate || undefined,

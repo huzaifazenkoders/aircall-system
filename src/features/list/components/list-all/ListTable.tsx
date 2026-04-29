@@ -3,6 +3,7 @@
 import TablePagination from "@/components/ui/table-pagination";
 import { Loader2Icon, MoreVerticalIcon, SearchIcon } from "lucide-react";
 import Link from "next/link";
+import { useDebounce } from "use-debounce";
 import React, { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,7 @@ const ListTable = ({
   setEditList: ReactDispatch<ListDetail | null>;
 }) => {
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery] = useDebounce(query, 400);
   const [limit, setLimit] = React.useState(10);
   const [tabs, setTabs] = useState<"shared" | "idv">("shared");
   const [dateRange, setDateRange] = React.useState<{
@@ -60,7 +62,7 @@ const ListTable = ({
 
   const sharedQuery = useGetLists({
     limit,
-    search: query?.trim() || undefined,
+    search: debouncedQuery.trim() || undefined,
     list_type: "shared",
     startDate: startDateStr,
     endDate: endDateStr
@@ -68,7 +70,7 @@ const ListTable = ({
 
   const idvQuery = useGetLists({
     limit,
-    search: query?.trim() || undefined,
+    search: debouncedQuery.trim() || undefined,
     list_type: "individual",
     startDate: startDateStr,
     endDate: endDateStr
