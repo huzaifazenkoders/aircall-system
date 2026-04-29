@@ -151,6 +151,7 @@ const GroupsView = () => {
             queryKey: groupKeys.info(selectedGroupId)
           });
           queryClient.invalidateQueries({ queryKey: groupKeys.all });
+          setAddMembersOpen(false);
         },
         onError: handleMutationError
       }
