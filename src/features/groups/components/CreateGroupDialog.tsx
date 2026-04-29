@@ -38,6 +38,7 @@ import { groupKeys } from "@/features/groups/query-keys";
 import { useGetUsers } from "@/features/users/services/userService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useDebounce } from "use-debounce";
 
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Group name is required"),
@@ -70,6 +71,7 @@ const CreateGroupDialog = ({
   const queryClient = useQueryClient();
   const { mutate: createGroup, isPending } = useCreateGroup();
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery] = useDebounce(query, 400);
   const [pickerOpen, setPickerOpen] = React.useState(false);
 
   const {
@@ -79,7 +81,7 @@ const CreateGroupDialog = ({
     fetchNextPage,
   } = useGetUsers({
     limit: 20,
-    search: query?.trim() || undefined,
+    search: debouncedQuery.trim() || undefined,
     role: "sales_person",
     status: "active",
   });
@@ -214,7 +216,7 @@ const CreateGroupDialog = ({
                     className={`${groupsStyles.memberPanel} w-(--anchor-width) p-0`}
                     sideOffset={8}
                   >
-                    <div className="px-3 pt-3">
+                    <div className="px-3 pt-3" onKeyDown={(e) => e.stopPropagation()}>
                       <TextInput
                         startIcon={
                           <SearchIcon className="size-6 text-panel-muted" />

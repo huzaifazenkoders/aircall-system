@@ -37,6 +37,7 @@ import { usersStyles } from "@/features/users/styles/usersStyles";
 import { userKeys } from "@/features/users/query-keys";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useDebounce } from "use-debounce";
 
 type GroupOption = {
   id: string;
@@ -58,11 +59,12 @@ const AddUserToGroupDialog = ({
   const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedGroups, setSelectedGroups] = React.useState<string[]>([]);
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetGroups({
     limit: 20,
-    search: searchValue.trim() || undefined
+    search: debouncedSearch.trim() || undefined
   });
 
   const { mutate: addGroupsToUser, isPending: isAddingGroups } =
@@ -185,7 +187,7 @@ const AddUserToGroupDialog = ({
                 className={`${usersStyles.menuPanel} mt-0 w-(--anchor-width) p-0`}
                 sideOffset={8}
               >
-                <div className="border-b border-border p-3">
+                <div className="border-b border-border p-3" onKeyDown={(e) => e.stopPropagation()}>
                   <TextInput
                     value={searchValue}
                     setValue={setSearchValue}

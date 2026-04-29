@@ -34,6 +34,7 @@ import { listKeys } from "@/features/list/query-keys";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useDebounce } from "use-debounce";
 import { cn } from "@/lib/utils";
 
 const MoveLeadDialog = ({
@@ -52,11 +53,12 @@ const MoveLeadDialog = ({
   const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedListId, setSelectedListId] = React.useState("");
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetLists({
     limit: 20,
-    search: searchValue.trim() || undefined,
+    search: debouncedSearch.trim() || undefined,
     list_type: "shared"
   });
 
@@ -158,7 +160,7 @@ const MoveLeadDialog = ({
                 className="mt-0 w-(--anchor-width) rounded-lg border border-border bg-white p-0 shadow-[0_20px_40px_rgba(15,23,42,0.08)]"
                 sideOffset={8}
               >
-                <div className="border-b border-border p-4">
+                <div className="border-b border-border p-4" onKeyDown={(e) => e.stopPropagation()}>
                   <TextInput
                     value={searchValue}
                     setValue={setSearchValue}

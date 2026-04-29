@@ -42,6 +42,7 @@ import { useAssignList } from "@/features/list/services/listService";
 import { usersStyles } from "@/features/users/styles/usersStyles";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { handleMutationError } from "@/utils/handleMutationError";
+import { useDebounce } from "use-debounce";
 
 const AssignGroupsToListDialog = ({
   open,
@@ -57,11 +58,12 @@ const AssignGroupsToListDialog = ({
   const queryClient = useQueryClient();
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 400);
   const [selectedGroupIds, setSelectedGroupIds] = React.useState<string[]>([]);
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetGroups({
     limit: 20,
-    search: searchValue.trim() || undefined,
+    search: debouncedSearch.trim() || undefined,
     is_active: true
   });
 
@@ -186,7 +188,7 @@ const AssignGroupsToListDialog = ({
                 className={`${usersStyles.menuPanel} mt-0 w-(--anchor-width) p-0`}
                 sideOffset={8}
               >
-                <div className="border-b border-border p-3">
+                <div className="border-b border-border p-3" onKeyDown={(e) => e.stopPropagation()}>
                   <TextInput
                     value={searchValue}
                     setValue={setSearchValue}

@@ -33,6 +33,7 @@ import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import { useGetLists } from "@/features/list/services/listService";
 import { useGetUsers } from "@/features/users/services/userService";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
+import { useDebounce } from "use-debounce";
 
 type SelectionItem = {
   id: string;
@@ -87,6 +88,7 @@ const GroupSelectionDialog = ({
   onSubmit: (selectedIds: string[]) => void;
 }) => {
   const [query, setQuery] = React.useState("");
+  const [debouncedQuery] = useDebounce(query, 400);
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<string[]>(
     initialSelectedIds ?? [],
@@ -105,7 +107,7 @@ const GroupSelectionDialog = ({
     fetchNextPage: usersFetchNextPage,
   } = useGetUsers({
     limit: 20,
-    search: usesUserQuery ? query?.trim() || undefined : undefined,
+    search: usesUserQuery ? debouncedQuery.trim() || undefined : undefined,
     role: "sales_person",
     status: "active",
   });
@@ -118,7 +120,7 @@ const GroupSelectionDialog = ({
   } = useGetLists({
     limit: 20,
     list_type: "shared",
-    search: usesListQuery ? query?.trim() || undefined : undefined,
+    search: usesListQuery ? debouncedQuery.trim() || undefined : undefined,
     status: "active",
   });
 
@@ -223,7 +225,7 @@ const GroupSelectionDialog = ({
                   className={`${groupsStyles.memberPanel} w-(--anchor-width) p-0`}
                   sideOffset={8}
                 >
-                  <div className="px-3 pt-3">
+                  <div className="px-3 pt-3" onKeyDown={(e) => e.stopPropagation()}>
                     <TextInput
                       startIcon={
                         <SearchIcon className="size-6 text-panel-muted" />
