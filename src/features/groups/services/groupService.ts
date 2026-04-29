@@ -216,6 +216,27 @@ export const useUpdateGroup = () =>
     }
   });
 
+// ─── Add Lists to Group ───────────────────────────────────────────────────────
+
+interface AddListsToGroupReq {
+  payload: {
+    group_id: string;
+    list_ids: string[];
+  };
+}
+
+interface AddListsToGroupRes {
+  message: string;
+}
+
+export const useAddListsToGroup = () =>
+  useMutation({
+    mutationFn: async ({ payload }: AddListsToGroupReq) => {
+      const res = await axiosInstance.post("/groups/add-lists", payload);
+      return res.data as AddListsToGroupRes;
+    }
+  });
+
 // ─── Delete Group ─────────────────────────────────────────────────────────────
 
 interface DeleteGroupReq {

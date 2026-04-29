@@ -17,6 +17,7 @@ import GroupsTable, {
 import { groupKeys } from "@/features/groups/query-keys";
 import {
   useActivateGroup,
+  useAddListsToGroup,
   useAddUsersToGroup,
   useDeleteGroup,
   useGetGroupInfo,
@@ -31,10 +32,7 @@ import {
   GroupStatus,
   GroupUser
 } from "@/features/groups/types/groupTypes";
-import {
-  useAssignList,
-  useUnassignList
-} from "@/features/list/services/listService";
+import { useUnassignList } from "@/features/list/services/listService";
 import { handleMutationError } from "@/utils/handleMutationError";
 import { transformInfiniteData } from "@/utils/infiniteQueryUtils";
 import { parseAsString, useQueryState } from "nuqs";
@@ -114,18 +112,17 @@ const GroupsView = () => {
     useUpdateGroupStatus();
   const { mutate: activateGroup, isPending: isActivating } = useActivateGroup();
   const { mutate: unassignList } = useUnassignList();
-  const { mutate: assignList, isPending: isAssigningList } = useAssignList();
+  const { mutate: addListsToGroup, isPending: addingListToGroup } =
+    useAddListsToGroup();
   const { mutate: deleteGroup, isPending: isDeleting } = useDeleteGroup();
 
   const handleAssignLists = (listIds: string[]) => {
     if (!selectedGroupId || !listIds.length) return;
-    assignList(
+    addListsToGroup(
       {
         payload: {
-          list_id: listIds[0],
-          assign_type: "group",
-          group_ids: [selectedGroupId],
-          user_ids: []
+          group_id: selectedGroupId,
+          list_ids: listIds
         }
       },
       {
@@ -350,7 +347,7 @@ const GroupsView = () => {
         fieldLabel="Lists"
         triggerLabel="Select Lists"
         searchPlaceholder="Search..."
-        submitLabel={isAssigningList ? "Assigning..." : "Assign Lists"}
+        submitLabel={addingListToGroup ? "Assigning..." : "Assign Lists"}
         emptyTitle="No available lists found"
         emptyDescription="All available lists are already assigned to this group."
         emptyKind="lists"
