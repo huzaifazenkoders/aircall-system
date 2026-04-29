@@ -21,7 +21,7 @@ const CallHistoryView = () => {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(10);
   const [searchValue, setSearchValue] = React.useState("");
-  const [debouncedSearch] = useDebounce(searchValue, 400);
+  const [debouncedSearch] = useDebounce(searchValue.trim(), 400);
   const [statusValue, setStatusValue] = React.useState("");
   const [selectedDate, setSelectedDate] = React.useState<string | undefined>();
   const [selectedId, setSelectedId] = React.useState("");

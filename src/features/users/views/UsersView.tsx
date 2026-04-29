@@ -19,7 +19,7 @@ import { useDebounce } from "use-debounce";
 
 const UsersView = () => {
   const [searchValue, setSearchValue] = React.useState("");
-  const [searchValueD] = useDebounce(searchValue, 500);
+  const [searchValueD] = useDebounce(searchValue.trim(), 500);
   const [statusFilter, setStatusFilter] = React.useState<
     "All Status" | "active" | "suspend" | "invited"
   >("All Status");

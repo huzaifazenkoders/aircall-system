@@ -61,7 +61,7 @@ const AssignGroupsToListDialog = ({
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetGroups({
     limit: 20,
-    search: searchValue || undefined,
+    search: searchValue.trim() || undefined,
     is_active: true
   });
 

@@ -70,7 +70,7 @@ const AssignListsToUserDialog = ({
     fetchNextPage
   } = useGetLists({
     limit: 20,
-    search: searchValue || undefined,
+    search: searchValue.trim() || undefined,
     status: "active",
     list_type: "shared"
   });

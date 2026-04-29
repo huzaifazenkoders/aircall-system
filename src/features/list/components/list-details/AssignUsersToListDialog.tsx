@@ -61,7 +61,7 @@ const AssignUsersToListDialog = ({
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetUsers({
     limit: 20,
-    search: searchValue || undefined,
+    search: searchValue.trim() || undefined,
     status: "active",
     role: "sales_person"
   });

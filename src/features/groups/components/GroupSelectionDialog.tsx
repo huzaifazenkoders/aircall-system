@@ -105,7 +105,7 @@ const GroupSelectionDialog = ({
     fetchNextPage: usersFetchNextPage,
   } = useGetUsers({
     limit: 20,
-    search: usesUserQuery ? query || undefined : undefined,
+    search: usesUserQuery ? query?.trim() || undefined : undefined,
     role: "sales_person",
     status: "active",
   });
@@ -118,7 +118,7 @@ const GroupSelectionDialog = ({
   } = useGetLists({
     limit: 20,
     list_type: "shared",
-    search: usesListQuery ? query || undefined : undefined,
+    search: usesListQuery ? query?.trim() || undefined : undefined,
     status: "active",
   });
 

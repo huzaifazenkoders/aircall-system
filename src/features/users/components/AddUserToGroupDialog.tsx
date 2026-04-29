@@ -62,7 +62,7 @@ const AddUserToGroupDialog = ({
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetGroups({
     limit: 20,
-    search: searchValue || undefined
+    search: searchValue.trim() || undefined
   });
 
   const { mutate: addGroupsToUser, isPending: isAddingGroups } =

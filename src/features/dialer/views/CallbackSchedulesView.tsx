@@ -28,7 +28,7 @@ const CallbackSchedulesView = () => {
   const [searchValue, setSearchValue] = React.useState("");
   const [startDate, setStartDate] = React.useState("");
   const [endDate, setEndDate] = React.useState("");
-  const [debouncedSearch] = useDebounce(searchValue, 400);
+  const [debouncedSearch] = useDebounce(searchValue.trim(), 400);
   const [selectedActivityId, setSelectedActivityId] = React.useState("");
   const [dialogOpen, setDialogOpen] = React.useState(false);
 

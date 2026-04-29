@@ -60,7 +60,7 @@ const ListTable = ({
 
   const sharedQuery = useGetLists({
     limit,
-    search: query || undefined,
+    search: query?.trim() || undefined,
     list_type: "shared",
     startDate: startDateStr,
     endDate: endDateStr
@@ -68,7 +68,7 @@ const ListTable = ({
 
   const idvQuery = useGetLists({
     limit,
-    search: query || undefined,
+    search: query?.trim() || undefined,
     list_type: "individual",
     startDate: startDateStr,
     endDate: endDateStr

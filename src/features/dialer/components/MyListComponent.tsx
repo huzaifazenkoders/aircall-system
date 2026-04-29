@@ -75,7 +75,7 @@ const MyListComponent = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useGetMyLists({ limit: LIMIT, search: listSearch });
+  } = useGetMyLists({ limit: LIMIT, search: listSearch.trim() });
 
   const myLists = transformInfiniteData(myListsData, "data");
 
@@ -101,7 +101,7 @@ const MyListComponent = () => {
     page: leadsPage,
     limit: leadsLimit,
     list_id: selectedList?.id ?? "",
-    search: leadSearch,
+    search: leadSearch.trim() || undefined,
     status:
       statusFilter !== "All Status"
         ? (statusFilter.toLowerCase() as never)
@@ -120,7 +120,7 @@ const MyListComponent = () => {
 
   const invalidateMyLists = () =>
     queryClient.invalidateQueries({
-      queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch })
+      queryKey: listKeys.myLists({ limit: LIMIT, search: listSearch.trim() })
     });
 
   const handleToggleList = (list: MyList) => {

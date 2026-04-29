@@ -46,7 +46,7 @@ const GroupsView = () => {
   const [createOpen, setCreateOpen] = React.useState(false);
   const [createdName, setCreatedName] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
-  const [searchValueDebounced] = useDebounce(searchValue, 500);
+  const [searchValueDebounced] = useDebounce(searchValue.trim(), 500);
   const [statusFilter, setStatusFilter] = React.useState<
     "All Status" | GroupStatus
   >("All Status");

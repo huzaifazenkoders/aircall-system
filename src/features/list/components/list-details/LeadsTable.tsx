@@ -81,7 +81,7 @@ const LeadsTable = ({
     page,
     limit,
     list_id: listId,
-    search: query || undefined,
+    search: query?.trim() || undefined,
     status:
       statusFilter === "all" ? undefined : (statusFilter as LeadActivityStatus),
     startDate: startDate || undefined,

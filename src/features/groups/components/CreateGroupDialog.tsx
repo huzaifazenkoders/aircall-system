@@ -79,7 +79,7 @@ const CreateGroupDialog = ({
     fetchNextPage,
   } = useGetUsers({
     limit: 20,
-    search: query || undefined,
+    search: query?.trim() || undefined,
     role: "sales_person",
     status: "active",
   });

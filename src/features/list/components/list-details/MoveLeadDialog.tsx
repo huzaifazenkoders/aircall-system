@@ -56,7 +56,7 @@ const MoveLeadDialog = ({
 
   const { data, isPending, hasNextPage, fetchNextPage } = useGetLists({
     limit: 20,
-    search: searchValue || undefined,
+    search: searchValue.trim() || undefined,
     list_type: "shared"
   });
 
