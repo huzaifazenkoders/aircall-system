@@ -6,7 +6,7 @@ import {
   ListChecksIcon,
   Loader2Icon,
   SearchIcon,
-  UsersRoundIcon
+  UsersRoundIcon,
 } from "lucide-react";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -21,12 +21,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import TextInput from "@/components/ui/text-input";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
@@ -44,7 +44,7 @@ const avatarPalettes = [
   { bg: "#DAF4F6", fg: "#147B8A" },
   { bg: "#E0EAFF", fg: "#1D4ED8" },
   { bg: "#FDEAD7", fg: "#B54708" },
-  { bg: "#FCE7F3", fg: "#BE185D" }
+  { bg: "#FCE7F3", fg: "#BE185D" },
 ];
 
 const getInitials = (label: string) =>
@@ -69,7 +69,7 @@ const GroupSelectionDialog = ({
   emptyKind,
   items = [],
   initialSelectedIds,
-  onSubmit
+  onSubmit,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -89,15 +89,11 @@ const GroupSelectionDialog = ({
   const [query, setQuery] = React.useState("");
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<string[]>(
-    initialSelectedIds ?? []
+    initialSelectedIds ?? [],
   );
   const initialSelectedKey = React.useMemo(
     () => (initialSelectedIds ?? []).slice().sort().join(","),
-    [initialSelectedIds]
-  );
-  const lockedIds = React.useMemo(
-    () => new Set(initialSelectedIds ?? []),
-    [initialSelectedIds]
+    [initialSelectedIds],
   );
   const usesUserQuery = emptyKind === "members";
   const usesListQuery = emptyKind === "lists";
@@ -106,22 +102,24 @@ const GroupSelectionDialog = ({
     data: usersData,
     isPending: isUsersPending,
     hasNextPage: usersHasNextPage,
-    fetchNextPage: usersFetchNextPage
+    fetchNextPage: usersFetchNextPage,
   } = useGetUsers({
     limit: 20,
     search: usesUserQuery ? query || undefined : undefined,
-    role: "sales_person"
+    role: "sales_person",
+    status: "active",
   });
 
   const {
     data: listsData,
     isPending: isListsPending,
     hasNextPage: listsHasNextPage,
-    fetchNextPage: listsFetchNextPage
+    fetchNextPage: listsFetchNextPage,
   } = useGetLists({
     limit: 20,
     list_type: "shared",
-    search: usesListQuery ? query || undefined : undefined
+    search: usesListQuery ? query || undefined : undefined,
+    status: "active",
   });
 
   const fetchNextPage = usesUserQuery ? usersFetchNextPage : listsFetchNextPage;
@@ -145,7 +143,7 @@ const GroupSelectionDialog = ({
       return users.map((user) => ({
         id: user.id,
         title: `${user.first_name} ${user.last_name}`,
-        subtitle: user.email
+        subtitle: user.email,
       }));
     }
 
@@ -154,7 +152,7 @@ const GroupSelectionDialog = ({
       return lists.map((list) => ({
         id: list.id,
         title: list.name,
-        subtitle: `Priority ${list.priority}`
+        subtitle: `Priority ${list.priority}`,
       }));
     }
 
@@ -167,27 +165,18 @@ const GroupSelectionDialog = ({
     });
   }, [items, listsData, query, usersData, usesListQuery, usesUserQuery]);
 
-  const toggleItem = React.useCallback(
-    (itemId: string, checked: boolean) => {
-      if (lockedIds.has(itemId)) return;
-
-      setSelectedIds((current) => {
-        if (checked) {
-          return current.includes(itemId) ? current : [...current, itemId];
-        }
-
-        return current.filter((value) => value !== itemId);
-      });
-    },
-    [lockedIds]
-  );
+  const toggleItem = React.useCallback((itemId: string, checked: boolean) => {
+    setSelectedIds((current) => {
+      if (checked) {
+        return current.includes(itemId) ? current : [...current, itemId];
+      }
+      return current.filter((value) => value !== itemId);
+    });
+  }, []);
 
   const resolvedTriggerLabel =
     selectedIds.length > 0 ? `${selectedIds.length} selected` : triggerLabel;
-  const newSelectedIds = React.useMemo(
-    () => selectedIds.filter((id) => !lockedIds.has(id)),
-    [lockedIds, selectedIds]
-  );
+  const newSelectedIds = selectedIds;
   const shouldShowUsersLoading =
     (usesUserQuery && isUsersPending) || (usesListQuery && isListsPending);
 
@@ -274,19 +263,16 @@ const GroupSelectionDialog = ({
                       >
                         {resolvedItems.map((item, index) => {
                           const checked = selectedIds.includes(item.id);
-                          const isLocked = lockedIds.has(item.id);
                           const palette =
                             avatarPalettes[index % avatarPalettes.length];
 
                           return (
                             <label
                               key={item.id}
-                              className={`${groupsStyles.selectionRow} ${isLocked ? "cursor-not-allowed opacity-70" : ""}`}
-                              title={isLocked ? "Already a member" : undefined}
+                              className={groupsStyles.selectionRow}
                             >
                               <Checkbox
                                 checked={checked}
-                                disabled={isLocked}
                                 onCheckedChange={(value) =>
                                   toggleItem(item.id, Boolean(value))
                                 }
@@ -297,7 +283,7 @@ const GroupSelectionDialog = ({
                                   className={groupsStyles.avatar}
                                   style={{
                                     backgroundColor: palette.bg,
-                                    color: palette.fg
+                                    color: palette.fg,
                                   }}
                                 >
                                   {getInitials(item.title)}
@@ -349,7 +335,6 @@ const GroupSelectionDialog = ({
             disabled={!newSelectedIds.length}
             onClick={() => {
               onSubmit(newSelectedIds);
-              onOpenChange(false);
             }}
           >
             {submitLabel}

@@ -7,7 +7,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   Loader2Icon,
-  SearchIcon
+  SearchIcon,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Dialog,
@@ -28,7 +28,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogIconClose,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { groupsStyles } from "@/features/groups/styles/groupsStyles";
 import TextInput from "@/components/ui/text-input";
@@ -42,14 +42,14 @@ import { handleMutationError } from "@/utils/handleMutationError";
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Group name is required"),
   description: Yup.string().trim().required("Description is required"),
-  user_ids: Yup.array().of(Yup.string())
+  user_ids: Yup.array().of(Yup.string()),
 });
 
 const avatarPalettes = [
   { bg: "#DAF4F6", fg: "#147B8A" },
   { bg: "#E0EAFF", fg: "#1D4ED8" },
   { bg: "#FDEAD7", fg: "#B54708" },
-  { bg: "#FCE7F3", fg: "#BE185D" }
+  { bg: "#FCE7F3", fg: "#BE185D" },
 ];
 
 const getInitials = (label: string) =>
@@ -62,7 +62,7 @@ const getInitials = (label: string) =>
 
 const CreateGroupDialog = ({
   open,
-  onOpenChange
+  onOpenChange,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -76,11 +76,12 @@ const CreateGroupDialog = ({
     data,
     isPending: isUsersPending,
     hasNextPage,
-    fetchNextPage
+    fetchNextPage,
   } = useGetUsers({
     limit: 20,
     search: query || undefined,
-    role: "sales_person"
+    role: "sales_person",
+    status: "active",
   });
 
   const members = React.useMemo(() => {
@@ -88,7 +89,7 @@ const CreateGroupDialog = ({
     return users.map((user) => ({
       id: user.id,
       name: `${user.first_name} ${user.last_name}`,
-      subtitle: user.email
+      subtitle: user.email,
     }));
   }, [data]);
 
@@ -102,8 +103,8 @@ const CreateGroupDialog = ({
             name: values.name.trim(),
             description: values.description.trim(),
             is_active: true,
-            user_ids: values.user_ids
-          }
+            user_ids: values.user_ids,
+          },
         },
         {
           onSuccess: (res) => {
@@ -111,10 +112,10 @@ const CreateGroupDialog = ({
             void queryClient.invalidateQueries({ queryKey: groupKeys.all });
             onOpenChange(false);
           },
-          onError: handleMutationError
-        }
+          onError: handleMutationError,
+        },
       );
-    }
+    },
   });
 
   React.useEffect(() => {
@@ -135,7 +136,7 @@ const CreateGroupDialog = ({
 
       void formik.setFieldValue("user_ids", next);
     },
-    [formik]
+    [formik],
   );
 
   const triggerLabel =
@@ -247,7 +248,7 @@ const CreateGroupDialog = ({
                         >
                           {members.map((member, index) => {
                             const checked = formik.values.user_ids.includes(
-                              member.id
+                              member.id,
                             );
                             const palette =
                               avatarPalettes[index % avatarPalettes.length];
@@ -268,7 +269,7 @@ const CreateGroupDialog = ({
                                   className={groupsStyles.avatar}
                                   style={{
                                     backgroundColor: palette.bg,
-                                    color: palette.fg
+                                    color: palette.fg,
                                   }}
                                 >
                                   {getInitials(member.name)}
