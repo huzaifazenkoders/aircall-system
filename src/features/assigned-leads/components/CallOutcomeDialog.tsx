@@ -133,6 +133,14 @@ const CallOutcomeDialog = ({
                 )}
               </SelectContent>
             </Select>
+            {disposition && (
+              <p className="text-xs text-muted-foreground mt-1 capitalize">
+                Resulting lead status:
+                {dispositions
+                  .find((_) => _.id === disposition)
+                  ?.resulting_lead_status?.replaceAll("_", " ")}
+              </p>
+            )}
             {isCallback && (
               <p className="text-xs text-muted-foreground mt-1">
                 You will schedule the next call time.
