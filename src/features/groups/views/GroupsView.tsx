@@ -286,7 +286,7 @@ const GroupsView = () => {
             setAddMembersOpen(true);
             setSelectedGroupId(grpId);
           }}
-          isPending={isPending}
+          isPending={isPending || searchValue.trim() !== searchValueDebounced}
           date={date}
           setDate={setDate}
           total={groupsTotal}
